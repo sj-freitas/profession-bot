@@ -1,4 +1,7 @@
 {
   "extends": "../tsconfig.base.json",
-  "exclude": ["deployment/**/*", "node_modules", "./dist/**/*"]
+  "exclude": ["deployment/**/*", "node_modules", "./dist/**/*"],
+  "compilerOptions": {
+    "outDir": "dist",
+  }
 }
