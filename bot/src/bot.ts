@@ -14,6 +14,7 @@ import { getGuildInfo } from "./exports/wowHeadIntegration";
 import { readProfessionData } from "./sheets/reader";
 import { createSheetClient } from "./sheets/config";
 import { Database, loadDatabase } from "./exports/mem-database";
+import { exposePort } from "./create-server";
 
 const commands = [
   new SlashCommandBuilder()
@@ -39,6 +40,8 @@ async function setupClient(database: Database): Promise<void> {
   client.on(Events.InteractionCreate, handler);
 
   await client.login(CONFIG.DISCORD.BOT_TOKEN);
+
+  exposePort(3000);
 }
 
 async function bootstrapServer(): Promise<void> {
