@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import { CONFIG } from "./config";
 import { toMarkdown } from "./exports/markdown";
 import { getGuildInfo } from "./exports/wowHeadIntegration";
 import { createSheetClient } from "./sheets/config";
@@ -9,7 +10,7 @@ async function main() {
   const sheetClient = createSheetClient();
   const data = await readProfessionData(
     sheetClient,
-    "1asjzhO1UyBiQyQ_qIv_EAaGponvCbqXU0rKrEKnOwLA",
+    CONFIG.GUILD.PROFESSION_SHEET,
   );
 
   const parsed = await getGuildInfo(data);

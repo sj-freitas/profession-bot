@@ -6,6 +6,7 @@
   "private": true,
   "scripts": {
     "dev": "dotenv -e .env 'tsx' src/index.ts",
+    "bot:dev": "dotenv -e .env 'tsx' src/bot.ts",
     "lint:fix": "prettier --write src/ && eslint --fix --ext .ts src/"
   },
   "dependencies": {

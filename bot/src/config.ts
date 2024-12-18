@@ -1,6 +1,10 @@
 import { z } from "zod";
 
 const ApplicationConfigurationZod = z.object({
+  GUILD: z.object({
+    NAME: z.string().optional(),
+    PROFESSION_SHEET: z.string().nonempty(),
+  }),
   WOW_HEAD: z.object({
     HOST_NAME: z.string().url(),
   }),
@@ -10,6 +14,8 @@ const ApplicationConfigurationZod = z.object({
   }),
   DISCORD: z.object({
     PUBLIC_KEY: z.string().nonempty(),
+    BOT_TOKEN: z.string().nonempty(),
+    APPLICATION_ID: z.string().nonempty(),
   }),
 });
 
@@ -18,6 +24,9 @@ export type ApplicationConfiguration = z.infer<
 >;
 
 export const rawConfig: ApplicationConfiguration = {
+  GUILD: {
+    PROFESSION_SHEET: process.env.GUILD_PROFESSION_SHEET as string,
+  },
   WOW_HEAD: {
     HOST_NAME: "https://www.wowhead.com",
   },
@@ -27,6 +36,8 @@ export const rawConfig: ApplicationConfiguration = {
   },
   DISCORD: {
     PUBLIC_KEY: process.env.DISCORD_PUBLIC_KEY as string,
+    BOT_TOKEN: process.env.DISCORD_BOT_TOKEN as string,
+    APPLICATION_ID: process.env.DISCORD_APPLICATION_ID as string,
   },
 };
 
