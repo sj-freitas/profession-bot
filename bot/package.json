@@ -1,0 +1,43 @@
+{
+  "name": "profession-bot",
+  "version": "1.0.0",
+  "description": "Handles a google sheet as a database, checks the items with wowhead as source of truth and generates a nice wiki document for discord.",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "dev": "dotenv -e .env 'tsx' src/index.ts",
+    "lint:fix": "prettier --write src/ && eslint --fix --ext .ts src/"
+  },
+  "dependencies": {
+    "discord.js": "^14.16.3",
+    "dotenv": "^16.4.7",
+    "dotenv-cli": "^7.3.0",
+    "googleapis": "^144.0.0",
+    "node-fetch": "^2.6.8",
+    "zod": "^3.22.3"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.13",
+    "@types/node": "^22.7.6",
+    "@types/node-fetch": "^2.6.2",
+    "@types/node-jose": "^1.1.8",
+    "@types/validator": "^13.6.6",
+    "@typescript-eslint/eslint-plugin": "^8.8.0",
+    "@typescript-eslint/parser": "^8.8.0",
+    "eslint": "^8.57.1",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-jest": "^28.8.3",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^7.1.0",
+    "jest": "^29.6.4",
+    "jest-mock-extended": "^3.0.7",
+    "nodemon": "^2.0.15",
+    "prettier": "^3.3.3",
+    "ts-jest": "^29.2.5",
+    "tsx": "^4.19.1",
+    "typescript": "~5.5.4",
+    "utility-types": "^3.10.0"
+  }
+}

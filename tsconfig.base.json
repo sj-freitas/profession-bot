@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "ESNext",
+    "strict": true,
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "outDir": "dist",
+    "incremental": true,                              /* Enable incremental compilation */
+    "composite": true,                                /* Enable constraints that allow a TypeScript project to be used with project references. */
+    "declaration": true,
+    "declarationMap": true,
+    "rootDir": "."
+  }
+}
