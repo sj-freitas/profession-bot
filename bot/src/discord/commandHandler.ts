@@ -88,5 +88,5 @@ export const handleCrafter: CommandHandler<Database> = async (
   const { recipe: name, url } = results[0];
   const crafters = results.map((t) => t.crafter);
 
-  await reply(`[${name}](${url}) can be crafter by: ${crafters.join(", ")}`);
+  await reply(`[${name}](${url}) can be crafted by: ${crafters.join(", ")}`);
 };
