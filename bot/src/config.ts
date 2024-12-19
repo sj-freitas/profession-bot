@@ -17,6 +17,9 @@ const ApplicationConfigurationZod = z.object({
     BOT_TOKEN: z.string().nonempty(),
     APPLICATION_ID: z.string().nonempty(),
   }),
+  RENDER: z.object({
+    EXPOSED_PORT: z.string(),
+  }),
 });
 
 export type ApplicationConfiguration = z.infer<
@@ -39,6 +42,9 @@ export const rawConfig: ApplicationConfiguration = {
     BOT_TOKEN: process.env.DISCORD_BOT_TOKEN as string,
     APPLICATION_ID: process.env.DISCORD_APPLICATION_ID as string,
   },
+  RENDER: {
+    EXPOSED_PORT: process.env.PORT as string,
+  }
 };
 
 // This should throw errors on bootstrap.

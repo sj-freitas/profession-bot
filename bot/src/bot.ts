@@ -36,7 +36,7 @@ async function refreshDatabase(database: Database): Promise<void> {
   const parsed = await getGuildInfo(data);
 
   database.setAllRecipes(toFlattenData(parsed));
-  
+
   console.log("Database refresh complete.");
 }
 
@@ -66,7 +66,7 @@ async function setupClient(database: Database): Promise<void> {
 
   await client.login(CONFIG.DISCORD.BOT_TOKEN);
 
-  exposePort(3000);
+  exposePort(CONFIG.RENDER.EXPOSED_PORT);
 }
 
 async function bootstrapServer(): Promise<void> {
