@@ -6,8 +6,8 @@
   "private": true,
   "scripts": {
     "build": "tsc --build", 
-    "dev": "dotenv -e .env 'tsx' src/index.ts",
     "bot:start": "dotenv -e .env node dist/bot/src/bot.js",
+    "export:md": "dotenv -e .env 'tsx' src/index.ts",
     "bot:dev": "dotenv -e .env 'tsx' src/bot.ts",
     "lint:fix": "prettier --write src/ && eslint --fix --ext .ts src/"
   },

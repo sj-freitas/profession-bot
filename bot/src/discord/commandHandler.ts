@@ -3,7 +3,7 @@ import {
   Interaction,
   InteractionResponse,
 } from "discord.js";
-import { Database, searchDatabase } from "../exports/mem-database";
+import { Database } from "../exports/mem-database";
 import { queryWowHead } from "../wowhead/client";
 import { removeNonSpells, removeQAResults } from "../wowhead/helpers";
 
@@ -68,7 +68,7 @@ export const handleCrafter: CommandHandler<Database> = async (
   const wowHeadResults = await queryWowHead(recipe);
   const wowHeadFiltered = removeNonSpells(removeQAResults(wowHeadResults))
     .results[0];
-  const results = searchDatabase(database, wowHeadFiltered.name);
+  const results = database.queryRecipes(wowHeadFiltered.name);
 
   if (results.length === 0) {
     await reply(
