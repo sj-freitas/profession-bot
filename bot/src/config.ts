@@ -43,7 +43,7 @@ export const rawConfig: ApplicationConfiguration = {
     APPLICATION_ID: process.env.DISCORD_APPLICATION_ID as string,
   },
   RENDER: {
-    EXPOSED_PORT: process.env.PORT as string,
+    EXPOSED_PORT: process.env.PORT as string ?? "4000",
   }
 };
 

@@ -74,7 +74,7 @@ async function bootstrapServer(): Promise<void> {
 
   // Loop this function
   const database = new Database();
-  await loop(async () => refreshDatabase(database), FIFTEEN_MINUTES);
+  void loop(async () => refreshDatabase(database), FIFTEEN_MINUTES);
   await setupClient(database);
 
   try {

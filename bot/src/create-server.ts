@@ -3,7 +3,7 @@ import { createServer } from "http";
 
 export function exposePort(port: string) {
   const server = createServer((_, res) => {
-    res.writeHead(204); // 204 No Content
+    res.write("Hello World!");
     res.end();
   });
 
