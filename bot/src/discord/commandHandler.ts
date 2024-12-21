@@ -146,7 +146,7 @@ export const handleCrafter: CommandHandler<Database> = async (
 
   const mapped = [...groupedRecipes.values()].map(
     ({ name, url, crafters }) =>
-      `[${name}](${url}) crafters: ${crafters.map((t) => `${t.characterName} (${t.discordHandle} )`).join(", ")}`,
+      `[${name}](${url}) crafters: ${crafters.map((t) => `${t.characterName} (<${t.discordHandle}>)`).join(", ")}`,
   );
 
   await reply(mapped.join("\n"));
