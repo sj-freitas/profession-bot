@@ -15,7 +15,7 @@ export async function getPlayers(
     sheetClient,
     sheetId,
     "DiscordMapping",
-    "A:B",
+    "A:C",
   );
 
   if (!rows) {
