@@ -110,7 +110,7 @@ export const handleCrafter: CommandHandler<Database> = async (
   const uniqueRecipes = new Map(results.map((t) => [t.wowHeadId, t]));
   if (uniqueRecipes.size > MAX_ALLOWED_SEARCH_RESULTS) {
     await reply(
-      `Found more than ${MAX_ALLOWED_SEARCH_RESULTS} matching recipes:\n${[...uniqueRecipes.values()].join("\n")}\nYou can search for a specific one by copying it from above.`,
+      `Found more than ${MAX_ALLOWED_SEARCH_RESULTS} matching recipes:\n${[...uniqueRecipes.values()].map((t) => t.recipe).join("\n")}\nYou can search for a specific one by copying it from above.`,
     );
     return;
   }
