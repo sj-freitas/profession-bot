@@ -3,7 +3,7 @@ import { z } from "zod";
 const ApplicationConfigurationZod = z.object({
   GUILD: z.object({
     NAME: z.string().optional(),
-    PROFESSION_SHEET: z.string().nonempty(),
+    INFO_SHEET: z.string().nonempty(),
   }),
   WOW_HEAD: z.object({
     HOST_NAME: z.string().url(),
@@ -17,9 +17,6 @@ const ApplicationConfigurationZod = z.object({
     BOT_TOKEN: z.string().nonempty(),
     APPLICATION_ID: z.string().nonempty(),
   }),
-  RENDER: z.object({
-    EXPOSED_PORT: z.string(),
-  }),
 });
 
 export type ApplicationConfiguration = z.infer<
@@ -28,7 +25,7 @@ export type ApplicationConfiguration = z.infer<
 
 export const rawConfig: ApplicationConfiguration = {
   GUILD: {
-    PROFESSION_SHEET: process.env.GUILD_PROFESSION_SHEET as string,
+    INFO_SHEET: process.env.GUILD_INFO_SHEET as string,
   },
   WOW_HEAD: {
     HOST_NAME: "https://www.wowhead.com",
@@ -42,9 +39,6 @@ export const rawConfig: ApplicationConfiguration = {
     BOT_TOKEN: process.env.DISCORD_BOT_TOKEN as string,
     APPLICATION_ID: process.env.DISCORD_APPLICATION_ID as string,
   },
-  RENDER: {
-    EXPOSED_PORT: process.env.PORT as string ?? "4000",
-  }
 };
 
 // This should throw errors on bootstrap.

@@ -1,3 +1,5 @@
+import { WorldBuffAssignments, WorldBuffHistory } from "../sheets/get-buffers";
+import { Player } from "../sheets/get-players";
 import { AvailableProfession, GuildProfessionData } from "./types";
 
 interface RecipeInfo {
@@ -19,6 +21,12 @@ function canContain(lowerCasedSearchTerm: string, object: any): boolean {
 export class Database {
   private allRecipes: RecipeInfo[] = [];
 
+  private worldBuffAssignments: WorldBuffAssignments[] = [];
+
+  private worldBuffHistory: WorldBuffHistory[] = [];
+
+  private playerRoster: Player[] = [];
+
   queryRecipes(searchTerm: string): RecipeInfo[] {
     // Can do with some magic here to make some words more similar to others and resolve
     // typos
@@ -29,6 +37,30 @@ export class Database {
 
   setAllRecipes(recipes: RecipeInfo[]) {
     this.allRecipes = recipes;
+  }
+
+  getWorldBuffHistory(): WorldBuffHistory[] {
+    return this.worldBuffHistory;
+  }
+
+  setWorldBuffHistory(worldBuffHistory: WorldBuffHistory[]) {
+    this.worldBuffHistory = worldBuffHistory;
+  }
+
+  getWorldBuffAssignments(): WorldBuffAssignments[] {
+    return this.worldBuffAssignments;
+  }
+
+  setWorldBuffAssignments(worldBuffAssignments: WorldBuffAssignments[]) {
+    this.worldBuffAssignments = worldBuffAssignments;
+  }
+
+  getPlayersRoster(): Player[] {
+    return this.playerRoster;
+  }
+
+  setPlayersRoster(players: Player[]) {
+    this.playerRoster = players;
   }
 }
 

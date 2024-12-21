@@ -1,19 +1,6 @@
 import { AvailableProfession, PlayerProfessionsData } from "../exports/types";
 import { SheetClient } from "./config";
-
-export async function readGoogleSheet(
-  googleSheetClient: SheetClient,
-  sheetId: string,
-  tabName: string,
-  range: string,
-) {
-  const res = await googleSheetClient.spreadsheets.values.get({
-    spreadsheetId: sheetId,
-    range: `${tabName}!${range}`,
-  });
-
-  return res.data.values;
-}
+import { readGoogleSheet } from "./utils";
 
 function parseProf(
   title: string | undefined,

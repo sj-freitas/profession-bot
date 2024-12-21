@@ -9,12 +9,17 @@ import {
   SlashCommandBuilder,
 } from "discord.js";
 import { CONFIG } from "./config";
-import { createCommandHandler, handleCrafter } from "./discord/commandHandler";
+import {
+  createCommandHandler,
+  handleCrafter,
+  worldBuffsHandler,
+} from "./discord/commandHandler";
 import { getGuildInfo } from "./exports/wowHeadIntegration";
-import { readProfessionData } from "./sheets/reader";
+import { readProfessionData } from "./sheets/parse-prof";
 import { createSheetClient } from "./sheets/config";
 import { Database, toFlattenData } from "./exports/mem-database";
-import { exposePort } from "./create-server";
+import { getPlayers } from "./sheets/get-players";
+import { getAllBuffHistory, getWorldBuffInfo } from "./sheets/get-buffers";
 
 const FIFTEEN_MINUTES = 15 * 60 * 1000;
 
@@ -25,17 +30,41 @@ const commands = [
     .addStringOption((option) =>
       option.setName("recipe").setDescription("The recipe to search for"),
     ),
+  new SlashCommandBuilder()
+    .setName("world-buffs")
+    .setDescription(
+      "Creates a list possible for assignees for world buffs based on who buffed least times",
+    )
+    .addStringOption((option) =>
+      option
+        .setName("roster")
+        .setDescription(
+          "The discord handles for all raid participants, should be copied from the Raid-Helper announcement",
+        ),
+    ),
 ];
 
 async function refreshDatabase(database: Database): Promise<void> {
+  console.log("Database refresh started.");
+
   const sheetClient = createSheetClient();
-  const data = await readProfessionData(
-    sheetClient,
-    "1asjzhO1UyBiQyQ_qIv_EAaGponvCbqXU0rKrEKnOwLA",
-  );
+  const data = await readProfessionData(sheetClient, CONFIG.GUILD.INFO_SHEET);
   const parsed = await getGuildInfo(data);
+  const roster = await getPlayers(sheetClient, CONFIG.GUILD.INFO_SHEET);
+  const worldBuffAssignments = await getWorldBuffInfo(
+    sheetClient,
+    CONFIG.GUILD.INFO_SHEET,
+  );
+  const worldBuffHistory = await getAllBuffHistory(
+    sheetClient,
+    CONFIG.GUILD.INFO_SHEET,
+    worldBuffAssignments,
+  );
 
   database.setAllRecipes(toFlattenData(parsed));
+  database.setPlayersRoster(roster);
+  database.setWorldBuffAssignments(worldBuffAssignments);
+  database.setWorldBuffHistory(worldBuffHistory);
 
   console.log("Database refresh complete.");
 }
@@ -57,6 +86,10 @@ async function setupClient(database: Database): Promise<void> {
       id: "crafter",
       handler: handleCrafter,
     },
+    {
+      id: "world-buffs",
+      handler: worldBuffsHandler,
+    },
   ]);
 
   client.on(Events.ClientReady, (readyClient) => {
@@ -65,8 +98,6 @@ async function setupClient(database: Database): Promise<void> {
   client.on(Events.InteractionCreate, handler);
 
   await client.login(CONFIG.DISCORD.BOT_TOKEN);
-
-  exposePort(CONFIG.RENDER.EXPOSED_PORT);
 }
 
 async function bootstrapServer(): Promise<void> {

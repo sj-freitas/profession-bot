@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import {
   CommandInteractionOptionResolver,
   Interaction,
@@ -6,6 +7,13 @@ import {
 import { Database } from "../exports/mem-database";
 import { queryWowHead } from "../wowhead/client";
 import { removeNonSpells, removeQAResults } from "../wowhead/helpers";
+import {
+  mapRawAssignmentConfig,
+  mapRawHistory,
+} from "../buff-management/utils";
+import { findNextAssignment } from "../buff-management/find-next-assignment";
+import { Player } from "../sheets/get-players";
+import { formatGroupAssignmentsToMarkdown } from "../exports/world-buffs/format-group-assigments-md";
 
 type CommandOptions = Omit<
   CommandInteractionOptionResolver,
@@ -89,4 +97,74 @@ export const handleCrafter: CommandHandler<Database> = async (
   const crafters = results.map((t) => t.crafter);
 
   await reply(`[${name}](${url}) can be crafted by: ${crafters.join(", ")}`);
+};
+
+const NUMBER_OF_GROUPS = 2;
+
+export const worldBuffsHandler: CommandHandler<Database> = async (
+  options: CommandOptions,
+  reply: StringReply,
+  // database: Database,
+): Promise<void> => {
+  const roster = options.getString("roster");
+
+  if (roster === null) {
+    await reply("Failed to provide a valid roster.");
+    return;
+  }
+
+  const parsedRoster = roster
+    .split(" ")
+    .map((t) => t.trim())
+    .filter((t) => Boolean(t));
+
+  console.log(parsedRoster);
+  await reply("all good!");
+
+  // const players = database.getPlayersRoster();
+  // const rawHistory = database.getWorldBuffHistory();
+  // const rawAssignmentConfig = database.getWorldBuffAssignments();
+
+  // const playerMap = new Map(
+  //   players.map((t) => [
+  //     t.discordHandle,
+  //     {
+  //       discordHandle: t.discordHandle,
+  //       characters: t.characters,
+  //     },
+  //   ]),
+  // );
+  // const mappedRoster = parsedRoster
+  //   .map((t) => {
+  //     const mapped = playerMap.get(t);
+  //     if (!mapped) {
+  //       console.warn(`Unexpected unknown user ${t}!`);
+  //     }
+  //     return mapped;
+  //   })
+  //   .filter((t): t is Player => Boolean(t));
+  // const history = mapRawHistory(rawHistory, playerMap);
+  // const assignmentConfig = mapRawAssignmentConfig(
+  //   rawAssignmentConfig,
+  //   playerMap,
+  // );
+
+  // const assignment = findNextAssignment({
+  //   history,
+  //   assignmentConfig,
+  //   roster: mappedRoster,
+  //   numberOfGroups: NUMBER_OF_GROUPS,
+  // });
+
+  // const formatted = formatGroupAssignmentsToMarkdown(
+  //       assignment,
+  //       new Map(
+  //         rawAssignmentConfig.map(({ buffInfo }) => [
+  //           buffInfo.shortName,
+  //           buffInfo,
+  //         ]),
+  //       ),
+  //     ),
+
+  // await reply(formatted);
 };
