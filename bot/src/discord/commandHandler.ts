@@ -104,7 +104,7 @@ const NUMBER_OF_GROUPS = 2;
 export const worldBuffsHandler: CommandHandler<Database> = async (
   options: CommandOptions,
   reply: StringReply,
-  // database: Database,
+  database: Database,
 ): Promise<void> => {
   const roster = options.getString("roster");
 
@@ -116,33 +116,21 @@ export const worldBuffsHandler: CommandHandler<Database> = async (
   const parsedRoster = roster
     .split(" ")
     .map((t) => t.trim())
-    .filter((t) => Boolean(t));
+    .filter((t) => Boolean(t))
+    .filter((t) => t.startsWith("@"));
 
-  console.log(parsedRoster);
-  await reply("all good!");
-
-  // const players = database.getPlayersRoster();
+  const players = database.getPlayersRoster();
   // const rawHistory = database.getWorldBuffHistory();
   // const rawAssignmentConfig = database.getWorldBuffAssignments();
+  const serverHandleMap = new Map(players.map((t) => [t.serverHandle, t]));
+  const mappedRoster = parsedRoster
+    .map((t) => serverHandleMap.get(t))
+    .filter((t): t is Player => Boolean(t));
 
-  // const playerMap = new Map(
-  //   players.map((t) => [
-  //     t.discordHandle,
-  //     {
-  //       discordHandle: t.discordHandle,
-  //       characters: t.characters,
-  //     },
-  //   ]),
-  // );
-  // const mappedRoster = parsedRoster
-  //   .map((t) => {
-  //     const mapped = playerMap.get(t);
-  //     if (!mapped) {
-  //       console.warn(`Unexpected unknown user ${t}!`);
-  //     }
-  //     return mapped;
-  //   })
-  //   .filter((t): t is Player => Boolean(t));
+  console.log(mappedRoster);
+  await reply(`All good: ${mappedRoster.join(" ")} `);
+  // const playerMap = new Map(players.map((t) => [t.discordHandle, t]));
+
   // const history = mapRawHistory(rawHistory, playerMap);
   // const assignmentConfig = mapRawAssignmentConfig(
   //   rawAssignmentConfig,

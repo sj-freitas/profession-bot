@@ -35,15 +35,7 @@ async function main() {
 
   // Map it to the accepted history format
 
-  const playerMap = new Map(
-    players.map((t) => [
-      t.discordHandle,
-      {
-        discordHandle: t.discordHandle,
-        characters: t.characters,
-      },
-    ]),
-  );
+  const playerMap = new Map(players.map((t) => [t.discordHandle, t]));
   const mappedRoster = ROSTER.map((t) => {
     const mapped = playerMap.get(t);
     if (!mapped) {
