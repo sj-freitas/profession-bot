@@ -124,27 +124,30 @@ export const handleCrafter: CommandHandler<Database> = async (
     crafters: SimplifiedPlayer[];
   };
 
-  const groupedRecipes = new Map<number, CraftingResult>();
-  [...uniqueRecipes.values()].forEach((curr) => {
-    const existing = groupedRecipes.get(curr.wowHeadId) ?? {
-      wowHeadId: curr.wowHeadId,
-      name: curr.recipe,
-      url: curr.url,
-      crafters: [],
-    };
+  const groupedRecipes: CraftingResult[] = [...uniqueRecipes.values()].map(
+    (curr) => {
+      const crafters = database
+        .queryRecipes(curr.url)
+        .map((t) => t.crafter)
+        .map((t) => {
+          const matchingCrafter = allPlayers.get(t);
+          if (!matchingCrafter) {
+            console.warn(`unknown character ${t}`);
+          }
+          return matchingCrafter;
+        })
+        .filter((t): t is SimplifiedPlayer => Boolean(t));
 
-    const crafterPlayer = allPlayers.get(curr.crafter);
+      return {
+        wowHeadId: curr.wowHeadId,
+        name: curr.recipe,
+        url: curr.url,
+        crafters,
+      };
+    },
+  );
 
-    if (!crafterPlayer) {
-      console.warn(`unknown character ${curr.crafter}`);
-      return;
-    }
-
-    existing.crafters.push(crafterPlayer);
-    groupedRecipes.set(curr.wowHeadId, existing);
-  });
-
-  const mapped = [...groupedRecipes.values()].map(
+  const mapped = groupedRecipes.map(
     ({ name, url, crafters }) =>
       `[${name}](${url}) crafters: ${crafters.map((t) => `${t.characterName} (${t.serverHandle})`).join(", ")}`,
   );
