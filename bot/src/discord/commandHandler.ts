@@ -60,6 +60,8 @@ export function createCommandHandler<TContext>(
   };
 }
 
+const MAX_ALLOWED_SEARCH_RESULTS = 4;
+
 export const handleCrafter: CommandHandler<Database> = async (
   options: CommandOptions,
   reply: StringReply,
@@ -74,10 +76,29 @@ export const handleCrafter: CommandHandler<Database> = async (
 
   // Match with a similar name
   // Search the database
+  type SimplifiedPlayer = {
+    characterName: string;
+    serverHandle: string;
+  };
+  const allPlayers = new Map(
+    database
+      .getPlayersRoster()
+      .map((t) =>
+        t.characters.map((x) => ({
+          characterName: x,
+          serverHandle: t.serverHandle,
+        })),
+      )
+      .flatMap((t: SimplifiedPlayer[]) => t)
+      .map((t) => [t.characterName, t]),
+  );
   const wowHeadResults = await queryWowHead(recipe);
-  const wowHeadFiltered = removeNonSpells(removeQAResults(wowHeadResults))
-    .results[0];
-  const results = database.queryRecipes(wowHeadFiltered.name);
+  const wowHeadFilteredResults = removeNonSpells(
+    removeQAResults(wowHeadResults),
+  ).results;
+  const results = wowHeadFilteredResults
+    .map((t) => database.queryRecipes(t.name))
+    .flatMap((t) => t);
 
   if (results.length === 0) {
     await reply(
@@ -87,17 +108,48 @@ export const handleCrafter: CommandHandler<Database> = async (
   }
 
   const uniqueRecipes = new Set(results.map((t) => t.recipe));
-  if (uniqueRecipes.size > 1) {
+  if (uniqueRecipes.size > MAX_ALLOWED_SEARCH_RESULTS) {
     await reply(
       `Found more than one matching recipes: ${[...uniqueRecipes.values()].join(", ")}, narrow it down please.`,
     );
     return;
   }
 
-  const { recipe: name, url } = results[0];
-  const crafters = results.map((t) => t.crafter);
+  // Return the multiple results
+  // Group by same recipe
+  type CraftingResult = {
+    wowHeadId: number;
+    url: string;
+    name: string;
+    crafters: SimplifiedPlayer[];
+  };
 
-  await reply(`[${name}](${url}) can be crafted by: ${crafters.join(", ")}`);
+  const groupedRecipes = new Map<number, CraftingResult>();
+  results.forEach((curr) => {
+    const existing = groupedRecipes.get(curr.wowHeadId) ?? {
+      wowHeadId: curr.wowHeadId,
+      name: curr.recipe,
+      url: curr.url,
+      crafters: [],
+    };
+
+    const crafterPlayer = allPlayers.get(curr.crafter);
+
+    if (!crafterPlayer) {
+      console.warn(`unknown character ${curr.crafter}`);
+      return;
+    }
+
+    existing.crafters.push(crafterPlayer);
+    groupedRecipes.set(curr.wowHeadId, existing);
+  });
+
+  const mapped = [...groupedRecipes.values()].map(
+    ({ name, url, crafters }) =>
+      `[${name}](${url}) can be crafted by: ${crafters.map((t) => `${t.characterName} (${t.serverHandle} )`).join(", ")}`,
+  );
+
+  await reply(mapped.join("\n"));
 };
 
 const NUMBER_OF_GROUPS = 2;
