@@ -24,9 +24,11 @@ export async function getPlayers(
 
   const values = (rows ?? []).slice(1) as string[][];
 
-  return values.map(([discordHandle, characters, serverHandle]) => ({
-    discordHandle: discordHandle.trim(),
-    characters: characters.split(";").map((t) => t.trim()),
-    serverHandle: serverHandle.trim(),
-  }));
+  return values
+    .map(([discordHandle, characters, serverHandle]) => ({
+      discordHandle: discordHandle?.trim(),
+      characters: characters?.split(";").map((t) => t.trim()),
+      serverHandle: serverHandle?.trim(),
+    }))
+    .filter((t) => t.discordHandle && t.characters && t.serverHandle);
 }
