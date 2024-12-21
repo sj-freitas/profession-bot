@@ -127,7 +127,6 @@ export const worldBuffsHandler: CommandHandler<Database> = async (
     .map((t) => serverHandleMap.get(t))
     .filter((t): t is Player => Boolean(t));
 
-  console.log(mappedRoster);
   const playerMap = new Map(players.map((t) => [t.discordHandle, t]));
 
   const history = mapRawHistory(rawHistory, playerMap);
@@ -150,5 +149,5 @@ export const worldBuffsHandler: CommandHandler<Database> = async (
     ),
   );
 
-  await reply(formatted);
+  await reply(`Please copy paste the following message to the sign up channel:\n\`\`\`${formatted}\`\`\``);
 };
