@@ -151,6 +151,6 @@ export const worldBuffsHandler: CommandHandler<Database> = async (
   );
 
   await reply(
-    `Please copy paste the following message to the sign up channel:\n\`\`\`${formatted}\`\`\`\n Use the format below to copy&paste on google sheets to save ${formatGroupsForSheets(assignment, rawAssignmentConfig)}`,
+    `Please copy paste the following message to the sign up channel:\n\`\`\`${formatted}\`\`\`\n Use the format below to copy&paste on google sheets to save\n${formatGroupsForSheets(assignment, rawAssignmentConfig)}`,
   );
 };

@@ -23,7 +23,7 @@ export function formatGroupsForSheets(
 ): string {
   return groupsConfig
     .map((group, index) => {
-      const groupName = `ASSIGNMENTS 22.12 ${incrementLetter("A", index)}`;
+      const groupName = `ASSIGNMENTS [DATE] ${incrementLetter("A", index)}`;
 
       const inOrder = worldBuffConfig.map((currBuff) =>
         getArrayFromSingleOrArray(
