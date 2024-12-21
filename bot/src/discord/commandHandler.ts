@@ -78,7 +78,7 @@ export const handleCrafter: CommandHandler<Database> = async (
   // Search the database
   type SimplifiedPlayer = {
     characterName: string;
-    serverHandle: string;
+    discordHandle: string;
   };
   const allPlayers = new Map(
     database
@@ -86,7 +86,7 @@ export const handleCrafter: CommandHandler<Database> = async (
       .map((t) =>
         t.characters.map((x) => ({
           characterName: x,
-          serverHandle: t.serverHandle,
+          discordHandle: t.discordHandle,
         })),
       )
       .flatMap((t: SimplifiedPlayer[]) => t)
@@ -107,10 +107,10 @@ export const handleCrafter: CommandHandler<Database> = async (
     return;
   }
 
-  const uniqueRecipes = new Set(results.map((t) => t.recipe));
+  const uniqueRecipes = new Map(results.map((t) => [t.wowHeadId, t]));
   if (uniqueRecipes.size > MAX_ALLOWED_SEARCH_RESULTS) {
     await reply(
-      `Found more than one matching recipes: ${[...uniqueRecipes.values()].join(", ")}, narrow it down please.`,
+      `Found more than ${MAX_ALLOWED_SEARCH_RESULTS} matching recipes:\n${[...uniqueRecipes.values()].join("\n")}\nYou can search for a specific one by copying it from above.`,
     );
     return;
   }
@@ -125,7 +125,7 @@ export const handleCrafter: CommandHandler<Database> = async (
   };
 
   const groupedRecipes = new Map<number, CraftingResult>();
-  results.forEach((curr) => {
+  [...uniqueRecipes.values()].forEach((curr) => {
     const existing = groupedRecipes.get(curr.wowHeadId) ?? {
       wowHeadId: curr.wowHeadId,
       name: curr.recipe,
@@ -146,7 +146,7 @@ export const handleCrafter: CommandHandler<Database> = async (
 
   const mapped = [...groupedRecipes.values()].map(
     ({ name, url, crafters }) =>
-      `[${name}](${url}) can be crafted by: ${crafters.map((t) => `${t.characterName} (${t.serverHandle} )`).join(", ")}`,
+      `[${name}](${url}) crafters: ${crafters.map((t) => `${t.characterName} (${t.discordHandle} )`).join(", ")}`,
   );
 
   await reply(mapped.join("\n"));
