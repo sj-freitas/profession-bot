@@ -128,7 +128,7 @@ export const worldBuffsHandler: CommandHandler<Database> = async (
     .filter((t): t is Player => Boolean(t));
 
   console.log(mappedRoster);
-  await reply(`All good: ${mappedRoster.join(" ")} `);
+  await reply(`All good: ${mappedRoster.map((t) => t.discordHandle).join(" ")} `);
   // const playerMap = new Map(players.map((t) => [t.discordHandle, t]));
 
   // const history = mapRawHistory(rawHistory, playerMap);
