@@ -64,10 +64,13 @@ ${Object.entries(formatted)
       )
         .map(
           ([groupId, handles]) =>
-            `${groupId}: ${handles.length === 1 ? `${handles[0]}` : `${handles.map((t, index) => `${index+1}: ${t}`).join(" ; ")}` }`,
+            `${groupId}: ${handles.length === 1 ? `${handles[0]}` : `${handles.map((t, index) => `${index + 1}: ${t}`).join(" ; ")}`}`,
         )
         .join("  ")} `,
   )
   .join("\n")}
+
+Please DM an officer if you cannot provide at least 3 items in the raid.
+In case of a <MISSING_ASSIGNMENT> please feel free to volunteer!
   `;
 }

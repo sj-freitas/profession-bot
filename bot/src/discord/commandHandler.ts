@@ -120,39 +120,35 @@ export const worldBuffsHandler: CommandHandler<Database> = async (
     .filter((t) => t.startsWith("@"));
 
   const players = database.getPlayersRoster();
-  // const rawHistory = database.getWorldBuffHistory();
-  // const rawAssignmentConfig = database.getWorldBuffAssignments();
+  const rawHistory = database.getWorldBuffHistory();
+  const rawAssignmentConfig = database.getWorldBuffAssignments();
   const serverHandleMap = new Map(players.map((t) => [t.serverHandle, t]));
   const mappedRoster = parsedRoster
     .map((t) => serverHandleMap.get(t))
     .filter((t): t is Player => Boolean(t));
 
   console.log(mappedRoster);
-  await reply(`All good: ${mappedRoster.map((t) => t.discordHandle).join(" ")} `);
-  // const playerMap = new Map(players.map((t) => [t.discordHandle, t]));
+  const playerMap = new Map(players.map((t) => [t.discordHandle, t]));
 
-  // const history = mapRawHistory(rawHistory, playerMap);
-  // const assignmentConfig = mapRawAssignmentConfig(
-  //   rawAssignmentConfig,
-  //   playerMap,
-  // );
+  const history = mapRawHistory(rawHistory, playerMap);
+  const assignmentConfig = mapRawAssignmentConfig(
+    rawAssignmentConfig,
+    playerMap,
+  );
 
-  // const assignment = findNextAssignment({
-  //   history,
-  //   assignmentConfig,
-  //   roster: mappedRoster,
-  //   numberOfGroups: NUMBER_OF_GROUPS,
-  // });
+  const assignment = findNextAssignment({
+    history,
+    assignmentConfig,
+    roster: mappedRoster,
+    numberOfGroups: NUMBER_OF_GROUPS,
+  });
 
-  // const formatted = formatGroupAssignmentsToMarkdown(
-  //       assignment,
-  //       new Map(
-  //         rawAssignmentConfig.map(({ buffInfo }) => [
-  //           buffInfo.shortName,
-  //           buffInfo,
-  //         ]),
-  //       ),
-  //     ),
+  const formatted = formatGroupAssignmentsToMarkdown(
+    assignment,
+    new Map(
+      rawAssignmentConfig.map(({ buffInfo }) => [buffInfo.shortName, buffInfo]),
+    ),
+  );
 
-  // await reply(formatted);
+  await reply(formatted);
 };
