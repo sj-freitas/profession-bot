@@ -112,6 +112,13 @@ export function findNextAssignment({
     new Map<string, number>(),
   );
 
+  // Add people without history
+  for (const curr of roster) {
+    if (!userBuffCounter.has(curr.discordHandle))  {
+      userBuffCounter.set(curr.discordHandle, 0);
+    }
+  }
+
   const sortedByLessFrequency = [...userBuffCounter.entries()]
     .sort(([, countA], [, countB]) => countA - countB)
     .map(([discordHandle]) => discordHandle);
