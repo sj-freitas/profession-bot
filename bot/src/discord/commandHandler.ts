@@ -14,6 +14,7 @@ import {
 import { findNextAssignment } from "../buff-management/find-next-assignment";
 import { Player } from "../sheets/get-players";
 import { formatGroupAssignmentsToMarkdown } from "../exports/world-buffs/format-group-assigments-md";
+import { formatGroupsForSheets } from "../exports/world-buffs/format-groups-for-sheets";
 
 type CommandOptions = Omit<
   CommandInteractionOptionResolver,
@@ -149,5 +150,7 @@ export const worldBuffsHandler: CommandHandler<Database> = async (
     ),
   );
 
-  await reply(`Please copy paste the following message to the sign up channel:\n\`\`\`${formatted}\`\`\``);
+  await reply(
+    `Please copy paste the following message to the sign up channel:\n\`\`\`${formatted}\`\`\`\n Use the format below to copy&paste on google sheets to save ${formatGroupsForSheets(assignment, rawAssignmentConfig)}`,
+  );
 };
