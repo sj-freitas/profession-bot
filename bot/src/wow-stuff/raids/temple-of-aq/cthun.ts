@@ -141,19 +141,19 @@ export function exportToDiscord(composition: Raid): string {
   const raidTargets = Object.values(ALL_RAID_TARGETS).reverse();
 
   return `## C'thun composition
-  ${composition.groups
-    .map(
-      (t, idx) =>
-        `### Group ${idx + 1}:\n${t.slots
-          .filter((slot): slot is Character => Boolean(slot))
-          .map((slot, currSlotIdx) =>
-            currSlotIdx === 0 && isMeleeCharacter(slot)
-              ? `- ${raidTargets[idx].discordEmoji} ${slot.name}`
-              : `- ${slot.name}`,
-          )
-          .join("\n")}`,
-    )
-    .join("\n\n")}`;
+${composition.groups
+  .map(
+    (t, idx) =>
+      `### Group ${idx + 1}:\n${t.slots
+        .filter((slot): slot is Character => Boolean(slot))
+        .map((slot, currSlotIdx) =>
+          currSlotIdx === 0 && isMeleeCharacter(slot)
+            ? `- ${raidTargets[idx].discordEmoji} ${slot.name}`
+            : `- ${slot.name}`,
+        )
+        .join("\n")}`,
+  )
+  .join("\n\n")}`;
 }
 
 export function exportToLuaTable(composition: Raid): string {
