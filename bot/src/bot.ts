@@ -9,17 +9,12 @@ import {
   SlashCommandBuilder,
 } from "discord.js";
 import { CONFIG } from "./config";
-import {
-  createCommandHandler,
-  handleCrafter,
-  worldBuffsHandler,
-} from "./discord/commandHandler";
-import { getGuildInfo } from "./exports/wowHeadIntegration";
-import { readProfessionData } from "./sheets/parse-prof";
-import { createSheetClient } from "./sheets/config";
-import { Database, toFlattenData } from "./exports/mem-database";
-import { getPlayers } from "./sheets/get-players";
-import { getAllBuffHistory, getWorldBuffInfo } from "./sheets/get-buffers";
+import { createCommandHandler } from "./discord/commandHandler";
+import { Database } from "./exports/mem-database";
+import { loop, refreshDatabase } from "./exports/utils";
+import { handleCrafter } from "./discord/professions.command";
+import { worldBuffsHandler } from "./discord/worldbuffs.command";
+import { raidAssignHandler, SUPPORTED_ENCOUNTERS } from "./discord/raidassign.command";
 
 const FIFTEEN_MINUTES = 15 * 60 * 1000;
 
@@ -42,42 +37,26 @@ const commands = [
           "The discord handles for all raid participants, should be copied from the Raid-Helper announcement",
         ),
     ),
+  new SlashCommandBuilder()
+    .setName("raid-assign")
+    .setDescription(
+      "Lists the raid assignments for a specific raid and encounter",
+    )
+    .addStringOption((option) =>
+      option
+        .setName("encounter")
+        .setDescription(
+          `The name of the encounter, accepted values are ${SUPPORTED_ENCOUNTERS.join(" | ")}`,
+        ),
+    )
+    .addStringOption((option) =>
+      option
+        .setName("roster")
+        .setDescription(
+          "The discord handles for all raid participants, should be copied from the Raid-Helper announcement",
+        ),
+    ),
 ];
-
-async function refreshDatabase(database: Database): Promise<void> {
-  console.log("Database refresh started.");
-
-  const sheetClient = createSheetClient();
-  const data = await readProfessionData(sheetClient, CONFIG.GUILD.INFO_SHEET);
-  const parsed = await getGuildInfo(data);
-  const roster = await getPlayers(sheetClient, CONFIG.GUILD.INFO_SHEET);
-  const worldBuffAssignments = await getWorldBuffInfo(
-    sheetClient,
-    CONFIG.GUILD.INFO_SHEET,
-  );
-  const worldBuffHistory = await getAllBuffHistory(
-    sheetClient,
-    CONFIG.GUILD.INFO_SHEET,
-    worldBuffAssignments,
-  );
-
-  database.setAllRecipes(toFlattenData(parsed));
-  database.setPlayersRoster(roster);
-  database.setWorldBuffAssignments(worldBuffAssignments);
-  database.setWorldBuffHistory(worldBuffHistory);
-
-  console.log("Database refresh complete.");
-}
-
-async function loop(callback: () => Promise<void>, intervalInMs: number) {
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    await callback();
-    await new Promise((resolve) => {
-      setTimeout(resolve, intervalInMs);
-    });
-  }
-}
 
 async function setupClient(database: Database): Promise<void> {
   const client = new Client({ intents: [GatewayIntentBits.Guilds] });
@@ -90,6 +69,10 @@ async function setupClient(database: Database): Promise<void> {
       id: "world-buffs",
       handler: worldBuffsHandler,
     },
+    {
+      id: "raid-assign",
+      handler: raidAssignHandler,
+    }
   ]);
 
   client.on(Events.ClientReady, (readyClient) => {

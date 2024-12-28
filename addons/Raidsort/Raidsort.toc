@@ -1,0 +1,7 @@
+## interface : 11505
+## Title: Raidsort
+## Notes: Tool to sort your groups according to a list. (Beta)
+## SavedVariables: _raidsort_global
+## IconTexture: Interface\Icons\inv_misc_enggizmos_19
+
+Raidsort.lua

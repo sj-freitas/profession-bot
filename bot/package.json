@@ -5,10 +5,12 @@
   "main": "index.js",
   "private": true,
   "scripts": {
+    "test": "jest",
     "build": "tsc --build", 
     "bot:start": "dotenv -e .env node dist/bot/src/bot.js",
     "export:md": "dotenv -e .env 'tsx' src/index.ts",
     "buff-assign": "dotenv -e .env 'tsx' src/buff-assignments.ts",
+    "raid-assign": "dotenv -e .env 'tsx' src/raid-assignments.ts",
     "bot:dev": "dotenv -e .env 'tsx' src/bot.ts",
     "lint:fix": "prettier --write src/ && eslint --fix --ext .ts src/"
   },
