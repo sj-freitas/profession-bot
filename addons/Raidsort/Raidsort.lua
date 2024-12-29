@@ -302,11 +302,6 @@ function Raidsort:Invite()
         return
     end
 
-    if not UnitIsGroupAssistant("player") and not UnitIsGroupLeader("player") then
-        print("[Raidsort]: You need to be a raid lead/assistant to sort it!")
-        return
-    end
-
     Invite(Raidsort.savedGroups);
 end
 
