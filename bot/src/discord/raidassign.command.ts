@@ -9,11 +9,12 @@ import { getSarturaAssignment } from "../classic-wow/raids/temple-of-aq/sartura"
 import { CommandHandler, CommandOptions, StringReply } from "./commandHandler";
 import { getGenericRaidAssignment } from "../classic-wow/raids/generic";
 import { parseDiscordHandles } from "./utils";
+import { CharacterDetails } from "../raider-io/types";
 
 type RaidAssignment = (roster: Character[], players: Player[]) => string;
 
 export const ENCOUNTER_HANDLERS: { [key: string]: RaidAssignment } = {
-  "raid": getGenericRaidAssignment,
+  raid: getGenericRaidAssignment,
   "aq-sartura": getSarturaAssignment,
   "aq-cthun": getCthunAssignment,
 };
@@ -24,6 +25,11 @@ export const SUPPORTED_ENCOUNTERS = Object.keys(ENCOUNTER_HANDLERS);
 // On the bot state.
 const REALM_NAME = "wild-growth";
 const REGION = "eu";
+
+interface Failure {
+  failure: true;
+  name: string;
+}
 
 async function getCharacterInfos(
   characterNames: string[],
@@ -37,18 +43,31 @@ async function getCharacterInfos(
         console.error(
           `Failed to fetch data for ${characterName}, reason: ${err}`,
         );
-        return null;
+        // Can override this by considering this person is a "hunter" - hunters are almost like misc so that works.
+        return {
+          failure: true,
+          name: characterName,
+        };
       }
     }),
   );
 
   return allInfos
     .filter((t) => t !== null)
-    .map((t) => ({
-      name: t.characterDetails.character.name,
-      role: getRoleFromCharacter(t),
-      class: t.characterDetails.character.class.name,
-    }));
+    .map((t) =>
+      !(t as Failure).failure
+        ? {
+            name: (t as CharacterDetails).characterDetails.character.name,
+            role: getRoleFromCharacter(t as CharacterDetails),
+            class: (t as CharacterDetails).characterDetails.character.class
+              .name,
+          }
+        : {
+            name: (t as Failure).name,
+            role: "Ranged",
+            class: "Hunter",
+          },
+    );
 }
 
 export const raidAssignHandler: CommandHandler<Database> = async (
@@ -76,7 +95,6 @@ export const raidAssignHandler: CommandHandler<Database> = async (
     return;
   }
 
-
   const parsedRoster = parseDiscordHandles(roster);
   const players = database.getPlayersRoster();
   const serverHandleMap = new Map(players.map((t) => [t.serverHandle, t]));
@@ -85,7 +103,9 @@ export const raidAssignHandler: CommandHandler<Database> = async (
     .filter((t): t is Player => Boolean(t));
 
   // Maybe these HTTP requests can be cached?
-  const characters = await getCharacterInfos(mappedRoster.map((t) => t.characters[0]));
+  const characters = await getCharacterInfos(
+    mappedRoster.map((t) => t.characters[0]),
+  );
   const assignments = getAssignmentForEncounter(characters, mappedRoster);
 
   await reply(assignments);

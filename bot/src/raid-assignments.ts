@@ -13,6 +13,7 @@ import {
   makeAssignments as makeAssignmentsSartura,
 } from "./classic-wow/raids/temple-of-aq/sartura";
 import { exportToLuaTable } from "./classic-wow/raids/utilts";
+import { CharacterDetails } from "./raider-io/types";
 
 // Manual overrides
 const overrideConfig: Character[] = [
@@ -29,6 +30,11 @@ export function override(
   const map = new Map(config.map((t) => [t.name, t]));
 
   return roster.map((t) => map.get(t.name) ?? t);
+}
+
+interface Failure {
+  failure: true;
+  name: string;
 }
 
 async function main() {
@@ -67,18 +73,28 @@ async function main() {
         console.error(
           `Failed to fetch data for ${characterName}, reason: ${err}`,
         );
-        return null;
+        // Can override this by considering this person is a "hunter" - hunters are almost like misc so that works.
+        return {
+          failure: true,
+          name: characterName,
+        };
       }
     }),
   );
 
-  const rawRoster: Character[] = allInfos
-    .filter((t) => t !== null)
-    .map((t) => ({
-      name: t.characterDetails.character.name,
-      role: getRoleFromCharacter(t),
-      class: t.characterDetails.character.class.name,
-    }));
+  const rawRoster: Character[] = allInfos.map((t) =>
+    !(t as Failure).failure
+      ? {
+          name: (t as CharacterDetails).characterDetails.character.name,
+          role: getRoleFromCharacter(t as CharacterDetails),
+          class: (t as CharacterDetails).characterDetails.character.class.name,
+        }
+      : {
+          name: (t as Failure).name,
+          role: "Ranged",
+          class: "Hunter",
+        },
+  );
 
   const roster = override(rawRoster);
   const sarturaAssigments = makeAssignmentsSartura(roster);
