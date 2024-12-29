@@ -8,6 +8,7 @@ import { getCthunAssignment } from "../classic-wow/raids/temple-of-aq/cthun";
 import { getSarturaAssignment } from "../classic-wow/raids/temple-of-aq/sartura";
 import { CommandHandler, CommandOptions, StringReply } from "./commandHandler";
 import { getGenericRaidAssignment } from "../classic-wow/raids/generic";
+import { parseDiscordHandles } from "./utils";
 
 type RaidAssignment = (roster: Character[], players: Player[]) => string;
 
@@ -75,12 +76,8 @@ export const raidAssignHandler: CommandHandler<Database> = async (
     return;
   }
 
-  const parsedRoster = roster
-    .split(" ")
-    .map((t) => t.trim())
-    .filter((t) => Boolean(t))
-    .filter((t) => t.startsWith("@"));
 
+  const parsedRoster = parseDiscordHandles(roster);
   const players = database.getPlayersRoster();
   const serverHandleMap = new Map(players.map((t) => [t.serverHandle, t]));
   const mappedRoster = parsedRoster

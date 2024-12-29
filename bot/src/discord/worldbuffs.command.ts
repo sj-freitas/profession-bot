@@ -8,6 +8,7 @@ import { formatGroupAssignmentsToMarkdown } from "../exports/world-buffs/format-
 import { formatGroupsForSheets } from "../exports/world-buffs/format-groups-for-sheets";
 import { Player } from "../sheets/get-players";
 import { CommandHandler, CommandOptions, StringReply } from "./commandHandler";
+import { parseDiscordHandles } from "./utils";
 
 const NUMBER_OF_GROUPS = 2;
 
@@ -23,12 +24,7 @@ export const worldBuffsHandler: CommandHandler<Database> = async (
     return;
   }
 
-  const parsedRoster = roster
-    .split(" ")
-    .map((t) => t.trim())
-    .filter((t) => Boolean(t))
-    .filter((t) => t.startsWith("@"));
-
+  const parsedRoster = parseDiscordHandles(roster);
   const players = database.getPlayersRoster();
   const rawHistory = database.getWorldBuffHistory();
   const rawAssignmentConfig = database.getWorldBuffAssignments();
