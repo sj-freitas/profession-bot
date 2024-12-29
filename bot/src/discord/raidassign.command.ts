@@ -3,14 +3,16 @@ import { Database } from "../exports/mem-database";
 import { fetchCharacterData } from "../raider-io/raider-io-client";
 import { getRoleFromCharacter } from "../raider-io/utils";
 import { Player } from "../sheets/get-players";
-import { Character } from "../wow-stuff/raid-assignment";
-import { getCthunAssignment } from "../wow-stuff/raids/temple-of-aq/cthun";
-import { getSarturaAssignment } from "../wow-stuff/raids/temple-of-aq/sartura";
+import { Character } from "../classic-wow/raid-assignment";
+import { getCthunAssignment } from "../classic-wow/raids/temple-of-aq/cthun";
+import { getSarturaAssignment } from "../classic-wow/raids/temple-of-aq/sartura";
 import { CommandHandler, CommandOptions, StringReply } from "./commandHandler";
+import { getGenericRaidAssignment } from "../classic-wow/raids/generic";
 
 type RaidAssignment = (roster: Character[], players: Player[]) => string;
 
 export const ENCOUNTER_HANDLERS: { [key: string]: RaidAssignment } = {
+  "raid": getGenericRaidAssignment,
   "aq-sartura": getSarturaAssignment,
   "aq-cthun": getCthunAssignment,
 };
@@ -30,6 +32,7 @@ async function getCharacterInfos(
       try {
         return await fetchCharacterData(REGION, REALM_NAME, characterName);
       } catch (err: unknown) {
+        // Implement a fallback by having some hardcoded character data?
         console.error(
           `Failed to fetch data for ${characterName}, reason: ${err}`,
         );

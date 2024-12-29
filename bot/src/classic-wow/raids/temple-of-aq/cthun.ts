@@ -5,7 +5,7 @@ import {
   Group,
   Raid,
 } from "../../raid-assignment";
-import { pickOneAtRandomAndRemoveFromArray } from "../utilts";
+import { exportToLuaTable, pickOneAtRandomAndRemoveFromArray } from "../utilts";
 
 export const IDEAL_NUMBER_OF_MELEE_PER_GROUP = 2;
 export const ABSOLUTE_MAXIMUM_AMOUNT_OF_MELEE_IN_GROUP = 3;
@@ -156,19 +156,6 @@ ${composition.groups
   .join("\n\n")}`;
 }
 
-export function exportToLuaTable(composition: Raid): string {
-  return `{\n${composition.groups
-    .map(
-      (currGroup) =>
-        `    {${currGroup.slots
-          .filter((t): t is Character => Boolean(t))
-          .map((t) => `"${t.name}"`)
-          .join(",")}}`,
-    )
-    .join(",\n")}
-}`;
-}
-
 export function getCthunAssignment(roster: Character[]): string {
   const assignments = makeAssignments(roster);
 
@@ -184,5 +171,5 @@ ${exportToDiscord(assignments)}
 \`\`\`
 ${exportToLuaTable(assignments)}
 \`\`\`
-  `;
+`;
 }

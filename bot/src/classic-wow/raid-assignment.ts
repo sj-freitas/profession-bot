@@ -1,6 +1,10 @@
 import { Class } from "../raider-io/types";
 import { RaidRole } from "../raider-io/utils";
 
+export const MAX_GROUP_SIZE = 5;
+export const MAX_RAID_GROUP_AMOUNT = 8;
+export const MAX_RAID_SIZE = MAX_GROUP_SIZE * MAX_RAID_GROUP_AMOUNT;
+
 export interface Character {
   name: string;
   class: Class;

@@ -113,7 +113,7 @@ interface AssignmentInfo {
 
 export function exportToRaidWarning(
   sarturaAssignment: TargetAssignment[],
-): string[] {
+): string {
   const groupedByAssignmentTypeId = sarturaAssignment.reduce<AssignmentInfo>(
     (res, curr) => {
       curr.assignments.forEach((t) => {
@@ -131,13 +131,18 @@ export function exportToRaidWarning(
     {},
   );
 
-  return Object.entries(groupedByAssignmentTypeId).map(
-    ([assignmentId, details]) =>
-      `/rw ${assignmentId}: ${details.map((t) => `${t.targetInfo.icon.symbol} ${t.targetInfo.name} = ${t.assignees.map((char) => char.name).join(", ")}`).join(" || ")}`,
-  );
+  return Object.entries(groupedByAssignmentTypeId)
+    .map(
+      ([assignmentId, details]) =>
+        `/rw ${assignmentId}: ${details.map((t) => `${t.targetInfo.icon.symbol} ${t.targetInfo.name} = ${t.assignees.map((char) => char.name).join(", ")}`).join(" || ")}`,
+    )
+    .join("\n");
 }
 
-export function getSarturaAssignment(roster: Character[], players: Player[]): string {
+export function getSarturaAssignment(
+  roster: Character[],
+  players: Player[],
+): string {
   const assignments = makeAssignments(roster);
 
   return `
@@ -154,4 +159,3 @@ ${exportToRaidWarning(assignments)}
 \`\`\`
   `;
 }
-

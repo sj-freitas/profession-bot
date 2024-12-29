@@ -18,6 +18,8 @@ export const handleCrafter: CommandHandler<Database> = async (
     return;
   }
 
+  // Analytics for here
+
   // Match with a similar name
   // Search the database
   type SimplifiedPlayer = {

@@ -17,7 +17,21 @@ export type CommandHandler<T> = (
   payload: T,
 ) => Promise<void>;
 
+
 export type NamedCommandHandler<T> = { id: string; handler: CommandHandler<T> };
+
+// Unused for now, attempt at standardizing this
+export interface DiscordCommand<TContext> {
+  handler: NamedCommandHandler<TContext>[],
+  name: string;
+  slashCommand: string;
+  parameters: [
+    {
+      name: string;
+      description: string;
+    }
+  ]
+}
 
 export function createCommandHandler<TContext>(
   context: TContext,
@@ -44,6 +58,7 @@ export function createCommandHandler<TContext>(
     foundHandler
       .handler(interaction.options, replyDelegated, context)
       .catch(() => {
+        // Analytics for failure
         void replyDelegated(`Command failed`);
       });
   };

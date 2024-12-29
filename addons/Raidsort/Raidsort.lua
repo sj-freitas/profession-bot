@@ -4,17 +4,6 @@ local MAX_RAID_SIZE = 8
 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 -- Lua Library inline imports
-local function __TS__ObjectAssign(target, ...)
-    local sources = {...}
-    for i = 1, #sources do
-        local source = sources[i]
-        for key in pairs(source) do
-            target[key] = source[key]
-        end
-    end
-    return target
-end
-
 local function __TS__ArrayFilter(self, callbackfn, thisArg)
     local result = {}
     local len = 0
@@ -25,15 +14,6 @@ local function __TS__ArrayFilter(self, callbackfn, thisArg)
         end
     end
     return result
-end
-
-local function __TS__ArrayFindIndex(self, callbackFn, thisArg)
-    for i = 1, #self do
-        if callbackFn(thisArg, self[i], i - 1, self) then
-            return i - 1
-        end
-    end
-    return -1
 end
 
 local function __TS__ArrayMap(self, callbackfn, thisArg)
@@ -120,8 +100,8 @@ function SolvePlayerPosition(player, directive)
         raidInfo,
         function(____, t) return t.playerName == player.playerName end
     )
-    if not currentStatusOfPlayer then
-        print(("Unpexted player not found " .. player.playerName) .. ", skipping, but this should never happen.")
+    if currentStatusOfPlayer == nil then
+        print(("Unexpected player not found " .. player.playerName) .. ", skipping, but this should never happen.")
     end
     local existingCurrentPlayer = currentStatusOfPlayer
     if existingCurrentPlayer.groupId == destinationGroupId then
@@ -143,7 +123,7 @@ function SolvePlayerPosition(player, directive)
                 return (directivePlayer and directivePlayer.destinationGroupId) ~= destinationGroupId
             end
         )
-        if not wronglyPlacedPlayer then
+        if wronglyPlacedPlayer == nil then
             print("WE HAVE A PROBLEM!")
         end
         SetRaidSubgroup(
@@ -211,6 +191,24 @@ function SortRaid(raid)
     end
     for ____, curr in ipairs(sortState.preSortState) do
         SolvePlayerPosition(curr, sortState.preSortState)
+    end
+end
+
+local function Invite(raid)
+    local characterNames = __TS__ArrayFlatMap(
+        __TS__ArrayMap(
+            raid,
+            function(____, t) return __TS__ArrayMap(
+                t,
+                function(____, characterName) return characterName end
+            ) end
+        ),
+        function(____, t) return t end
+    )
+
+    -- Iterate through the raid and invite everyone
+    for ____, currName in ipairs(characterNames) do
+        InviteUnit(currName)
     end
 end
 
@@ -297,6 +295,21 @@ function Raidsort:SortRaid()
     print("[Raidsort]: Raid sorted!")
 end
 
+function Raidsort:Invite()
+    -- Throws out invites to everyone in the raid
+    if Raidsort.savedGroups == nil then
+        print("[Raidsort]: Error: No Setup is stored!")
+        return
+    end
+
+    if not UnitIsGroupAssistant("player") and not UnitIsGroupLeader("player") then
+        print("[Raidsort]: You need to be a raid lead/assistant to sort it!")
+        return
+    end
+
+    Invite(Raidsort.savedGroups);
+end
+
 -- Slash command handler
 SLASH_RAIDSORT1 = "/raidsort"
 function SlashCmdList.RAIDSORT(msg)
@@ -309,10 +322,13 @@ function SlashCmdList.RAIDSORT(msg)
         Raidsort:ShowImportWindow()
     elseif args[1] == "load" then
         Raidsort:SortRaid()
+    elseif args[1] == "invite" then
+        Raidsort:Invite()
     else
         print("[Raidsort]: Usage:")
-        print("  /raidsort import")
-        print("  /raidsort load")
+        print("  /raidsort import (Opens a UI to paste the raid roster config)")
+        print("  /raidsort invite (Invites characters in the roster)")
+        print("  /raidsort load (Loads the group preset)")
     end
 end
 

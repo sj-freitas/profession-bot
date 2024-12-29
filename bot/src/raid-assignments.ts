@@ -3,16 +3,16 @@ import { Database } from "./exports/mem-database";
 import { refreshDatabase } from "./exports/utils";
 import { fetchCharacterData } from "./raider-io/raider-io-client";
 import { getRoleFromCharacter } from "./raider-io/utils";
-import { Character } from "./wow-stuff/raid-assignment";
+import { Character } from "./classic-wow/raid-assignment";
 import {
   exportToDiscord as exportToDiscordCthun,
   exportToLuaTable as exportToLuaTableCthun,
   makeAssignments as makeAssignmentsCthun,
-} from "./wow-stuff/raids/temple-of-aq/cthun";
+} from "./classic-wow/raids/temple-of-aq/cthun";
 import {
   exportToDiscord as exportToDiscordSartura,
   makeAssignments as makeAssignmentsSartura,
-} from "./wow-stuff/raids/temple-of-aq/sartura";
+} from "./classic-wow/raids/temple-of-aq/sartura";
 
 // Manual overrides
 const overrideConfig: Character[] = [
@@ -32,7 +32,7 @@ export function override(
 }
 
 async function main() {
-  const characterHandles = `@Darkshivan @Svajone @Dirkwarlock @Justhealing @Grumbus<FB> @Kimepo/jenhi<FB> @Wolfsun @wwolf @Bibimbap @Mich @Datoliina @Vysha/Sterot<FB> @Paynex @Tearyn @Ashgiver @Lutaryon @Broederbeer @boomstronk @Goodmann @Barakary/Eydrak @Snace/Velarok @Krint(FB) @Orcbolg/Asti @Eyvor @Lockfel @Pignose @Libriyum<FB> @Dougie/Verylongname @zugpriest @Laranel<FB> @Milfred/Souzy`;
+  const characterHandles = `@Darkshivan @Svajone @Dirkwarlock @Justhealing @Grumbus<FB> @Kimepo/jenhi<FB> @Wolfsun @wwolf @Bibimbap @Mich @Datoliina @Vysha/Sterot<FB> @Paynex @Tearyn @Ashgiver @Lutaryon @Broederbeer @boomstronk @Goodmann @Barakary/Eydrak @Snace/Velarok @Krint(FB) @Orcbolg / Asti @Eyvor @Lockfel @Pignose @Libriyum<FB> @Dougie/Verylongname @zugpriest @Laranel<FB> @Milfred/Souzy`;
   const allHandles = characterHandles
     .split(" ")
     .map((t) => t.trim())
@@ -94,7 +94,7 @@ async function main() {
 }
 
 // Command: Given a Roster it will:
-// /raid-assign AQ|Naxx|BWL(?) [Roster] (would be perfect if we could read from the channel actually!!)
+// /raid-assign [Encounter][Roster] (would be perfect if we could read from the channel actually!!)
 // 1. [X] Create assignments for Stuns
 // 2. [X] Create C'thun assignment
 // 3. [ ] Create Twins assignment
