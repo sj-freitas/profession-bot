@@ -6,13 +6,13 @@ import { getRoleFromCharacter } from "./raider-io/utils";
 import { Character } from "./classic-wow/raid-assignment";
 import {
   exportToDiscord as exportToDiscordCthun,
-  exportToLuaTable as exportToLuaTableCthun,
   makeAssignments as makeAssignmentsCthun,
 } from "./classic-wow/raids/temple-of-aq/cthun";
 import {
   exportToDiscord as exportToDiscordSartura,
   makeAssignments as makeAssignmentsSartura,
 } from "./classic-wow/raids/temple-of-aq/sartura";
+import { exportToLuaTable } from "./classic-wow/raids/utilts";
 
 // Manual overrides
 const overrideConfig: Character[] = [
@@ -90,7 +90,7 @@ async function main() {
   const cthunAssignments = makeAssignmentsCthun(roster);
 
   console.log(exportToDiscordCthun(cthunAssignments));
-  console.log(exportToLuaTableCthun(cthunAssignments));
+  console.log(exportToLuaTable(cthunAssignments));
 }
 
 // Command: Given a Roster it will:
