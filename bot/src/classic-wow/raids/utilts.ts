@@ -1,4 +1,5 @@
-import { Character, Raid } from "../raid-assignment";
+import { Table, toTableMarkdown } from "../../exports/markdown";
+import { Character, Group, Raid } from "../raid-assignment";
 
 export function pickOnePutOnTop<T>(array: T[], preselected?: T): T[] {
   const element =
@@ -42,4 +43,41 @@ export function getRaidsortLuaAssignment(assignments: Raid) {
 ${exportToLuaTable(assignments)}
 \`\`\`
   `;
+}
+
+function toTable(groups: Group[], startId: number): Table {
+  const table: Table = {
+    columns: groups.map((t, index) => ({
+      header: `Group ${startId + index + 1}`,
+      values: t.slots
+        .map((x) => x?.name)
+        .filter((x): x is string => Boolean(x)),
+    })),
+  };
+
+  return table;
+}
+
+export function exportRaidGroupsToTable(
+  { groups }: Raid,
+  numberOfGroupsPerLine = 3,
+) {
+  const maxNumberOfTablesPerLine = Math.ceil(
+    groups.length / numberOfGroupsPerLine,
+  );
+
+  const maxWidthOverride = Math.max(
+    ...groups.flatMap((t) => t.slots).map((t) => t?.name.length ?? 0),
+  );
+  const tables: Table[] = [];
+  for (let i = 0; i < maxNumberOfTablesPerLine; i += 1) {
+    const currLine = groups.slice(
+      i * numberOfGroupsPerLine,
+      i * numberOfGroupsPerLine + numberOfGroupsPerLine,
+    );
+
+    tables.push(toTable(currLine, i * numberOfGroupsPerLine));
+  }
+
+  return `${tables.map((t) => `\n${toTableMarkdown(t, maxWidthOverride)}`).join("\n")}`;
 }

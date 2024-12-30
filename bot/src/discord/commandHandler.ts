@@ -17,20 +17,19 @@ export type CommandHandler<T> = (
   payload: T,
 ) => Promise<void>;
 
-
 export type NamedCommandHandler<T> = { id: string; handler: CommandHandler<T> };
 
 // Unused for now, attempt at standardizing this
 export interface DiscordCommand<TContext> {
-  handler: NamedCommandHandler<TContext>[],
+  handler: NamedCommandHandler<TContext>[];
   name: string;
   slashCommand: string;
   parameters: [
     {
       name: string;
       description: string;
-    }
-  ]
+    },
+  ];
 }
 
 export function createCommandHandler<TContext>(
@@ -67,4 +66,3 @@ export function createCommandHandler<TContext>(
 // TODO, look into having a single source of truth
 // Something like the parameters and the descriptions
 // Coming from the same object
-

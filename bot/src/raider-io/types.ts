@@ -223,29 +223,32 @@ export const talentTreeSchema = z.object({
     background: z.string(),
     ordinal: z.number(),
   }),
-  talents: z.array(
-    z.object({
-      rank: z.unknown().nullable().optional(),
-      spell: z.object({
-        id: z.number(),
-        name: z.string(),
-        description: z.string(),
-        icon: z.string(),
-        school: z.number(),
+  talents: z
+    .array(
+      z.object({
         rank: z.unknown().nullable().optional(),
-        hasCooldown: z.boolean(),
+        spell: z.object({
+          id: z.number(),
+          name: z.string(),
+          description: z.string(),
+          icon: z.string(),
+          school: z.number(),
+          rank: z.unknown().nullable().optional(),
+          hasCooldown: z.boolean(),
+        }),
+        talent: z.object({
+          id: z.number(),
+          tabId: z.number(),
+          tierId: z.number(),
+          columnIndex: z.number(),
+          indexInRow: z.number(),
+          talentsInRow: z.number(),
+          spellRankIds: z.array(z.number()),
+        }),
       }),
-      talent: z.object({
-        id: z.number(),
-        tabId: z.number(),
-        tierId: z.number(),
-        columnIndex: z.number(),
-        indexInRow: z.number(),
-        talentsInRow: z.number(),
-        spellRankIds: z.array(z.number()),
-      }),
-    }),
-  ).nullable().optional(),
+    )
+    .nullable()
+    .optional(),
 });
 
 export const expansionDataSchema = z.object({

@@ -27,7 +27,15 @@ export interface Raid {
   groups: Group[];
 }
 
-export type RaidTargetId = "Skull" | "Cross" | "Square" | "Moon" | "Star" | "Circle" | "Triangle" | "Diamond"
+export type RaidTargetId =
+  | "Skull"
+  | "Cross"
+  | "Square"
+  | "Moon"
+  | "Star"
+  | "Circle"
+  | "Triangle"
+  | "Diamond";
 
 export interface RaidTargetIcon {
   name: RaidTargetId;
@@ -37,7 +45,7 @@ export interface RaidTargetIcon {
 
 export type AllRaidTargets = {
   [key in RaidTargetId]: RaidTargetIcon;
-}
+};
 
 export interface RaidTarget {
   icon: RaidTargetIcon;
@@ -96,4 +104,4 @@ export const ALL_RAID_TARGETS: AllRaidTargets = {
     symbol: "{star}",
     discordEmoji: ":star:",
   },
-}
+};

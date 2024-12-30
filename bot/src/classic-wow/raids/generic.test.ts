@@ -168,16 +168,14 @@ describe("generic", () => {
     it("Given a raid of several people, it finds the best setup possible", () => {
       const raid = makeAssignments(LARGE_ROSTER);
       const allNames = raid.groups
-          .map((t) =>
-            t.slots
-              .filter((x): x is Character => Boolean(x))
-              .map((x) => x.name),
-          )
-          .flatMap((t) => t);
-        const allUniqueNames = new Set(allNames);
+        .map((t) =>
+          t.slots.filter((x): x is Character => Boolean(x)).map((x) => x.name),
+        )
+        .flatMap((t) => t);
+      const allUniqueNames = new Set(allNames);
 
-        expect(allUniqueNames.size).toBe(allNames.length);
-        expect(allUniqueNames.size).toBe(LARGE_ROSTER.length);
-    })
-  })
-})
+      expect(allUniqueNames.size).toBe(allNames.length);
+      expect(allUniqueNames.size).toBe(LARGE_ROSTER.length);
+    });
+  });
+});

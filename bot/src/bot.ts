@@ -14,7 +14,10 @@ import { Database } from "./exports/mem-database";
 import { loop, refreshDatabase } from "./exports/utils";
 import { handleCrafter } from "./discord/professions.command";
 import { worldBuffsHandler } from "./discord/worldbuffs.command";
-import { raidAssignHandler, SUPPORTED_ENCOUNTERS } from "./discord/raidassign.command";
+import {
+  raidAssignHandler,
+  SUPPORTED_ENCOUNTERS,
+} from "./discord/raidassign.command";
 
 const FIFTEEN_MINUTES = 15 * 60 * 1000;
 
@@ -72,7 +75,7 @@ async function setupClient(database: Database): Promise<void> {
     {
       id: "raid-assign",
       handler: raidAssignHandler,
-    }
+    },
   ]);
 
   client.on(Events.ClientReady, (readyClient) => {

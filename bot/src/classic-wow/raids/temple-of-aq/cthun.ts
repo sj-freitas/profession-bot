@@ -5,7 +5,11 @@ import {
   Group,
   Raid,
 } from "../../raid-assignment";
-import { exportToLuaTable, pickOneAtRandomAndRemoveFromArray } from "../utilts";
+import {
+  exportRaidGroupsToTable,
+  exportToLuaTable,
+  pickOneAtRandomAndRemoveFromArray,
+} from "../utilts";
 
 export const IDEAL_NUMBER_OF_MELEE_PER_GROUP = 2;
 export const ABSOLUTE_MAXIMUM_AMOUNT_OF_MELEE_IN_GROUP = 3;
@@ -144,19 +148,22 @@ export function exportToDiscord(composition: Raid): string {
 Check your positioning on [this map](https://discord.com/channels/1170959696174272663/1266480999781502976/1321583474641076284)
 Each melee has a "group leader" stack on top of your group's leader.
 
-${composition.groups
-  .map(
-    (t, idx) =>
-      `**Group ${idx + 1}:**\n${t.slots
-        .filter((slot): slot is Character => Boolean(slot))
-        .map((slot, currSlotIdx) =>
-          currSlotIdx === 0 && isMeleeCharacter(slot)
-            ? `- ${raidTargets[idx].discordEmoji} ${slot.name}`
-            : `- ${slot.name}`,
-        )
-        .join("\n")}`,
-  )
-  .join("\n\n")}`;
+\`\`\`${exportRaidGroupsToTable({
+    groups: composition.groups.map(
+      (t, groupIndex) =>
+        ({
+          slots: t.slots.map((s, index) =>
+            s?.role === "Melee" && index === 0
+              ? {
+                  ...s,
+                  name: `${s.name} [${raidTargets[groupIndex].name}]`,
+                }
+              : s,
+          ),
+        }) as Group,
+    ),
+  })}
+\`\`\``;
 }
 
 export function getCthunAssignment(roster: Character[]): string {

@@ -114,7 +114,7 @@ export function findNextAssignment({
 
   // Add people without history
   for (const curr of roster) {
-    if (!userBuffCounter.has(curr.discordHandle))  {
+    if (!userBuffCounter.has(curr.discordHandle)) {
       userBuffCounter.set(curr.discordHandle, 0);
     }
   }
