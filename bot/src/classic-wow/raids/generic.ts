@@ -2,7 +2,13 @@
 /* eslint-disable no-extend-native */
 import { Class } from "../../raider-io/types";
 import { CLASS_ROLE_MAP } from "../class-role";
-import { Character, Group, MAX_GROUP_SIZE, Raid } from "../raid-assignment";
+import {
+  Character,
+  Group,
+  GroupSlots,
+  MAX_GROUP_SIZE,
+  Raid,
+} from "../raid-assignment";
 import {
   getRaidsortLuaAssignment,
   pickOneAtRandomAndRemoveFromArray,
@@ -17,6 +23,41 @@ type Predicate<T> = (value: T, index: number, array: T[]) => boolean;
 function negatePredicate<T>(predicate: Predicate<T>): Predicate<T> {
   return (value: T, index: number, array: T[]) =>
     !predicate(value, index, array);
+}
+
+function tryMergeGroups(groups: Group[]): Group[] {
+  const mergedGroups: Group[] = [];
+  const remainingGroups = [...groups];
+
+  while (remainingGroups.length > 0) {
+    const currentGroup = remainingGroups.shift();
+
+    if (!currentGroup) {
+      // eslint-disable-next-line no-continue
+      continue;
+    }
+
+    let merged = false;
+
+    for (let i = 0; i < mergedGroups.length; i += 1) {
+      if (
+        mergedGroups[i].slots.length + currentGroup.slots.length <=
+        MAX_GROUP_SIZE
+      ) {
+        mergedGroups[i].slots = mergedGroups[i].slots.concat(
+          currentGroup.slots,
+        ) as GroupSlots;
+        merged = true;
+        break;
+      }
+    }
+
+    if (!merged) {
+      mergedGroups.push(currentGroup);
+    }
+  }
+
+  return mergedGroups;
 }
 
 export function filterTwo<T>(
@@ -254,37 +295,35 @@ export function makeAssignments(roster: Character[]): Raid {
     notFullGroup.push(currHunter);
   }
 
+  const hunterGroups = rangedHunters.reduce<Character[][]>((acc, next) => {
+    let lastGroup = acc[acc.length - 1];
+    if (lastGroup === undefined || lastGroup.length === MAX_GROUP_SIZE) {
+      lastGroup = [];
+      acc.push(lastGroup);
+    }
+
+    lastGroup.push(next);
+
+    return acc;
+  }, []);
+
   // If we have more than 8 groups we need to split the smaller groups ?
 
+  const adjustedGroups = [...groups, ...hunterGroups].map(
+    (currGroup) =>
+      ({
+        slots: new Array(MAX_GROUP_SIZE)
+          .fill(null)
+          .map((_, idx) => currGroup[idx] ?? null),
+      }) as Group,
+  );
+
   return {
-    groups: [
-      ...groups,
-      // Put any remaining hunters in a new group, probably not needed.
-      ...rangedHunters.reduce<Character[][]>((acc, next) => {
-        let lastGroup = acc[acc.length - 1];
-        if (lastGroup === undefined || lastGroup.length === MAX_GROUP_SIZE) {
-          lastGroup = [];
-          acc.push(lastGroup);
-        }
-
-        lastGroup.push(next);
-
-        return acc;
-      }, []),
-    ]
-      .map(
-        (currGroup) =>
-          ({
-            slots: new Array(MAX_GROUP_SIZE)
-              .fill(null)
-              .map((_, idx) => currGroup[idx] ?? null),
-          }) as Group,
-      )
-      .sort(
-        (group1, group2) =>
-          group2.slots.filter((t) => t !== null).length -
-          group1.slots.filter((t) => t !== null).length,
-      ),
+    groups: tryMergeGroups(adjustedGroups).sort(
+      (group1, group2) =>
+        group2.slots.filter((t) => t !== null).length -
+        group1.slots.filter((t) => t !== null).length,
+    ),
   };
 }
 

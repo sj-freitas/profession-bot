@@ -20,6 +20,9 @@ DISCORD_APPLICATION_ID="{DISCORD_DOT_APPLICATION_OR_CLIENT_ID}"
 - Bot mode: Server that serves bot requests to find crafters for professions
 
 # Missing features
-- More accurate word matching (tolerant to typos)
-- Auto update the database
-- Look into hosting it somewhere
+- More accurate word matching (tolerant to typos) [HARD]
+- Support item IDs directly
+- Raid assignments merge groups with free slots [EZ]
+- Sartura bug fix
+- Twin emps assignment
+- guild feedback bot [Star]

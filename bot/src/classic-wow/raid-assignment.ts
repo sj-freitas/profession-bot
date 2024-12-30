@@ -11,15 +11,17 @@ export interface Character {
   role: RaidRole;
 }
 
+export type GroupSlots = [
+  Character | null,
+  Character | null,
+  Character | null,
+  Character | null,
+  Character | null,
+];
+
 // Groups have 5 character slots
 export interface Group {
-  slots: [
-    Character | null,
-    Character | null,
-    Character | null,
-    Character | null,
-    Character | null,
-  ];
+  slots: GroupSlots;
 }
 
 // Raids have 8 group slots
