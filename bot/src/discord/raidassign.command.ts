@@ -65,7 +65,7 @@ async function getCharacterInfos(
         : {
             name: (t as Failure).name,
             role: "Ranged",
-            class: "Hunter",
+            class: "Mage",
           },
     );
 }

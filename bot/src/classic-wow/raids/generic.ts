@@ -271,14 +271,20 @@ export function makeAssignments(roster: Character[]): Raid {
 
         return acc;
       }, []),
-    ].map(
-      (currGroup) =>
-        ({
-          slots: new Array(MAX_GROUP_SIZE)
-            .fill(null)
-            .map((_, idx) => currGroup[idx] ?? null),
-        }) as Group,
-    ),
+    ]
+      .map(
+        (currGroup) =>
+          ({
+            slots: new Array(MAX_GROUP_SIZE)
+              .fill(null)
+              .map((_, idx) => currGroup[idx] ?? null),
+          }) as Group,
+      )
+      .sort(
+        (group1, group2) =>
+          group2.slots.filter((t) => t !== null).length -
+          group1.slots.filter((t) => t !== null).length,
+      ),
   };
 }
 
