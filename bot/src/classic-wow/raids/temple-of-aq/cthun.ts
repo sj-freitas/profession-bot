@@ -144,11 +144,12 @@ export function makeAssignments(roster: Character[]): Raid {
 export function exportToDiscord(composition: Raid): string {
   const raidTargets = Object.values(ALL_RAID_TARGETS).reverse();
 
-  return `## C'thun composition
+  return `\`\`\`
+## C'thun composition
 Check your positioning on [this map](https://discord.com/channels/1170959696174272663/1266480999781502976/1321583474641076284)
 Each melee has a "group leader" stack on top of your group's leader.
 
-\`\`\`${exportRaidGroupsToTable({
+${exportRaidGroupsToTable({
     groups: composition.groups.map(
       (t, groupIndex) =>
         ({
@@ -173,9 +174,8 @@ export function getCthunAssignment(roster: Character[]): string {
 ## Copy the following assignments to their specific use cases
 
 ### Discord Assignment for the specific raid channel:
-\`\`\`
+
 ${exportToDiscord(assignments)}
-\`\`\`
 
 ### WoW Raidsort Addon, do \`/raidsort import\` and copy the following value:
 \`\`\`
