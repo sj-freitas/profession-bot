@@ -63,7 +63,7 @@ export async function respondToRequestInfo(
   const indexOfTicket = rows.findIndex((t) => t[0] === ticketId);
   const row = rows[indexOfTicket];
 
-  if (row && row[3] !== null) {
+  if (row && Boolean(row[3])) {
     // Do not support multiple replies, only one per ticket.
     return null;
   }
