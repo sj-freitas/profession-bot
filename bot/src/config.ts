@@ -40,7 +40,6 @@ export const rawConfig: ApplicationConfiguration = {
     PUBLIC_KEY: process.env.DISCORD_PUBLIC_KEY as string,
     BOT_TOKEN: process.env.DISCORD_BOT_TOKEN as string,
     APPLICATION_ID: process.env.DISCORD_APPLICATION_ID as string,
-
   },
 };
 

@@ -16,7 +16,7 @@ export const staffRequestHandler: CommandHandler<Database> = async ({
   }
 
   const messageId = newUuid();
-  const anonymous = options.getBoolean("anonymous") ?? false;
+  const anonymous = options.getBoolean("anonymous") ?? true;
   const channelId = "1323265459230867497";
 
   // Store this info on the sheets - might need to check permissions
@@ -30,9 +30,13 @@ export const staffRequestHandler: CommandHandler<Database> = async ({
 
   await sendMessageToChannel(
     channelId,
-    `[${anonymous ? `${`@${author.username}`}` : "Anonymous"}] requests: \`\`\`
+    `[${anonymous ? "Anonymous" : `${`@${author.username}`}`}] requests: \`\`\`
 ${message}
 \`\`\`
 to reply type \`/staff-reply ${messageId} <reply text>\`.`,
+  );
+
+  await reply(
+    "Message sent to the staff team successfully. Someone will be checking it shortly.",
   );
 };
