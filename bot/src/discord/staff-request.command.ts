@@ -94,6 +94,6 @@ to reply DM the officer in question or submit another issue.`,
   );
 
   await reply(
-    "Message sent to the staff team successfully. Someone will be checking it shortly.",
+    "A DM in your name has been sent to the requester.",
   );
 };
