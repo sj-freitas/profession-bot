@@ -57,9 +57,9 @@ export const staffReplyHandler: CommandHandler<Database> = async ({
   author,
   sendDirectMessageToUser,
 }): Promise<void> => {
-  const ticketId = options.getString("ticketId");
+  const ticketId = options.getString("ticket-id");
   if (ticketId === null) {
-    await reply("Failed to provide a valid ticketId.");
+    await reply("Failed to provide a valid ticket-id.");
     return;
   }
 
