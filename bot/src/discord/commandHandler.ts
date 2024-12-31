@@ -22,7 +22,10 @@ export type SendDirectMessageToUser = (
   message: string,
 ) => Promise<void>;
 
-export type StringReply = (content: string) => Promise<InteractionResponse>;
+export type StringReply = (
+  content: string,
+  ephemeral?: boolean,
+) => Promise<InteractionResponse>;
 
 export interface CommandHandlerInput<TContext> {
   options: CommandOptions;
@@ -64,10 +67,10 @@ export function createCommandHandler<TContext>(
       return;
     }
 
-    const replyDelegated: StringReply = (args: string) =>
+    const replyDelegated: StringReply = (args: string, ephemeral = true) =>
       interaction.reply({
         content: args,
-        ephemeral: true,
+        ephemeral,
       });
     const commandName = interaction.commandName.trim();
     const foundHandler = handlers.find((t) => t.id === commandName);

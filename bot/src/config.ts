@@ -4,6 +4,7 @@ const ApplicationConfigurationZod = z.object({
   GUILD: z.object({
     NAME: z.string().optional(),
     INFO_SHEET: z.string().nonempty(),
+    STAFF_REQUEST_CHANNEL_ID: z.string().nonempty(),
   }),
   WOW_HEAD: z.object({
     HOST_NAME: z.string().url(),
@@ -26,6 +27,7 @@ export type ApplicationConfiguration = z.infer<
 export const rawConfig: ApplicationConfiguration = {
   GUILD: {
     INFO_SHEET: process.env.GUILD_INFO_SHEET as string,
+    STAFF_REQUEST_CHANNEL_ID: process.env.GUILD_STAFF_REQUEST_CHANNEL_ID as string,
   },
   WOW_HEAD: {
     HOST_NAME: "https://www.wowhead.com",
@@ -38,6 +40,7 @@ export const rawConfig: ApplicationConfiguration = {
     PUBLIC_KEY: process.env.DISCORD_PUBLIC_KEY as string,
     BOT_TOKEN: process.env.DISCORD_BOT_TOKEN as string,
     APPLICATION_ID: process.env.DISCORD_APPLICATION_ID as string,
+
   },
 };
 
