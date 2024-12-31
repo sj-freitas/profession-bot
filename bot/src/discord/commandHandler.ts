@@ -116,8 +116,9 @@ export function createCommandHandler<TContext>(
         sendDirectMessageToUser,
         author: interaction.member?.user,
       })
-      .catch(() => {
+      .catch((err: unknown) => {
         // Analytics for failure
+        console.error(err);
         void replyDelegated(`Command failed`);
       });
   };
