@@ -64,6 +64,22 @@ const commands = [
         ),
     ),
   new SlashCommandBuilder()
+    .setName("staff-request")
+    .setDescription(
+      "Allows you to send a message to the guild staff. Messages can be anonymous",
+    )
+    .addStringOption((option) =>
+      option
+        .setName("message")
+        .setDescription("The text message to send to the officers."),
+    )
+    .addBooleanOption((option) =>
+      option
+        .setName("anonymous")
+        .setDescription("Inform the officers if you want your name to be known")
+        .setRequired(false),
+    ),
+  new SlashCommandBuilder()
     .setName("staff-reply")
     .setDescription("Allows a staff member to reply to a message")
     .addBooleanOption((option) =>
