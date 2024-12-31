@@ -22,7 +22,7 @@ DISCORD_APPLICATION_ID="{DISCORD_DOT_APPLICATION_OR_CLIENT_ID}"
 # Missing features
 - More accurate word matching (tolerant to typos) [HARD]
 - Support item IDs directly
-- Raid assignments merge groups with free slots [EZ]
+- Raid assignments merge groups with free slots [DONE]
 - Sartura bug fix
 - Twin emps assignment
-- guild feedback bot [Star]
+- guild feedback bot [Start]

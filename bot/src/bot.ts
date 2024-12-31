@@ -9,7 +9,6 @@ import {
   SlashCommandBuilder,
 } from "discord.js";
 import { CONFIG } from "./config";
-import { createCommandHandler } from "./discord/commandHandler";
 import { Database } from "./exports/mem-database";
 import { loop, refreshDatabase } from "./exports/utils";
 import { handleCrafter } from "./discord/professions.command";
@@ -18,8 +17,10 @@ import {
   raidAssignHandler,
   SUPPORTED_ENCOUNTERS,
 } from "./discord/raidassign.command";
+import { staffRequestHandler } from "./discord/staff-request.command";
+import { createCommandHandler } from "./discord/commandHandler";
 
-const FIFTEEN_MINUTES = 15 * 60 * 1000;
+const FIVE_MINUTES = 5 * 60 * 1000;
 
 const commands = [
   new SlashCommandBuilder()
@@ -59,10 +60,33 @@ const commands = [
           "The discord handles for all raid participants, should be copied from the Raid-Helper announcement",
         ),
     ),
+  new SlashCommandBuilder()
+    .setName("staff-request")
+    .setDescription(
+      "Allows you to send a message to the guild staff. Messages can be anonymous",
+    )
+    .addStringOption((option) =>
+      option
+        .setName("message")
+        .setDescription("The text message to send to the officers."),
+    )
+    .addBooleanOption((option) =>
+      option
+        .setName("anonymous")
+        .setDescription("Inform the officers if you want your name to be known")
+        .setRequired(false),
+    ),
 ];
 
 async function setupClient(database: Database): Promise<void> {
-  const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+  const client = new Client({
+    intents: [
+      GatewayIntentBits.Guilds,
+      GatewayIntentBits.GuildMessages,
+      GatewayIntentBits.DirectMessages,
+      GatewayIntentBits.MessageContent,
+    ],
+  });
   const handler = createCommandHandler(database, [
     {
       id: "crafter",
@@ -75,6 +99,10 @@ async function setupClient(database: Database): Promise<void> {
     {
       id: "raid-assign",
       handler: raidAssignHandler,
+    },
+    {
+      id: "staff-request",
+      handler: staffRequestHandler,
     },
   ]);
 
@@ -91,7 +119,7 @@ async function bootstrapServer(): Promise<void> {
 
   // Loop this function
   const database = new Database();
-  void loop(async () => refreshDatabase(database), FIFTEEN_MINUTES);
+  void loop(async () => refreshDatabase(database), FIVE_MINUTES);
   await setupClient(database);
 
   try {

@@ -2,15 +2,15 @@
 import { Database } from "../exports/mem-database";
 import { queryWowHead } from "../wowhead/client";
 import { removeNonSpells, removeQAResults } from "../wowhead/helpers";
-import { CommandHandler, CommandOptions, StringReply } from "./commandHandler";
+import { CommandHandler } from "./commandHandler";
 
 const MAX_ALLOWED_SEARCH_RESULTS = 4;
 
-export const handleCrafter: CommandHandler<Database> = async (
-  options: CommandOptions,
-  reply: StringReply,
-  database: Database,
-): Promise<void> => {
+export const handleCrafter: CommandHandler<Database> = async ({
+  options,
+  reply,
+  payload: database,
+}): Promise<void> => {
   const recipe = options.getString("recipe");
 
   if (recipe === null) {

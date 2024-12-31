@@ -7,16 +7,16 @@ import { Database } from "../exports/mem-database";
 import { formatGroupAssignmentsToMarkdown } from "../exports/world-buffs/format-group-assigments-md";
 import { formatGroupsForSheets } from "../exports/world-buffs/format-groups-for-sheets";
 import { Player } from "../sheets/get-players";
-import { CommandHandler, CommandOptions, StringReply } from "./commandHandler";
+import { CommandHandler } from "./commandHandler";
 import { parseDiscordHandles } from "./utils";
 
 const NUMBER_OF_GROUPS = 2;
 
-export const worldBuffsHandler: CommandHandler<Database> = async (
-  options: CommandOptions,
-  reply: StringReply,
-  database: Database,
-): Promise<void> => {
+export const worldBuffsHandler: CommandHandler<Database> = async ({
+  options,
+  reply,
+  payload: database,
+}): Promise<void> => {
   const roster = options.getString("roster");
 
   if (roster === null) {

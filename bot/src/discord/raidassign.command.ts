@@ -6,7 +6,7 @@ import { Player } from "../sheets/get-players";
 import { Character } from "../classic-wow/raid-assignment";
 import { getCthunAssignment } from "../classic-wow/raids/temple-of-aq/cthun";
 import { getSarturaAssignment } from "../classic-wow/raids/temple-of-aq/sartura";
-import { CommandHandler, CommandOptions, StringReply } from "./commandHandler";
+import { CommandHandler } from "./commandHandler";
 import { getGenericRaidAssignment } from "../classic-wow/raids/generic";
 import { parseDiscordHandles } from "./utils";
 import { CharacterDetails } from "../raider-io/types";
@@ -70,11 +70,11 @@ async function getCharacterInfos(
     );
 }
 
-export const raidAssignHandler: CommandHandler<Database> = async (
-  options: CommandOptions,
-  reply: StringReply,
-  database: Database,
-): Promise<void> => {
+export const raidAssignHandler: CommandHandler<Database> = async ({
+  options,
+  reply,
+  payload: database,
+}): Promise<void> => {
   const encounter = options.getString("encounter");
   if (encounter === null) {
     await reply("Failed to provide a value for encounter.");
