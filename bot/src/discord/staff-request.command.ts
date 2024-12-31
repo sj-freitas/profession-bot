@@ -44,7 +44,7 @@ to reply type \`/staff-reply ${messageId} <reply text>\`.`,
 
   // Store the message
   const sheetClient = createSheetClient();
-  await writeRequestInfo(sheetClient, CONFIG.GUILD.INFO_SHEET, {
+  void await writeRequestInfo(sheetClient, CONFIG.GUILD.INFO_SHEET, {
     messageId,
     author: author.username,
     message,
