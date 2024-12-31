@@ -89,6 +89,7 @@ export const staffReplyHandler: CommandHandler<Database> = async ({
     await reply(
       "An officer has already replied to this message.",
     );
+    return;
   }
 
   await sendDirectMessageToUser(
