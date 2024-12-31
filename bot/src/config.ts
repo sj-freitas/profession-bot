@@ -10,7 +10,7 @@ const ApplicationConfigurationZod = z.object({
     HOST_NAME: z.string().url(),
   }),
   GOOGLE: z.object({
-    API_KEY: z.string().nonempty(),
+    CREDENTIALS: z.string().nonempty(),
     SHEETS_SCOPES: z.array(z.string().url()),
   }),
   DISCORD: z.object({
@@ -33,7 +33,7 @@ export const rawConfig: ApplicationConfiguration = {
     HOST_NAME: "https://www.wowhead.com",
   },
   GOOGLE: {
-    API_KEY: process.env.GOOGLE_API_KEY as string,
+    CREDENTIALS: process.env.GOOGLE_CREDENTIALS as string,
     SHEETS_SCOPES: ["https://www.googleapis.com/auth/spreadsheets"],
   },
   DISCORD: {

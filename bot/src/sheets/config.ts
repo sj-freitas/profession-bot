@@ -6,8 +6,9 @@ import { CONFIG } from "../config";
 export type SheetClient = sheets_v4.Sheets;
 
 export function createSheetClient(): SheetClient {
+  const credentials = JSON.parse(CONFIG.GOOGLE.CREDENTIALS);
   const auth = new google.auth.GoogleAuth({
-    apiKey: CONFIG.GOOGLE.API_KEY,
+    credentials,
     scopes: CONFIG.GOOGLE.SHEETS_SCOPES,
   });
 

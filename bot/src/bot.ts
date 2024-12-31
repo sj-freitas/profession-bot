@@ -17,7 +17,10 @@ import {
   raidAssignHandler,
   SUPPORTED_ENCOUNTERS,
 } from "./discord/raidassign.command";
-import { staffRequestHandler } from "./discord/staff-request.command";
+import {
+  staffRequestHandler,
+  staffReplyHandler,
+} from "./discord/staff-request.command";
 import { createCommandHandler } from "./discord/commandHandler";
 
 const FIVE_MINUTES = 5 * 60 * 1000;
@@ -61,20 +64,15 @@ const commands = [
         ),
     ),
   new SlashCommandBuilder()
-    .setName("staff-request")
-    .setDescription(
-      "Allows you to send a message to the guild staff. Messages can be anonymous",
+    .setName("staff-reply")
+    .setDescription("Allows a staff member to reply to a message")
+    .addBooleanOption((option) =>
+      option.setName("ticketId").setDescription("The ticket ID to reply to"),
     )
     .addStringOption((option) =>
       option
         .setName("message")
-        .setDescription("The text message to send to the officers."),
-    )
-    .addBooleanOption((option) =>
-      option
-        .setName("anonymous")
-        .setDescription("Inform the officers if you want your name to be known")
-        .setRequired(false),
+        .setDescription("The text message for the officers to send."),
     ),
 ];
 
@@ -103,6 +101,10 @@ async function setupClient(database: Database): Promise<void> {
     {
       id: "staff-request",
       handler: staffRequestHandler,
+    },
+    {
+      id: "staff-reply",
+      handler: staffReplyHandler,
     },
   ]);
 
