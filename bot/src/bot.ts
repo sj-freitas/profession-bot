@@ -82,7 +82,7 @@ const commands = [
   new SlashCommandBuilder()
     .setName("staff-reply")
     .setDescription("Allows a staff member to reply to a message")
-    .addBooleanOption((option) =>
+    .addStringOption((option) =>
       option.setName("ticket-id").setDescription("The ticket ID to reply to"),
     )
     .addStringOption((option) =>
