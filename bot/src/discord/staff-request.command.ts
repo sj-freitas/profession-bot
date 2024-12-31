@@ -85,6 +85,12 @@ export const staffReplyHandler: CommandHandler<Database> = async ({
     },
   );
 
+  if (userId === null) {
+    await reply(
+      "An officer has already replied to this message.",
+    );
+  }
+
   await sendDirectMessageToUser(
     userId,
     `Your request was answered by @${author.username}: \`\`\`

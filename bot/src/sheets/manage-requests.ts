@@ -48,12 +48,12 @@ export async function respondToRequestInfo(
   sheetId: string,
   ticketId: string,
   staffRequestResponse: StaffRequestResponse,
-): Promise<string> {
+): Promise<string | null> {
   const rows = await readGoogleSheet(
     sheetClient,
     sheetId,
     "Feedback and Suggestions",
-    "A:B",
+    "A:D",
   );
 
   if (!rows) {
@@ -61,6 +61,12 @@ export async function respondToRequestInfo(
   }
 
   const indexOfTicket = rows.findIndex((t) => t[0] === ticketId);
+  const row = rows[indexOfTicket];
+
+  if (row[3] !== null) {
+    // Do not support multiple replies, only one per ticket.
+    return null;
+  }
 
   if (indexOfTicket < 0) {
     throw new Error(`Issue ${ticketId} not found!`);
@@ -78,5 +84,5 @@ export async function respondToRequestInfo(
     ],
   );
 
-  return `${rows[indexOfTicket][1]}`;
+  return `${row[1]}`;
 }
