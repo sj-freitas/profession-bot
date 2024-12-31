@@ -67,7 +67,7 @@ const commands = [
     .setName("staff-reply")
     .setDescription("Allows a staff member to reply to a message")
     .addBooleanOption((option) =>
-      option.setName("ticketId").setDescription("The ticket ID to reply to"),
+      option.setName("ticket-id").setDescription("The ticket ID to reply to"),
     )
     .addStringOption((option) =>
       option
