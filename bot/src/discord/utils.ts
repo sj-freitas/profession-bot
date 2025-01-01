@@ -1,4 +1,4 @@
-import { Client, MessageFlags } from "discord.js";
+import { Client, MessageFlags, TextChannel } from "discord.js";
 
 export function parseDiscordHandles(handles: string): string[] {
   return handles
@@ -20,13 +20,10 @@ export async function deleteAllMessagesInChannel(
     return;
   }
 
+  const textChannel = channel as TextChannel;
   const allMessages = await channel.messages.fetch();
 
-  await Promise.all(
-    allMessages.map(async (currMessage) =>
-      channel.messages.delete(currMessage),
-    ),
-  );
+  await textChannel.bulkDelete(allMessages);
 }
 
 export async function sendMessageToChannel(
