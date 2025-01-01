@@ -21,8 +21,16 @@ DISCORD_APPLICATION_ID="{DISCORD_DOT_APPLICATION_OR_CLIENT_ID}"
 
 # Missing features
 - More accurate word matching (tolerant to typos) [HARD]
-- Support item IDs directly
-- Raid assignments merge groups with free slots [DONE]
-- Sartura bug fix
-- Twin emps assignment
-- guild feedback bot [Start]
+- Support item IDs directly [MEDIUM]
+- Raid assignments merge groups with free slots [BUGGED?]
+- Sartura bug fix [EASY]
+- Twin emps assignment [EASY?]
+- Automatic update on professions [EASY]
+- /nuke clears all messages in a channel if you are a Staff member [EASY] [STARTED]
+- integrate with with "raid-helper" API to retrieve raid-info from sign ups
+    - Have a database of character per player
+    - Use raider.io to fetch which character the player is signed up as (can use the API to get the class/spec and use the class to match)
+    - Listener to the raid Event that creates:
+        - WB Assignments
+        - Boss Assignments
+        - SR list

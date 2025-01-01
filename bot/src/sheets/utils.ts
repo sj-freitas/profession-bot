@@ -48,3 +48,21 @@ export async function appendRowToGoogleSheet(
     },
   });
 }
+
+export async function replaceValueInGoogleSheet(
+  googleSheetClient: SheetClient,
+  spreadsheetId: string,
+  tabName: string,
+  startCell: { x: string; y: number },
+  values: string[],
+) {
+  await googleSheetClient.spreadsheets.values.update({
+    spreadsheetId,
+    range: `${tabName}!${calculateRange(startCell, values.length)}`, // : "A3:C3"
+    valueInputOption: "RAW",
+    requestBody: {
+      majorDimension: "ROWS",
+      values: [values],
+    },
+  })
+}

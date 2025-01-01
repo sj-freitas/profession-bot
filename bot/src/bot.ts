@@ -1,13 +1,6 @@
 /* eslint-disable no-useless-return */
 /* eslint-disable no-console */
-import {
-  REST,
-  Routes,
-  Client,
-  Events,
-  GatewayIntentBits,
-  SlashCommandBuilder,
-} from "discord.js";
+import { REST, Routes, Events, SlashCommandBuilder, Client } from "discord.js";
 import { CONFIG } from "./config";
 import { Database } from "./exports/mem-database";
 import { loop, refreshDatabase } from "./exports/utils";
@@ -22,6 +15,9 @@ import {
   staffReplyHandler,
 } from "./discord/staff-request.command";
 import { createCommandHandler } from "./discord/commandHandler";
+import { createClient } from "./discord/create-client";
+import { deleteMessagesHandler } from "./discord/delete-messages.command";
+import { runJob } from "./discord/crafting-list.job";
 
 const FIVE_MINUTES = 5 * 60 * 1000;
 
@@ -90,17 +86,12 @@ const commands = [
         .setName("message")
         .setDescription("The text message for the officers to send."),
     ),
+  new SlashCommandBuilder()
+    .setName("nuke")
+    .setDescription("Deletes all messages from a channel"),
 ];
 
-async function setupClient(database: Database): Promise<void> {
-  const client = new Client({
-    intents: [
-      GatewayIntentBits.Guilds,
-      GatewayIntentBits.GuildMessages,
-      GatewayIntentBits.DirectMessages,
-      GatewayIntentBits.MessageContent,
-    ],
-  });
+async function setupClient(database: Database): Promise<Client> {
   const handler = createCommandHandler(database, [
     {
       id: "crafter",
@@ -122,23 +113,27 @@ async function setupClient(database: Database): Promise<void> {
       id: "staff-reply",
       handler: staffReplyHandler,
     },
+    {
+      id: "nuke",
+      handler: deleteMessagesHandler,
+    },
   ]);
 
-  client.on(Events.ClientReady, (readyClient) => {
-    console.log(`Logged in as ${readyClient.user.tag}!`);
+  return await createClient((client) => {
+    client.on(Events.ClientReady, (readyClient) => {
+      console.log(`Logged in as ${readyClient.user.tag}!`);
+    });
+    client.on(Events.InteractionCreate, handler);
   });
-  client.on(Events.InteractionCreate, handler);
-
-  await client.login(CONFIG.DISCORD.BOT_TOKEN);
 }
 
 async function bootstrapServer(): Promise<void> {
   const rest = new REST({ version: "10" }).setToken(CONFIG.DISCORD.BOT_TOKEN);
-
-  // Loop this function
   const database = new Database();
+  const discordClient = await setupClient(database);
+
   void loop(async () => refreshDatabase(database), FIVE_MINUTES);
-  await setupClient(database);
+  void loop(async () => runJob(discordClient), FIVE_MINUTES);
 
   try {
     console.log("Started refreshing application (/) commands.");

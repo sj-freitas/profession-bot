@@ -12,7 +12,7 @@ export async function refreshDatabase(database: Database): Promise<void> {
 
   const sheetClient = createSheetClient();
   const data = await readProfessionData(sheetClient, CONFIG.GUILD.INFO_SHEET);
-  const parsed = await getGuildInfo(data);
+  const parsed = await getGuildInfo(data.professionData);
   const roster = await getPlayers(sheetClient, CONFIG.GUILD.INFO_SHEET);
   const worldBuffAssignments = await getWorldBuffInfo(
     sheetClient,

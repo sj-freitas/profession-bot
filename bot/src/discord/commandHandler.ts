@@ -28,6 +28,7 @@ export type StringReply = (
 ) => Promise<InteractionResponse>;
 
 export interface CommandHandlerInput<TContext> {
+  interaction: Interaction;
   options: CommandOptions;
   reply: StringReply;
   payload: TContext;
@@ -112,6 +113,7 @@ export function createCommandHandler<TContext>(
 
     foundHandler
       .handler({
+        interaction,
         options: interaction.options,
         reply: replyDelegated,
         payload: context,
