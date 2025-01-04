@@ -44,3 +44,6 @@ RAID_HELPER_API_KEY="{RAIDER_HELPER_API_KEY_CAN_BE_OBTAINED_WITH_COMMAND_ON_DISC
         - Missing Twin Emps tactic
         - Missing Bug Trio
         - Merge Groups
+    - Clean up Raid Channels
+        - Every day at 2 am delete all non-bot messages
+        - 4 hours after the raid, delete current raid and create a new one with default description

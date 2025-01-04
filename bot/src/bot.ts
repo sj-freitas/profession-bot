@@ -20,7 +20,7 @@ import { deleteMessagesHandler } from "./discord/delete-messages.command";
 import { runJob } from "./discord/crafting-list.job";
 import { addChannelListener } from "./flows/soft-reserves/channel-listener";
 import { pollChannelsForSoftReserves } from "./flows/soft-reserves/recurring-job";
-import { pollChannelsForAssignments } from "./flows/raid-assignments/recurring-job";
+import { pollChannelsForAssignments } from "./flows/raid-assignments/recurring-jobs";
 
 const { RAID_SIGN_UP_CHANNELS, STAFF_RAID_CHANNEL_ID } = CONFIG.GUILD;
 const FIVE_MINUTES = 5 * 60 * 1000;
