@@ -19,9 +19,9 @@ export const deleteMessagesHandler: CommandHandler<Database> = async ({
   const roles = Array.isArray(member.roles) ? member.roles : [];
 
   if (roles.find((t) => t !== OFFICER_ROLE)) {
-    await reply("User doesn't have required role")
+    await reply("User doesn't have required role");
   }
-  
+
   // Analytics for here
   await deleteAllMessagesInChannel(interaction.client, channel.id);
   await reply("All clear!");

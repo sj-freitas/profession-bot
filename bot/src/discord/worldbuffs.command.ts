@@ -12,6 +12,8 @@ import { parseDiscordHandles } from "./utils";
 
 const NUMBER_OF_GROUPS = 2;
 
+export function a() {}
+
 export const worldBuffsHandler: CommandHandler<Database> = async ({
   options,
   reply,

@@ -49,7 +49,10 @@ export function formatGroupAssignmentsToMarkdown(
       formatted[currBuffInfo.shortName] = {
         ...formatted[currBuffInfo.shortName],
         [groupId]: getArrayFromSingleOrArray<Player | null>(assignees).map(
-          (t) => (t !== null ? t.discordHandle : "<MISSING_ASSIGNMENT>"),
+          (t) =>
+            t !== null
+              ? `<@${t.discordId ?? t.discordHandle}>`
+              : "<MISSING_ASSIGNMENT>",
         ),
       };
     });

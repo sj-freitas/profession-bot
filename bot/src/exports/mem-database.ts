@@ -1,3 +1,4 @@
+import { Character } from "../classic-wow/raid-assignment";
 import { WorldBuffAssignments, WorldBuffHistory } from "../sheets/get-buffers";
 import { Player } from "../sheets/get-players";
 import { AvailableProfession, GuildProfessionData } from "./types";
@@ -26,6 +27,8 @@ export class Database {
   private worldBuffHistory: WorldBuffHistory[] = [];
 
   private playerRoster: Player[] = [];
+
+  private characterRoster: Character[] = [];
 
   queryRecipes(searchTerm: string): RecipeInfo[] {
     // Can do with some magic here to make some words more similar to others and resolve
@@ -61,6 +64,14 @@ export class Database {
 
   setPlayersRoster(players: Player[]) {
     this.playerRoster = players;
+  }
+
+  getCharacterRoster(): Character[] {
+    return this.characterRoster;
+  }
+
+  setCharacterRoster(characters: Character[]) {
+    this.characterRoster = characters;
   }
 }
 

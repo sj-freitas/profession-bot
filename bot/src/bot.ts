@@ -18,7 +18,10 @@ import { createCommandHandler } from "./discord/commandHandler";
 import { createClient } from "./discord/create-client";
 import { deleteMessagesHandler } from "./discord/delete-messages.command";
 import { runJob } from "./discord/crafting-list.job";
+import { addChannelListener } from "./flows/soft-reserves/channel-listener";
+import { pollChannelsForSoftReserves } from "./flows/soft-reserves/recurring-job";
 
+const { RAID_SIGN_UP_CHANNELS, STAFF_RAID_CHANNEL_ID } = CONFIG.GUILD;
 const FIVE_MINUTES = 5 * 60 * 1000;
 
 const commands = [
@@ -120,6 +123,7 @@ async function setupClient(database: Database): Promise<Client> {
   ]);
 
   return await createClient((client) => {
+    addChannelListener(client, RAID_SIGN_UP_CHANNELS, STAFF_RAID_CHANNEL_ID);
     client.on(Events.ClientReady, (readyClient) => {
       console.log(`Logged in as ${readyClient.user.tag}!`);
     });
@@ -134,6 +138,15 @@ async function bootstrapServer(): Promise<void> {
 
   void loop(async () => refreshDatabase(database), FIVE_MINUTES);
   void loop(async () => runJob(discordClient), FIVE_MINUTES);
+  void loop(
+    async () =>
+      pollChannelsForSoftReserves(
+        discordClient,
+        RAID_SIGN_UP_CHANNELS,
+        STAFF_RAID_CHANNEL_ID,
+      ),
+    FIVE_MINUTES,
+  );
 
   try {
     console.log("Started refreshing application (/) commands.");

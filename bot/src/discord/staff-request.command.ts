@@ -23,7 +23,7 @@ export const staffRequestHandler: CommandHandler<Database> = async ({
 
   const messageId = newUuid();
   const anonymous = options.getBoolean("anonymous") ?? true;
-  const channelId = "1323265459230867497";
+  const channelId = CONFIG.GUILD.STAFF_REQUEST_CHANNEL_ID;
 
   if (!author) {
     await reply("Failed to provide a valid author.");
@@ -44,11 +44,11 @@ to reply type \`/staff-reply ${messageId} <reply text>\`.`,
 
   // Store the message
   const sheetClient = createSheetClient();
-  void await writeRequestInfo(sheetClient, CONFIG.GUILD.INFO_SHEET, {
+  void (await writeRequestInfo(sheetClient, CONFIG.GUILD.INFO_SHEET, {
     messageId,
     author: author.username,
     message,
-  });
+  }));
 };
 
 export const staffReplyHandler: CommandHandler<Database> = async ({
@@ -86,9 +86,7 @@ export const staffReplyHandler: CommandHandler<Database> = async ({
   );
 
   if (userId === null) {
-    await reply(
-      "An officer has already replied to this message.",
-    );
+    await reply("An officer has already replied to this message.");
     return;
   }
 
@@ -100,7 +98,5 @@ ${message}
 to reply DM the officer in question or submit another issue.`,
   );
 
-  await reply(
-    "A DM in your name has been sent to the requester.",
-  );
+  await reply("A DM in your name has been sent to the requester.");
 };

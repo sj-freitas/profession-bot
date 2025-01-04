@@ -1,5 +1,6 @@
 import fetch from "node-fetch";
 import { CharacterDetails, characterDetailsSchema } from "./types";
+import { CONFIG } from "../config";
 
 export async function fetchCharacterData(
   region: string,
@@ -7,7 +8,7 @@ export async function fetchCharacterData(
   characterName: string,
 ): Promise<CharacterDetails> {
   const response = await fetch(
-    `https://era.raider.io/api/characters/${region}/${realmName}/${characterName}?tier=30`,
+    `${CONFIG.RAIDER_IO_API.HOST_NAME}/characters/${region}/${realmName}/${characterName}?tier=30`,
   );
   const json = await response.json();
 

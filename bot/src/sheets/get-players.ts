@@ -3,6 +3,7 @@ import { readGoogleSheet } from "./utils";
 
 export interface Player {
   discordHandle: string;
+  discordId: string;
   serverHandle: string;
   characters: string[];
 }
@@ -15,7 +16,7 @@ export async function getPlayers(
     sheetClient,
     sheetId,
     "DiscordMapping",
-    "A:C",
+    "A:D",
   );
 
   if (!rows) {
@@ -25,10 +26,11 @@ export async function getPlayers(
   const values = (rows ?? []).slice(1) as string[][];
 
   return values
-    .map(([discordHandle, characters, serverHandle]) => ({
+    .map(([discordHandle, characters, serverHandle, discordId]) => ({
       discordHandle: discordHandle?.trim(),
       characters: characters?.split(";").map((t) => t.trim()),
       serverHandle: serverHandle?.trim(),
+      discordId: discordId.trim(),
     }))
     .filter((t) => t.discordHandle && t.characters && t.serverHandle);
 }

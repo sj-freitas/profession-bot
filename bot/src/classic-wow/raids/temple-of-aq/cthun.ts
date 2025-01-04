@@ -150,20 +150,20 @@ Check your positioning on [this map](https://discord.com/channels/11709596961742
 Each melee has a "group leader" stack on top of your group's leader.
 
 ${exportRaidGroupsToTable({
-    groups: composition.groups.map(
-      (t, groupIndex) =>
-        ({
-          slots: t.slots.map((s, index) =>
-            s?.role === "Melee" && index === 0
-              ? {
-                  ...s,
-                  name: `${s.name} [${raidTargets[groupIndex].name}]`,
-                }
-              : s,
-          ),
-        }) as Group,
-    ),
-  })}
+  groups: composition.groups.map(
+    (t, groupIndex) =>
+      ({
+        slots: t.slots.map((s, index) =>
+          s?.role === "Melee" && index === 0
+            ? {
+                ...s,
+                name: `${s.name} [${raidTargets[groupIndex].name}]`,
+              }
+            : s,
+        ),
+      }) as Group,
+  ),
+})}
 \`\`\``;
 }
 

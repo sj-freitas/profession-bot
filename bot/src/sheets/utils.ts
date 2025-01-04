@@ -1,6 +1,9 @@
 import { SheetClient } from "./config";
 
-export function incrementLetter(letter: string, incrementValue: number = 1): string {
+export function incrementLetter(
+  letter: string,
+  incrementValue: number = 1,
+): string {
   return (
     letter.substring(0, letter.length - 1) +
     String.fromCharCode(letter.charCodeAt(letter.length - 1) + incrementValue)
@@ -64,5 +67,5 @@ export async function replaceValueInGoogleSheet(
       majorDimension: "ROWS",
       values: [values],
     },
-  })
+  });
 }

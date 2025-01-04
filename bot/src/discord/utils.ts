@@ -1,4 +1,4 @@
-import { Client, MessageFlags, TextChannel } from "discord.js";
+import { Client, Message, MessageFlags, TextChannel } from "discord.js";
 
 export function parseDiscordHandles(handles: string): string[] {
   return handles
@@ -44,4 +44,29 @@ export async function sendMessageToChannel(
     content: message,
     flags: MessageFlags.SuppressEmbeds,
   });
+}
+
+export async function findMessageInHistory(
+  discordClient: Client,
+  channelId: string,
+  messageStartsWith: string,
+): Promise<Message<boolean> | null> {
+  const channel = await discordClient.channels.fetch(channelId);
+  if (!channel || !channel.isTextBased()) {
+    return null;
+  }
+
+  const messages = await channel.messages.fetch();
+  const messagesOfBot = messages.filter(
+    (t) => t.author.id === discordClient.application?.id,
+  );
+  const foundMessage = messagesOfBot.find(
+    (t) => t.content.indexOf(messageStartsWith) === 0,
+  );
+
+  if (!foundMessage) {
+    return null;
+  }
+
+  return foundMessage;
 }
