@@ -9,7 +9,7 @@ export interface SoftresRaidData {
 }
 
 const config: SheetTableConfig<SoftresRaidData> = {
-  tableRange: "C2:H",
+  tableRange: "E2:H",
   idColumnName: "softresId",
   mapRawToEntity: ([
     softresId,
