@@ -1,7 +1,9 @@
-# proffession-bot
-Aggregates data from a Google Sheet integrates with Wowhead and creates a nice wiki for discord
-Maybe I'll have multiple bots here and host them in one single repo. Let's see.
+# Introduction
+
+This is a repository of a bot and an Addon that I developed for my guild Relic Hunters for World of Warcraft Season of Discovery.
 
 ## Bot
-
 Go to [/bot](./bot).
+
+## Addons
+Go to [/addons](./addons)

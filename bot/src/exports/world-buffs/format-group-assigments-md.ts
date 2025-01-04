@@ -58,7 +58,7 @@ export function formatGroupAssignmentsToMarkdown(
     });
   });
 
-  return `# World buff item rotation
+  return `## World buff item rotation
 ${Object.entries(formatted)
   .map(
     ([buffName, groupInfo]) =>

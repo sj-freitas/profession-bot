@@ -12,18 +12,24 @@ import {
   fetchEvent,
   fetchServerEvents,
 } from "../../integrations/raid-helper/raid-helper-client";
-import { createSheetClient } from "../../integrations/sheets/config";
-
-const NUMBER_OF_DAYS_BEFORE_ASSIGNMENTS = 3;
+import {
+  createSheetClient,
+  SheetClient,
+} from "../../integrations/sheets/config";
 
 export async function pollChannelForWorldBuffAssignments(
   discordClient: Client,
+  sheetClient: SheetClient,
   raidInfoTable: RaidInfoTable,
   database: Database,
   raidInfo: RaidInfo,
 ): Promise<void> {
   const raidEvent = await fetchEvent(raidInfo.eventId);
   const roster = await getRosterFromRaidEvent(raidEvent);
+
+  // Stuff that should be done even if the hash doesn't change
+  await tryAdvertiseMissingSoftReserves(discordClient, sheetClient, raidEvent);
+
   if (raidInfo.rosterHash === roster.rosterHash) {
     return;
   }
@@ -32,7 +38,6 @@ export async function pollChannelForWorldBuffAssignments(
   await tryPostWorldBuffAssignments(discordClient, database, raidEvent, roster);
   await tryPostRaidComposition();
   await tryPostFightAssignments();
-  await tryAdvertiseMissingSoftReserves();
   await tryNotifyOfficersMissingSignUps(discordClient, database, raidEvent);
 
   // Update the hash
@@ -70,16 +75,10 @@ export async function pollChannelsForAssignments(
       if (!trackedEvent.startTime) {
         return;
       }
-      const raidTime = new Date(trackedEvent.startTime * 1000);
-      const oneDayBeforeRaid = new Date().setDate(
-        raidTime.getDate() - NUMBER_OF_DAYS_BEFORE_ASSIGNMENTS,
-      );
-      if (new Date().getTime() < oneDayBeforeRaid) {
-        return;
-      }
 
       await pollChannelForWorldBuffAssignments(
         discordClient,
+        sheetClient,
         raidInfoTable,
         database,
         matchingRaid,

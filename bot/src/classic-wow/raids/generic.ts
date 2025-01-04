@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-extend-native */
 import { Class } from "../../integrations/raider-io/types";
+import { filterTwo } from "../../lib/array-utilts";
 import { CLASS_ROLE_MAP } from "../class-role";
 import {
   Character,
@@ -16,14 +17,6 @@ import {
 
 const MAX_NUMBER_OF_TANKS_PER_GROUP = 2;
 const MAX_NUMBER_OF_HEALERS_PER_GROUP = 2;
-
-type FilterTwoResult<T> = [predicated: T[], notPredicated: T[]];
-type Predicate<T> = (value: T, index: number, array: T[]) => boolean;
-
-function negatePredicate<T>(predicate: Predicate<T>): Predicate<T> {
-  return (value: T, index: number, array: T[]) =>
-    !predicate(value, index, array);
-}
 
 function tryMergeGroups(groups: Group[]): Group[] {
   const mergedGroups: Group[] = [];
@@ -58,13 +51,6 @@ function tryMergeGroups(groups: Group[]): Group[] {
   }
 
   return mergedGroups;
-}
-
-export function filterTwo<T>(
-  array: T[],
-  predicate: Predicate<T>,
-): FilterTwoResult<T> {
-  return [array.filter(predicate), array.filter(negatePredicate(predicate))];
 }
 
 export function makeAssignments(roster: Character[]): Raid {

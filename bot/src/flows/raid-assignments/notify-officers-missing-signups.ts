@@ -8,17 +8,24 @@ import {
 } from "../../discord/utils";
 import { Player } from "../../integrations/sheets/get-players";
 import { RaidEvent } from "../../integrations/raid-helper/types";
+import { isRaidEventInAmountOfTime } from "../time-utils";
 
 const { RAIDER_ROLES, DISCORD_SERVER_ID, STAFF_RAID_CHANNEL_ID } = CONFIG.GUILD;
 const raiderRolesSet = new Set(RAIDER_ROLES);
+
+const THREE_DAYS_BEFORE_RAID = 3 * 24 * 60 * 60 * 1000;
 
 export async function tryNotifyOfficersMissingSignUps(
   discordClient: Client,
   database: Database,
   raidEvent: RaidEvent,
 ): Promise<void> {
-  const guild = await discordClient.guilds.fetch(DISCORD_SERVER_ID);
+  // Check if it's 3 days before the raid
+  if (isRaidEventInAmountOfTime(raidEvent, THREE_DAYS_BEFORE_RAID)) {
+    return;
+  }
 
+  const guild = await discordClient.guilds.fetch(DISCORD_SERVER_ID);
   const players = database.getPlayersRoster();
   const members = await Promise.all(
     players.map(async (t) => guild.members.fetch(t.discordId)),

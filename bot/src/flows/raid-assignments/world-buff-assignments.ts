@@ -13,6 +13,9 @@ import {
   findMessageInHistory,
   sendMessageToChannel,
 } from "../../discord/utils";
+import { isRaidEventInAmountOfTime } from "../time-utils";
+
+const THREE_DAYS_BEFORE_RAID = 3 * 24 * 60 * 60 * 1000;
 
 function getAssignmentConfigAndHistory(database: Database) {
   const rawHistory = database.getWorldBuffHistory();
@@ -38,6 +41,11 @@ export async function tryPostWorldBuffAssignments(
   raidEvent: RaidEvent,
   roster: Roster,
 ): Promise<void> {
+  // Check if it's 3 days before the raid
+  if (isRaidEventInAmountOfTime(raidEvent, THREE_DAYS_BEFORE_RAID)) {
+    return;
+  }
+
   // Assign world buffs
   const allPlayersWithMains = roster.characters
     .filter((t) => t.isMainCharacter)
@@ -63,7 +71,7 @@ export async function tryPostWorldBuffAssignments(
   const message = await findMessageInHistory(
     discordClient,
     raidEvent.channelId,
-    "# World buff item rotation",
+    "## World buff item rotation",
   );
   if (message !== null) {
     // Edit
