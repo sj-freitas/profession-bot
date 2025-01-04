@@ -19,7 +19,7 @@ export async function tryAdvertiseMissingSoftReserves(
   raidEvent: RaidEvent,
 ): Promise<void> {
   // Check if it's 1 hour before the raid
-  if (isRaidEventInAmountOfTime(raidEvent, ONE_HOUR_BEFORE_RAID)) {
+  if (!isRaidEventInAmountOfTime(raidEvent, ONE_HOUR_BEFORE_RAID)) {
     return;
   }
 
@@ -35,7 +35,7 @@ export async function tryAdvertiseMissingSoftReserves(
   // Format
   const formatted = softReserveInfo
     .map(
-      (curr) => `"## Missing Soft Reserves
+      (curr) => `## Missing Soft Reserves
 ### For ${allSoftresRaidInfo.find((t) => t.softresId === curr.instanceRoster.instanceName)?.raidName}
 The following players haven't soft-reserved yet: ${curr.missingPlayers.map((t) => `<@${t.discordId}>`).join(", ")}`,
     )

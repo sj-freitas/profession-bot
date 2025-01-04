@@ -42,7 +42,7 @@ export async function tryPostWorldBuffAssignments(
   roster: Roster,
 ): Promise<void> {
   // Check if it's 3 days before the raid
-  if (isRaidEventInAmountOfTime(raidEvent, THREE_DAYS_BEFORE_RAID)) {
+  if (!isRaidEventInAmountOfTime(raidEvent, THREE_DAYS_BEFORE_RAID)) {
     return;
   }
 
