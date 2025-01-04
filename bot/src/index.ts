@@ -42,8 +42,12 @@ async function main() {
     .map((raiderId) => players.find((player) => raiderId === player.discordId))
     .filter((t): t is Player => t !== undefined);
 
+  const roles = await Promise.all(
+    [...RAIDER_ROLES].map(async (roleId) => guild.roles.fetch(roleId)),
+  );
   const raidMarkdownLink = `[${raidEvent.id}](https://discord.com/channels/${DISCORD_SERVER_ID}/${raidEvent.channelId}/${raidEvent.id})`;
-  const formatted = `## Missing sign-ups for raid ${raidMarkdownLink} ${raidEvent.title}
+  const formatted = `### Missing sign-ups for raid ${raidMarkdownLink} ${raidEvent.title}
+This is a list of players registered as ${roles.map((t) => t?.name).join(" or ")} that haven't signed-up yet.
 ${notSignedUpPlayers.map((t) => ` - <@${t.discordId}> ${t.characters[0]}`).join("\n")}`;
   console.log(formatted);
 
