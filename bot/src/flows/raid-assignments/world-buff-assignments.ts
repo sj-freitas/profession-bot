@@ -34,9 +34,9 @@ function getAssignmentConfigAndHistory(database: Database) {
 
 export async function tryPostWorldBuffAssignments(
   discordClient: Client,
+  database: Database,
   raidEvent: RaidEvent,
   roster: Roster,
-  database: Database,
 ): Promise<void> {
   // Assign world buffs
   const allPlayersWithMains = roster.characters

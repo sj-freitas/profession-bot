@@ -77,6 +77,7 @@ export const eventSchema = z.object({
   signUps: z.array(signUpSchema),
   description: z.string().optional(),
   channelId: z.string(),
+  title: z.string().optional(),
   startTime: z.number(), // datetime in SECONDS. Multiply by 1000 for accurate date in MS.
 });
 

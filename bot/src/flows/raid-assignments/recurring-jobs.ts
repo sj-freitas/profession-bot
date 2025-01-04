@@ -29,11 +29,11 @@ export async function pollChannelForWorldBuffAssignments(
   }
 
   // Roster has updated, trigger all post changes and assignments
-  await tryPostWorldBuffAssignments(discordClient, raidEvent, roster, database);
+  await tryPostWorldBuffAssignments(discordClient, database, raidEvent, roster);
   await tryPostRaidComposition();
   await tryPostFightAssignments();
   await tryAdvertiseMissingSoftReserves();
-  await tryNotifyOfficersMissingSignUps();
+  await tryNotifyOfficersMissingSignUps(discordClient, database, raidEvent);
 
   // Update the hash
   await raidInfoTable.updateValue({

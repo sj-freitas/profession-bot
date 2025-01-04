@@ -10,6 +10,7 @@ const ApplicationConfigurationZod = z.object({
     STAFF_RAID_CHANNEL_ID: z.string().nonempty(),
     DISCORD_SERVER_ID: z.string().nonempty(),
     RAID_SIGN_UP_CHANNELS: z.array(z.string()),
+    RAIDER_ROLES: z.array(z.string()),
   }),
   WOW_HEAD: z.object({
     HOST_NAME: z.string().url(),
@@ -42,6 +43,7 @@ export type ApplicationConfiguration = z.infer<
 
 export const rawConfig: ApplicationConfiguration = {
   GUILD: {
+    RAIDER_ROLES: JSON.parse(process.env.GUILD_RAIDER_ROLES as string),
     NAME: process.env.GUILD_NAME as string,
     REALM: process.env.GUILD_REALM as string,
     REGION: process.env.GUILD_REGION as string,

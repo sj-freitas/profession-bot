@@ -74,10 +74,11 @@ export interface Roster {
 
 export async function getRosterFromRaidEvent(
   raidEvent: RaidEvent,
+  includeAbsences = false,
 ): Promise<Roster> {
   const sheetClient = createSheetClient();
   const signUps = raidEvent.signUps
-    .filter((t) => isConfirmedSignup(t))
+    .filter((t) => includeAbsences || isConfirmedSignup(t))
     .map((t) => ({
       wowClass: inferWowClassFromSpec(t.specName!),
       simplifiedDiscordHandle: t.name.toLowerCase(),
