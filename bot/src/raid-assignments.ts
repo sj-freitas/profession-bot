@@ -1,8 +1,6 @@
 /* eslint-disable no-console */
 import { Database } from "./exports/mem-database";
 import { refreshDatabase } from "./exports/utils";
-import { fetchCharacterData } from "./raider-io/raider-io-client";
-import { getRoleFromCharacter } from "./raider-io/utils";
 import { Character } from "./classic-wow/raid-assignment";
 import {
   exportToDiscord as exportToDiscordCthun,
@@ -13,7 +11,9 @@ import {
   makeAssignments as makeAssignmentsSartura,
 } from "./classic-wow/raids/temple-of-aq/sartura";
 import { exportToLuaTable } from "./classic-wow/raids/utilts";
-import { CharacterDetails } from "./raider-io/types";
+import { getRoleFromCharacter } from "./integrations/raider-io/utils";
+import { fetchCharacterData } from "./integrations/raider-io/raider-io-client";
+import { CharacterDetails } from "./integrations/raider-io/types";
 
 // Manual overrides
 const overrideConfig: Character[] = [

@@ -1,6 +1,6 @@
 // eslint-disable-next-line camelcase
 import { google, sheets_v4 } from "googleapis";
-import { CONFIG } from "../config";
+import { CONFIG } from "../../config";
 
 // eslint-disable-next-line camelcase
 export type SheetClient = sheets_v4.Sheets;

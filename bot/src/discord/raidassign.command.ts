@@ -1,15 +1,15 @@
 /* eslint-disable no-console */
 import { Database } from "../exports/mem-database";
-import { fetchCharacterData } from "../raider-io/raider-io-client";
-import { getRoleFromCharacter } from "../raider-io/utils";
-import { Player } from "../sheets/get-players";
+import { fetchCharacterData } from "../integrations/raider-io/raider-io-client";
+import { getRoleFromCharacter } from "../integrations/raider-io/utils";
+import { Player } from "../integrations/sheets/get-players";
 import { Character } from "../classic-wow/raid-assignment";
 import { getCthunAssignment } from "../classic-wow/raids/temple-of-aq/cthun";
 import { getSarturaAssignment } from "../classic-wow/raids/temple-of-aq/sartura";
 import { CommandHandler } from "./commandHandler";
 import { getGenericRaidAssignment } from "../classic-wow/raids/generic";
 import { parseDiscordHandles } from "./utils";
-import { CharacterDetails } from "../raider-io/types";
+import { CharacterDetails } from "../integrations/raider-io/types";
 
 type RaidAssignment = (roster: Character[], players: Player[]) => string;
 

@@ -1,6 +1,9 @@
 import { Character } from "../classic-wow/raid-assignment";
-import { WorldBuffAssignments, WorldBuffHistory } from "../sheets/get-buffers";
-import { Player } from "../sheets/get-players";
+import {
+  WorldBuffAssignments,
+  WorldBuffHistory,
+} from "../integrations/sheets/get-buffers";
+import { Player } from "../integrations/sheets/get-players";
 import { AvailableProfession, GuildProfessionData } from "./types";
 
 interface RecipeInfo {

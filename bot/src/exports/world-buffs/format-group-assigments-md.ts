@@ -1,6 +1,6 @@
 import { GroupPreConfig } from "../../buff-management/find-next-assignment";
-import { WorldBuffInfo } from "../../sheets/get-buffers";
-import { Player } from "../../sheets/get-players";
+import { WorldBuffInfo } from "../../integrations/sheets/get-buffers";
+import { Player } from "../../integrations/sheets/get-players";
 
 function incrementLetter(letter: string, incrementValue: number = 1): string {
   return (

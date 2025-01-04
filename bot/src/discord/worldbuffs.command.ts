@@ -6,7 +6,7 @@ import {
 import { Database } from "../exports/mem-database";
 import { formatGroupAssignmentsToMarkdown } from "../exports/world-buffs/format-group-assigments-md";
 import { formatGroupsForSheets } from "../exports/world-buffs/format-groups-for-sheets";
-import { Player } from "../sheets/get-players";
+import { Player } from "../integrations/sheets/get-players";
 import { CommandHandler } from "./commandHandler";
 import { parseDiscordHandles } from "./utils";
 

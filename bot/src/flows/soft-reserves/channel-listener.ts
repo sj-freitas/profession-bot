@@ -1,6 +1,6 @@
 import { Client } from "discord.js";
 import { CONFIG } from "../../config";
-import { fetchServerEvents } from "../../raid-helper/raid-helper-client";
+import { fetchServerEvents } from "../../integrations/raid-helper/raid-helper-client";
 import { createAndAdvertiseSoftres } from "./create-softres";
 
 const RAID_HELPER_BOT_ID = "579155972115660803";

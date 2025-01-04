@@ -3,8 +3,8 @@ import {
   WorldBuffAssignments,
   WorldBuffHistory,
   WorldBuffInfo,
-} from "../sheets/get-buffers";
-import { Player } from "../sheets/get-players";
+} from "../integrations/sheets/get-buffers";
+import { Player } from "../integrations/sheets/get-players";
 import { AssignmentConfig, GroupConfig, History } from "./find-next-assignment";
 
 export type BuffAssignmentEntry = {

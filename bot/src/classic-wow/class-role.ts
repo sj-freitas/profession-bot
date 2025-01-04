@@ -1,4 +1,4 @@
-import { Class } from "../raider-io/types";
+import { Class } from "../integrations/raider-io/types";
 import { Character } from "./raid-assignment";
 
 export interface RoleFeatures {

@@ -6,9 +6,9 @@ import {
 } from "../../buff-management/utils";
 import { Database } from "../../exports/mem-database";
 import { formatGroupAssignmentsToMarkdown } from "../../exports/world-buffs/format-group-assigments-md";
-import { NUMBER_OF_GROUPS } from "../../sheets/get-buffers";
+import { NUMBER_OF_GROUPS } from "../../integrations/sheets/get-buffers";
 import { Roster } from "../roster-helper";
-import { RaidEvent } from "../../raid-helper/types";
+import { RaidEvent } from "../../integrations/raid-helper/types";
 import {
   findMessageInHistory,
   sendMessageToChannel,

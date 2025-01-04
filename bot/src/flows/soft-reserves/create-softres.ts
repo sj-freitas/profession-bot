@@ -2,12 +2,12 @@
 import { Client } from "discord.js";
 import { CONFIG } from "../../config";
 import { sendMessageToChannel } from "../../discord/utils";
-import { createSheetClient } from "../../sheets/config";
-import { RaidInfoTable } from "../../sheets/raid-info";
-import { SoftresRaidDataTable } from "../../sheets/softres-raid-data";
-import { raidCreate } from "../../softres/softres-client";
-import { getSoftresLink } from "../../softres/utils";
-import { RaidInstance } from "../../softres/types";
+import { createSheetClient } from "../../integrations/sheets/config";
+import { RaidInfoTable } from "../../integrations/sheets/raid-info";
+import { SoftresRaidDataTable } from "../../integrations/sheets/softres-raid-data";
+import { raidCreate } from "../../integrations/softres/softres-client";
+import { getSoftresLink } from "../../integrations/softres/utils";
+import { RaidInstance } from "../../integrations/softres/types";
 
 const SOFT_RESERVE_MESSAGE_TITLE = "## Soft-Reserves for this raid are up!";
 

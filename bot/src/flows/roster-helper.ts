@@ -1,14 +1,17 @@
 /* eslint-disable no-console */
 import { createHash } from "crypto";
 import { Character } from "../classic-wow/raid-assignment";
-import { ClassName, RaidEvent } from "../raid-helper/types";
-import { inferWowClassFromSpec, isConfirmedSignup } from "../raid-helper/utils";
-import { Class } from "../raider-io/types";
-import { createSheetClient } from "../sheets/config";
-import { getPlayers, Player } from "../sheets/get-players";
+import { ClassName, RaidEvent } from "../integrations/raid-helper/types";
+import {
+  inferWowClassFromSpec,
+  isConfirmedSignup,
+} from "../integrations/raid-helper/utils";
+import { Class } from "../integrations/raider-io/types";
+import { createSheetClient } from "../integrations/sheets/config";
+import { getPlayers, Player } from "../integrations/sheets/get-players";
 import { CONFIG } from "../config";
-import { fetchCharacterData } from "../raider-io/raider-io-client";
-import { RaidRole } from "../raider-io/utils";
+import { fetchCharacterData } from "../integrations/raider-io/raider-io-client";
+import { RaidRole } from "../integrations/raider-io/utils";
 
 const DEFAULT_CLASS_IN_CASE_OF_CHARACTER_NOT_FOUND = "Mage";
 

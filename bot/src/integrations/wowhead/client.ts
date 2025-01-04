@@ -1,6 +1,6 @@
 import fetch from "node-fetch";
 import { WowHeadQueryResults } from "./types";
-import { CONFIG } from "../config";
+import { CONFIG } from "../../config";
 
 export async function queryWowHead(
   searchTerm: string,

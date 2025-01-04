@@ -1,4 +1,4 @@
-import { WorldBuffAssignments } from "../../sheets/get-buffers";
+import { WorldBuffAssignments } from "../../integrations/sheets/get-buffers";
 
 function capitalizeFirstLetter(word: string): string {
   const [firstLetter, ...remainingChars] = word;

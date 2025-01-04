@@ -38,12 +38,12 @@ RAID_HELPER_API_KEY="{RAIDER_HELPER_API_KEY_CAN_BE_OBTAINED_WITH_COMMAND_ON_DISC
 
 # Raid Assignment Features
 - Flows:
-    - List who misses SRs [NOTDONE]
+    - List who misses SRs [STARTED]
     - Show Raid Assignments [NOTDONE] - we have all parts for this but need to do a couple of fixes:
         - Sartura Assignments
         - Missing Twin Emps tactic
         - Missing Bug Trio
         - Merge Groups
-    - Clean up Raid Channels
+    - Clean up Raid Channels [NOTDONE]
         - Every day at 2 am delete all non-bot messages
-        - 4 hours after the raid, delete current raid and create a new one with default description
+        - 4 hours after the raid, delete current raid and create a new one with default description also sets the final buff groups as history

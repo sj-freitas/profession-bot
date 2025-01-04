@@ -1,9 +1,12 @@
 /* eslint-disable no-console */
 import { CONFIG } from "../config";
-import { createSheetClient } from "../sheets/config";
-import { getAllBuffHistory, getWorldBuffInfo } from "../sheets/get-buffers";
-import { getPlayers } from "../sheets/get-players";
-import { readProfessionData } from "../sheets/parse-prof";
+import { createSheetClient } from "../integrations/sheets/config";
+import {
+  getAllBuffHistory,
+  getWorldBuffInfo,
+} from "../integrations/sheets/get-buffers";
+import { getPlayers } from "../integrations/sheets/get-players";
+import { readProfessionData } from "../integrations/sheets/parse-prof";
 import { Database, toFlattenData } from "./mem-database";
 import { getGuildInfo } from "./wowHeadIntegration";
 

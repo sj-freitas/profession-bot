@@ -1,5 +1,5 @@
 import fetch from "node-fetch";
-import { CONFIG } from "../config";
+import { CONFIG } from "../../config";
 import { Faction, RaidConfig, RaidInstance, raidInstanceSchema } from "./types";
 
 interface SimplifiedRaidConfig {

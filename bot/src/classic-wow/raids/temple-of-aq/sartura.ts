@@ -1,4 +1,4 @@
-import { Player } from "../../../sheets/get-players";
+import { Player } from "../../../integrations/sheets/get-players";
 import { CLASS_ROLE_MAP } from "../../class-role";
 import {
   ALL_RAID_TARGETS,

@@ -1,4 +1,4 @@
-import { Player } from "../sheets/get-players";
+import { Player } from "../integrations/sheets/get-players";
 
 export interface GroupPreConfig {
   dmt: Player | null;

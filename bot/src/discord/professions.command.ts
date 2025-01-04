@@ -1,7 +1,10 @@
 /* eslint-disable no-console */
 import { Database } from "../exports/mem-database";
-import { queryWowHead } from "../wowhead/client";
-import { removeNonSpells, removeQAResults } from "../wowhead/helpers";
+import { queryWowHead } from "../integrations/wowhead/client";
+import {
+  removeNonSpells,
+  removeQAResults,
+} from "../integrations/wowhead/helpers";
 import { CommandHandler } from "./commandHandler";
 
 const MAX_ALLOWED_SEARCH_RESULTS = 4;

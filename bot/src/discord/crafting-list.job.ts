@@ -1,11 +1,11 @@
 import { Client } from "discord.js";
-import { createSheetClient } from "../sheets/config";
-import { readProfessionData } from "../sheets/parse-prof";
+import { createSheetClient } from "../integrations/sheets/config";
+import { readProfessionData } from "../integrations/sheets/parse-prof";
 import { CONFIG } from "../config";
 import { getGuildInfo } from "../exports/wowHeadIntegration";
 import { toMarkdown } from "../exports/markdown";
 import { deleteAllMessagesInChannel, sendMessageToChannel } from "./utils";
-import { replaceValueInGoogleSheet } from "../sheets/utils";
+import { replaceValueInGoogleSheet } from "../integrations/sheets/utils";
 
 function splitByLines(text: string, numberOfLines: number): string[] {
   const lines = text.split("\n");

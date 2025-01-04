@@ -2,11 +2,11 @@
 import { v4 as newUuid } from "uuid";
 import { Database } from "../exports/mem-database";
 import { CommandHandler } from "./commandHandler";
-import { createSheetClient } from "../sheets/config";
+import { createSheetClient } from "../integrations/sheets/config";
 import {
   respondToRequestInfo,
   writeRequestInfo,
-} from "../sheets/manage-requests";
+} from "../integrations/sheets/manage-requests";
 import { CONFIG } from "../config";
 
 export const staffRequestHandler: CommandHandler<Database> = async ({

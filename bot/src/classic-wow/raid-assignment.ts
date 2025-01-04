@@ -1,5 +1,5 @@
-import { Class } from "../raider-io/types";
-import { RaidRole } from "../raider-io/utils";
+import { Class } from "../integrations/raider-io/types";
+import { RaidRole } from "../integrations/raider-io/utils";
 
 export const MAX_GROUP_SIZE = 5;
 export const MAX_RAID_GROUP_AMOUNT = 8;

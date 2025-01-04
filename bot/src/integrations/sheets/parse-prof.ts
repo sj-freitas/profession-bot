@@ -1,4 +1,7 @@
-import { AvailableProfession, PlayerProfessionsData } from "../exports/types";
+import {
+  AvailableProfession,
+  PlayerProfessionsData,
+} from "../../exports/types";
 import { SheetClient } from "./config";
 import { readGoogleSheet } from "./utils";
 

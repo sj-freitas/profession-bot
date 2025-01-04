@@ -5,12 +5,12 @@ import {
   createSoftReserveMessage,
   isSoftReserveMessage,
 } from "./create-softres";
-import { createSheetClient } from "../../sheets/config";
+import { createSheetClient } from "../../integrations/sheets/config";
 import { CONFIG } from "../../config";
-import { RaidInfoTable } from "../../sheets/raid-info";
-import { fetchServerEvents } from "../../raid-helper/raid-helper-client";
-import { getRaid } from "../../softres/softres-client";
-import { SoftresRaidDataTable } from "../../sheets/softres-raid-data";
+import { RaidInfoTable } from "../../integrations/sheets/raid-info";
+import { fetchServerEvents } from "../../integrations/raid-helper/raid-helper-client";
+import { getRaid } from "../../integrations/softres/softres-client";
+import { SoftresRaidDataTable } from "../../integrations/sheets/softres-raid-data";
 import { sendMessageToChannel } from "../../discord/utils";
 
 export async function pollChannelsForSoftReserves(

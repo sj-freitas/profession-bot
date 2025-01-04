@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-extend-native */
-import { Class } from "../../raider-io/types";
+import { Class } from "../../integrations/raider-io/types";
 import { CLASS_ROLE_MAP } from "../class-role";
 import {
   Character,

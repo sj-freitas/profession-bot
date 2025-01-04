@@ -1,6 +1,6 @@
 import fetch from "node-fetch";
 import { CharacterDetails, characterDetailsSchema } from "./types";
-import { CONFIG } from "../config";
+import { CONFIG } from "../../config";
 
 export async function fetchCharacterData(
   region: string,

@@ -1,7 +1,10 @@
 /* eslint-disable no-console */
 import { CONFIG } from "../config";
-import { queryWowHead } from "../wowhead/client";
-import { removeNonSpells, removeQAResults } from "../wowhead/helpers";
+import { queryWowHead } from "../integrations/wowhead/client";
+import {
+  removeNonSpells,
+  removeQAResults,
+} from "../integrations/wowhead/helpers";
 import {
   AvailableProfession,
   filterByCraftingProfessions,

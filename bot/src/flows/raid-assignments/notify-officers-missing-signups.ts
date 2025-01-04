@@ -1,13 +1,13 @@
 import { Client } from "discord.js";
-import { RaidEvent } from "../../raid-helper/types";
 import { Database } from "../../exports/mem-database";
 import { CONFIG } from "../../config";
 import { getRosterFromRaidEvent } from "../roster-helper";
-import { Player } from "../../sheets/get-players";
 import {
   findMessageInHistory,
   sendMessageToChannel,
 } from "../../discord/utils";
+import { Player } from "../../integrations/sheets/get-players";
+import { RaidEvent } from "../../integrations/raid-helper/types";
 
 const { RAIDER_ROLES, DISCORD_SERVER_ID, STAFF_RAID_CHANNEL_ID } = CONFIG.GUILD;
 const raiderRolesSet = new Set(RAIDER_ROLES);
