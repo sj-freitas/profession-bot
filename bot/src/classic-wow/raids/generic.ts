@@ -18,7 +18,7 @@ import {
   pickOneAtRandomAndRemoveFromArray,
 } from "./utilts";
 
-const MAX_NUMBER_OF_TANKS_PER_GROUP = 2;
+const MAX_NUMBER_OF_TANKS_PER_GROUP = 1;
 const MAX_NUMBER_OF_HEALERS_PER_GROUP = 2;
 
 function tryMergeGroups(groups: Group[]): Group[] {

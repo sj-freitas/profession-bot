@@ -58,12 +58,12 @@ export async function tryPostFightAssignments(
       const officerChannelMessage =
         allOfficerChannelMessages.length >= 0
           ? `## Assignments for ${currRaid.raidName}
-${allOfficerChannelMessages.join("\n\n")}`
+${allOfficerChannelMessages.join("\n")}`
           : undefined;
       const raidSignUpChannelMessage =
         allRaidSignUpChannelMessages.length >= 0
           ? `## Assignments for ${currRaid.raidName}
-${allRaidSignUpChannelMessages.join("\n\n")}`
+${allRaidSignUpChannelMessages.join("\n")}`
           : undefined;
 
       const assignmentMessageOfRaid: AssignmentMessage = {
