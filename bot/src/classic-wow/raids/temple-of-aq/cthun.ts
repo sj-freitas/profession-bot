@@ -156,7 +156,7 @@ ${exportRaidGroupsToTable({
     (t, groupIndex) =>
       ({
         slots: t.slots.map((s, index) =>
-          s?.role === "Melee" && index === 0
+          (s?.role === "Melee" || s?.role === "Tank") && index === 0
             ? {
                 ...s,
                 name: `${s.name} [${raidTargets[groupIndex].name}]`,
