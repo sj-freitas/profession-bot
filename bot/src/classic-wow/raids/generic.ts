@@ -78,7 +78,7 @@ export function makeAssignments(roster: Character[]): Raid {
   );
   const [allMelee, meleeTanks] = filterTwo(
     nonCasters,
-    (t) => t.role === "Melee" && t.class !== "Druid",
+    (t) => t.role === "Melee" || (t.role === "Tank" && t.class !== "Druid"),
   );
   const [meleeBuffers, nonBufferMelee] = filterTwo(
     allMelee,
