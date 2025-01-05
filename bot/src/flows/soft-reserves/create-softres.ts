@@ -58,11 +58,10 @@ export async function createAndAdvertiseSoftres(
   const raids = new Map(softresRaidData.map((t) => [t.softresId, t.raidName]));
   const matchingTerms = softresRaidData
     .map((t) =>
-      t.raidNameMatchingTerms
-        .split(";")
-        .map((x) => x.trim())
-        .filter((x) => Boolean(x))
-        .map((x) => ({ tag: x.toLowerCase(), instance: t.softresId })),
+      t.raidNameMatchingTerms.map((x) => ({
+        tag: x.toLowerCase(),
+        instance: t.softresId,
+      })),
     )
     .flatMap((t) => t);
   const matchingRaids = new Set(
@@ -108,8 +107,8 @@ export async function createAndAdvertiseSoftres(
     eventId: raidEvent.id,
     serverId: CONFIG.GUILD.DISCORD_SERVER_ID,
     channelId: raidEvent.channelId,
-    softresId: associatedSoftReserves.map((x) => x.raidId).join(";"),
-    softresToken: associatedSoftReserves.map((x) => x.token).join(";"),
+    softresIds: associatedSoftReserves.map((x) => x.raidId),
+    softresTokens: associatedSoftReserves.map((x) => `${x.token}`),
     rosterHash: "",
     lastUpdated: new Date().toString(),
   });

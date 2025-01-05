@@ -10,7 +10,10 @@ import {
   MAX_GROUP_SIZE,
   Raid,
 } from "../raid-assignment";
+import { RaidAssignmentResult } from "./assignment-config";
+import { RaidAssignmentRoster } from "./raid-assignment-roster";
 import {
+  exportRaidGroupsToTable,
   getRaidsortLuaAssignment,
   pickOneAtRandomAndRemoveFromArray,
 } from "./utilts";
@@ -313,8 +316,22 @@ export function makeAssignments(roster: Character[]): Raid {
   };
 }
 
-export function getGenericRaidAssignment(roster: Character[]): string {
-  const raid = makeAssignments(roster);
+export function getGenericRaidAssignment(
+  roster: RaidAssignmentRoster,
+): RaidAssignmentResult {
+  const raid = makeAssignments(roster.characters);
 
-  return getRaidsortLuaAssignment(raid);
+  const dmAssignment = getRaidsortLuaAssignment(raid);
+  const announcementAssignment = `## Raid Groups
+\`\`\`
+${exportRaidGroupsToTable(raid)}
+\`\`\``;
+
+  const officerAssignment = getRaidsortLuaAssignment(raid);
+
+  return {
+    dmAssignment,
+    announcementAssignment,
+    officerAssignment,
+  };
 }

@@ -2,6 +2,7 @@
 import { CONFIG } from "./config";
 import { Database } from "./exports/mem-database";
 import { refreshDatabase } from "./exports/utils";
+import { getRosterFromRaidEvent } from "./flows/roster-helper";
 import {
   findRepeatedPlayers,
   getSoftReserveInformation,
@@ -23,12 +24,13 @@ async function main() {
     return;
   }
 
+  const roster = await getRosterFromRaidEvent(raidEvent, database);
   const allSoftresRaidInfo = await softResInfoTable.getAllValues();
   const raidReserveInformation = await getSoftReserveInformation(
     raidEvent,
-    database,
     sheetClient,
     INFO_SHEET,
+    roster,
   );
 
   for (const curr of raidReserveInformation) {

@@ -1,14 +1,10 @@
-import { Database } from "../../exports/mem-database";
 import { RaidEvent } from "../../integrations/raid-helper/types";
 import { SheetClient } from "../../integrations/sheets/config";
 import { Player } from "../../integrations/sheets/get-players";
 import { RaidInfoTable } from "../../integrations/sheets/raid-info";
 import { getRaid } from "../../integrations/softres/softres-client";
 import { filterTwo } from "../../lib/array-utilts";
-import {
-  CharacterWithMetadata,
-  getRosterFromRaidEvent,
-} from "../roster-helper";
+import { CharacterWithMetadata, Roster } from "../roster-helper";
 
 function getCharacterThatSoftReserved(
   player: Player,
@@ -84,19 +80,18 @@ export function findRepeatedPlayers(
 
 export async function getSoftReserveInformation(
   raidEvent: RaidEvent,
-  database: Database,
   sheetClient: SheetClient,
   infoSheet: string,
+  allPlayersOfRaid: Roster,
 ): Promise<SoftReserveInformation[]> {
   const raidInfoTable = new RaidInfoTable(sheetClient, infoSheet);
   const raidInfoEntity = await raidInfoTable.getValueById(raidEvent.id);
-  const allPlayersOfRaid = await getRosterFromRaidEvent(raidEvent, database);
 
   if (raidInfoEntity === null) {
     return [];
   }
 
-  const softResIds = raidInfoEntity.softresId.split(";");
+  const softResIds = raidInfoEntity.softresIds;
   const softReservesInformation: SoftReserveInformation[] = (
     await Promise.all(
       softResIds.map(async (currId) => {

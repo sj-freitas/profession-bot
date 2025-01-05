@@ -1,15 +1,18 @@
 /* eslint-disable no-console */
 import { Database } from "../exports/mem-database";
-import { Player } from "../integrations/sheets/get-players";
-import { Character } from "../classic-wow/raid-assignment";
 import { getCthunAssignment } from "../classic-wow/raids/temple-of-aq/cthun";
 import { getSarturaAssignment } from "../classic-wow/raids/temple-of-aq/sartura";
 import { CommandHandler } from "./commandHandler";
 import { getGenericRaidAssignment } from "../classic-wow/raids/generic";
-import { getRosterFromRaidEvent } from "../flows/roster-helper";
+import {
+  getRosterFromRaidEvent,
+  toRaidAssignmentRoster,
+} from "../flows/roster-helper";
 import { fetchEvent } from "../integrations/raid-helper/raid-helper-client";
+import { RaidAssignmentRoster } from "../classic-wow/raids/raid-assignment-roster";
+import { RaidAssignmentResult } from "../classic-wow/raids/assignment-config";
 
-type RaidAssignment = (roster: Character[], players: Player[]) => string;
+type RaidAssignment = (roster: RaidAssignmentRoster) => RaidAssignmentResult;
 
 export const ENCOUNTER_HANDLERS: { [key: string]: RaidAssignment } = {
   raid: getGenericRaidAssignment,
@@ -50,15 +53,8 @@ export const raidAssignHandler: CommandHandler<Database> = async ({
     return;
   }
   const roster = await getRosterFromRaidEvent(event, database);
-  const allPlayers = roster.characters.map((t) => t.player).flatMap((t) => t);
-  const assignments = getAssignmentForEncounter(
-    roster.characters.map((t) => ({
-      name: t.name,
-      class: t.class,
-      role: t.role,
-    })),
-    allPlayers,
-  );
+  const raidAssignmentRoster = toRaidAssignmentRoster(roster);
+  const assignments = getAssignmentForEncounter(raidAssignmentRoster);
 
-  await reply(assignments);
+  await reply(assignments.dmAssignment);
 };

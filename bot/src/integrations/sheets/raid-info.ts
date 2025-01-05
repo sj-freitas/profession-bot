@@ -1,12 +1,13 @@
 import { SheetClient } from "./config";
 import { SheetTableConfig, TableWrapper } from "./table-wrapper";
+import { toColumnValue, toEntityValue } from "./table-wrapper-utilts";
 
 export interface RaidInfo {
   eventId: string;
   serverId: string;
   channelId: string;
-  softresId: string;
-  softresToken: string;
+  softresIds: string[];
+  softresTokens: string[];
   rosterHash: string;
   lastUpdated: string;
 }
@@ -18,16 +19,16 @@ const config: SheetTableConfig<RaidInfo> = {
     eventId,
     serverId,
     channelId,
-    softresId,
-    softresToken,
+    softresIds,
+    softresTokens,
     rosterHash,
     lastUpdated,
   ]) => ({
     eventId,
     serverId,
     channelId,
-    softresId,
-    softresToken,
+    softresIds: toEntityValue(softresIds),
+    softresTokens: toEntityValue(softresTokens),
     rosterHash,
     lastUpdated,
   }),
@@ -35,16 +36,16 @@ const config: SheetTableConfig<RaidInfo> = {
     eventId,
     serverId,
     channelId,
-    softresId,
-    softresToken,
+    softresIds,
+    softresTokens,
     rosterHash,
     lastUpdated,
   }) => [
     eventId,
     serverId,
     channelId,
-    softresId,
-    softresToken,
+    toColumnValue(softresIds),
+    toColumnValue(softresTokens),
     rosterHash,
     lastUpdated,
   ],

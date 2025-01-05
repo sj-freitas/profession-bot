@@ -34,9 +34,9 @@ export async function pollChannelForWorldBuffAssignments(
   // Stuff that should be done even if the hash doesn't change
   await tryAdvertiseMissingSoftReserves(
     discordClient,
-    database,
     sheetClient,
     raidEvent,
+    roster,
   );
 
   if (raidInfo.rosterHash === roster.rosterHash) {
@@ -45,9 +45,9 @@ export async function pollChannelForWorldBuffAssignments(
 
   // Roster has updated, trigger all post changes and assignments
   await tryPostWorldBuffAssignments(discordClient, database, raidEvent, roster);
-  await tryPostRaidComposition();
-  await tryPostFightAssignments();
   await tryNotifyOfficersMissingSignUps(discordClient, database, raidEvent);
+  await tryPostRaidComposition(discordClient, sheetClient, raidEvent, roster);
+  await tryPostFightAssignments();
 
   // Update the hash
   await raidInfoTable.updateValue({

@@ -70,3 +70,32 @@ export async function findMessageInHistory(
 
   return foundMessage;
 }
+
+/**
+ * Creates or Edits an existing message, this is a helper function that avoids having to do several repeated calls
+ * instead doing the whole flow in a single function.
+ *
+ * @param discordClient The discord client to use.
+ * @param channelId The channel Id to search the messages for.
+ * @param messageTag A segment which indicates the start of the message text, this is how we can identity the message in a channel.
+ * @param messageContent The content of the message containing all the text.
+ */
+export async function createOrEditDiscordMessage(
+  discordClient: Client,
+  channelId: string,
+  messageTag: string,
+  messageContent: string,
+): Promise<void> {
+  const message = await findMessageInHistory(
+    discordClient,
+    channelId,
+    messageTag,
+  );
+  if (message !== null) {
+    // Edit
+    await message.edit(messageContent);
+  } else {
+    // Send
+    await sendMessageToChannel(discordClient, channelId, messageContent);
+  }
+}

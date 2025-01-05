@@ -60,9 +60,7 @@ const commands = [
     .addStringOption((option) =>
       option
         .setName("event-id")
-        .setDescription(
-          "The event id on the discord server",
-        ),
+        .setDescription("The event id on the discord server"),
     ),
   new SlashCommandBuilder()
     .setName("staff-request")
@@ -149,8 +147,10 @@ async function setupClient(database: Database): Promise<Client> {
 }
 
 async function bootstrapServer(): Promise<void> {
-  const rest = new REST({ version: "10" }).setToken(CONFIG.DISCORD.BOT_TOKEN);
   const database = new Database();
+  await refreshDatabase(database);
+
+  const rest = new REST({ version: "10" }).setToken(CONFIG.DISCORD.BOT_TOKEN);
   const discordClient = await setupClient(database);
 
   void loop(async () => refreshDatabase(database), FIVE_MINUTES);

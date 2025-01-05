@@ -1,9 +1,10 @@
 import { SheetClient } from "./config";
 import { SheetTableConfig, TableWrapper } from "./table-wrapper";
+import { toColumnValue, toEntityValue } from "./table-wrapper-utilts";
 
 export interface SoftresRaidData {
   softresId: string;
-  raidNameMatchingTerms: string;
+  raidNameMatchingTerms: string[];
   raidName: string;
   useSoftRes: string;
 }
@@ -18,7 +19,7 @@ const config: SheetTableConfig<SoftresRaidData> = {
     useSoftRes,
   ]) => ({
     softresId,
-    raidNameMatchingTerms,
+    raidNameMatchingTerms: toEntityValue(raidNameMatchingTerms),
     raidName,
     useSoftRes,
   }),
@@ -27,7 +28,7 @@ const config: SheetTableConfig<SoftresRaidData> = {
     raidNameMatchingTerms,
     raidName,
     useSoftRes,
-  }) => [softresId, raidNameMatchingTerms, raidName, useSoftRes],
+  }) => [softresId, toColumnValue(raidNameMatchingTerms), raidName, useSoftRes],
 };
 
 export class SoftresRaidDataTable extends TableWrapper<SoftresRaidData> {

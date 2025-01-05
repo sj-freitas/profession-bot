@@ -5,6 +5,8 @@ import {
   Group,
   Raid,
 } from "../../raid-assignment";
+import { RaidAssignmentResult } from "../assignment-config";
+import { RaidAssignmentRoster } from "../raid-assignment-roster";
 import {
   exportRaidGroupsToTable,
   exportToLuaTable,
@@ -144,11 +146,11 @@ export function makeAssignments(roster: Character[]): Raid {
 export function exportToDiscord(composition: Raid): string {
   const raidTargets = Object.values(ALL_RAID_TARGETS).reverse();
 
-  return `\`\`\`
-## C'thun composition
+  return `## C'thun composition
 Check your positioning on [this map](https://discord.com/channels/1170959696174272663/1266480999781502976/1321583474641076284)
 Each melee has a "group leader" stack on top of your group's leader.
 
+\`\`\`
 ${exportRaidGroupsToTable({
   groups: composition.groups.map(
     (t, groupIndex) =>
@@ -167,11 +169,11 @@ ${exportRaidGroupsToTable({
 \`\`\``;
 }
 
-export function getCthunAssignment(roster: Character[]): string {
-  const assignments = makeAssignments(roster);
-
-  return `
-## Copy the following assignments to their specific use cases
+export function getCthunAssignment(
+  roster: RaidAssignmentRoster,
+): RaidAssignmentResult {
+  const assignments = makeAssignments(roster.characters);
+  const dmAssignment = `## Copy the following assignments to their specific use cases
 
 ### Discord Assignment for the specific raid channel:
 
@@ -182,4 +184,20 @@ ${exportToDiscord(assignments)}
 ${exportToLuaTable(assignments)}
 \`\`\`
 `;
+
+  const announcementAssignment = exportToDiscord(assignments);
+  const officerAssignment = `### C'thun composition for Raidsort AddOn
+Do \`/raidsort import\` in-game to open the AddOn and copy the following value:
+\`\`\`
+${exportToLuaTable(assignments)}
+\`\`\`
+
+Once the setup is loaded you can \`/raidsort load\` to sort groups or \`/raidsort invite\` to invite members into the raid.
+`;
+
+  return {
+    dmAssignment,
+    announcementAssignment,
+    officerAssignment,
+  };
 }

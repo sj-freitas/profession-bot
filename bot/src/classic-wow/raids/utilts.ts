@@ -35,14 +35,13 @@ export function exportToLuaTable(composition: Raid): string {
 }
 
 export function getRaidsortLuaAssignment(assignments: Raid) {
-  return `
-## Copy the following assignments to their specific use cases
-
-### WoW Raidsort Addon, do \`/raidsort import\` and copy the following value:
+  return `## Overall composition for Raidsort AddOn
+Do \`/raidsort import\` in-game to open the AddOn and copy the following value:
 \`\`\`
 ${exportToLuaTable(assignments)}
 \`\`\`
-  `;
+
+Once the setup is loaded you can \`/raidsort load\` to sort groups or \`/raidsort invite\` to invite members into the raid.`;
 }
 
 function toTable(groups: Group[], startId: number): Table {

@@ -61,11 +61,7 @@ export async function pollChannelsForSoftReserves(
 
       // No message exists, we can also see if a record already exists for this raid
       const raidEvent = await raidInfo.getValueById(serverRaidEvent.id);
-      if (
-        !raidEvent ||
-        raidEvent.softresToken.split(";").filter((t) => Boolean(t.trim()))
-          .length === 0
-      ) {
+      if (!raidEvent || raidEvent.softresTokens.length === 0) {
         await createAndAdvertiseSoftres(
           discordClient,
           serverRaidEvent,
@@ -74,8 +70,8 @@ export async function pollChannelsForSoftReserves(
         return;
       }
 
-      const softReserveTokens = raidEvent.softresToken.split(";");
-      const softReserves = raidEvent.softresId.split(";").map((t, idx) => ({
+      const softReserveTokens = raidEvent.softresTokens;
+      const softReserves = raidEvent.softresIds.map((t, idx) => ({
         raidId: t,
         token: softReserveTokens[idx],
       }));

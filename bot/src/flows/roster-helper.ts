@@ -12,6 +12,7 @@ import { CONFIG } from "../config";
 import { fetchCharacterData } from "../integrations/raider-io/raider-io-client";
 import { RaidRole } from "../integrations/raider-io/utils";
 import { Database } from "../exports/mem-database";
+import { RaidAssignmentRoster } from "../classic-wow/raids/raid-assignment-roster";
 
 const DEFAULT_CLASS_IN_CASE_OF_CHARACTER_NOT_FOUND = "Mage";
 
@@ -170,5 +171,17 @@ export async function getRosterFromRaidEvent(
   return {
     rosterHash: hash,
     characters,
+  };
+}
+
+export function toRaidAssignmentRoster(roster: Roster): RaidAssignmentRoster {
+  const allPlayers = roster.characters.map((t) => t.player).flatMap((t) => t);
+  return {
+    characters: roster.characters.map((t) => ({
+      name: t.name,
+      class: t.class,
+      role: t.role,
+    })),
+    players: allPlayers,
   };
 }

@@ -1,5 +1,6 @@
 import { CONFIG } from "../config";
 import { Database } from "../exports/mem-database";
+import { getRosterFromRaidEvent } from "../flows/roster-helper";
 import { getSoftReserveInformation } from "../flows/soft-reserves/missing-softreserves";
 import { fetchEvent } from "../integrations/raid-helper/raid-helper-client";
 import { createSheetClient } from "../integrations/sheets/config";
@@ -26,12 +27,13 @@ export const handleMissingSoftreserves: CommandHandler<Database> = async ({
     return;
   }
 
+  const roster = await getRosterFromRaidEvent(raidEvent, database);
   const allSoftresRaidInfo = await softResInfoTable.getAllValues();
   const softReserveInfo = await getSoftReserveInformation(
     raidEvent,
-    database,
     sheetClient,
     INFO_SHEET,
+    roster,
   );
 
   const formatted = `## Missing Soft Reserves

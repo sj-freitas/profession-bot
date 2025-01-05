@@ -7,6 +7,8 @@ import {
   RaidTarget,
   TargetAssignment,
 } from "../../raid-assignment";
+import { RaidAssignmentResult } from "../assignment-config";
+import { RaidAssignmentRoster } from "../raid-assignment-roster";
 import { pickOnePutOnTop } from "../utilts";
 
 const NUMBER_OF_ADDS = 3;
@@ -139,13 +141,13 @@ export function exportToRaidWarning(
     .join("\n");
 }
 
-export function getSarturaAssignment(
-  roster: Character[],
-  players: Player[],
-): string {
-  const assignments = makeAssignments(roster);
+export function getSarturaAssignment({
+  characters,
+  players,
+}: RaidAssignmentRoster): RaidAssignmentResult {
+  const assignments = makeAssignments(characters);
 
-  return `
+  const dmAssignment = `
 ## Copy the following assignments to their specific use cases
 
 ### Discord Assignment for the specific raid channel:
@@ -158,4 +160,16 @@ ${exportToDiscord(assignments, players)}
 ${exportToRaidWarning(assignments)}
 \`\`\`
   `;
+
+  const announcementAssignment = exportToDiscord(assignments, players);
+  const officerAssignment = `### Sartura assignments to post as a \`/rw\` in-game
+\`\`\`
+${exportToRaidWarning(assignments)}
+\`\`\``;
+
+  return {
+    dmAssignment,
+    announcementAssignment,
+    officerAssignment,
+  };
 }
