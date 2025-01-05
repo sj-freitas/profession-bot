@@ -7,11 +7,11 @@ import {
   isConfirmedSignup,
 } from "../integrations/raid-helper/utils";
 import { Class } from "../integrations/raider-io/types";
-import { createSheetClient } from "../integrations/sheets/config";
-import { getPlayers, Player } from "../integrations/sheets/get-players";
+import { Player } from "../integrations/sheets/get-players";
 import { CONFIG } from "../config";
 import { fetchCharacterData } from "../integrations/raider-io/raider-io-client";
 import { RaidRole } from "../integrations/raider-io/utils";
+import { Database } from "../exports/mem-database";
 
 const DEFAULT_CLASS_IN_CASE_OF_CHARACTER_NOT_FOUND = "Mage";
 
@@ -77,9 +77,9 @@ export interface Roster {
 
 export async function getRosterFromRaidEvent(
   raidEvent: RaidEvent,
+  database: Database,
   includeAbsences = false,
 ): Promise<Roster> {
-  const sheetClient = createSheetClient();
   const signUps = raidEvent.signUps
     .filter((t) => includeAbsences || isConfirmedSignup(t))
     .map((t) => ({
@@ -93,7 +93,7 @@ export async function getRosterFromRaidEvent(
   type Potato = SimplifiedSignUp & { player: Player };
 
   const hash = createSignUpsHash(signUps);
-  const allPlayers = await getPlayers(sheetClient, CONFIG.GUILD.INFO_SHEET);
+  const allPlayers = database.getPlayersRoster();
   const playerMap = new Map(allPlayers.map((t) => [t.discordId, t]));
   const matchedPlayers = signUps
     .map(

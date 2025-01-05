@@ -10,6 +10,7 @@ const { INFO_SHEET } = CONFIG.GUILD;
 
 export const handleMissingSoftreserves: CommandHandler<Database> = async ({
   options,
+  payload: database,
   reply,
 }): Promise<void> => {
   const eventId = options.getString("event-id");
@@ -28,6 +29,7 @@ export const handleMissingSoftreserves: CommandHandler<Database> = async ({
   const allSoftresRaidInfo = await softResInfoTable.getAllValues();
   const softReserveInfo = await getSoftReserveInformation(
     raidEvent,
+    database,
     sheetClient,
     INFO_SHEET,
   );

@@ -9,12 +9,14 @@ import { SheetClient } from "../../integrations/sheets/config";
 import { isRaidEventInAmountOfTime } from "../time-utils";
 import { getSoftReserveInformation } from "../soft-reserves/missing-softreserves";
 import { SoftresRaidDataTable } from "../../integrations/sheets/softres-raid-data";
+import { Database } from "../../exports/mem-database";
 
 const ONE_HOUR_BEFORE_RAID = 60 * 60 * 1000;
 const INFO_SHEET_ID = CONFIG.GUILD.INFO_SHEET;
 
 export async function tryAdvertiseMissingSoftReserves(
   discordClient: Client,
+  database: Database,
   sheetClient: SheetClient,
   raidEvent: RaidEvent,
 ): Promise<void> {
@@ -28,6 +30,7 @@ export async function tryAdvertiseMissingSoftReserves(
   const allSoftresRaidInfo = await softResInfoTable.getAllValues();
   const softReserveInfo = await getSoftReserveInformation(
     raidEvent,
+    database,
     sheetClient,
     INFO_SHEET_ID,
   );

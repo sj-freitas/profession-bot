@@ -1,3 +1,4 @@
+import { Database } from "../../exports/mem-database";
 import { RaidEvent } from "../../integrations/raid-helper/types";
 import { SheetClient } from "../../integrations/sheets/config";
 import { Player } from "../../integrations/sheets/get-players";
@@ -83,42 +84,50 @@ export function findRepeatedPlayers(
 
 export async function getSoftReserveInformation(
   raidEvent: RaidEvent,
+  database: Database,
   sheetClient: SheetClient,
   infoSheet: string,
 ): Promise<SoftReserveInformation[]> {
   const raidInfoTable = new RaidInfoTable(sheetClient, infoSheet);
   const raidInfoEntity = await raidInfoTable.getValueById(raidEvent.id);
-  const allPlayersOfRaid = await getRosterFromRaidEvent(raidEvent);
+  const allPlayersOfRaid = await getRosterFromRaidEvent(raidEvent, database);
 
   if (raidInfoEntity === null) {
     return [];
   }
 
   const softResIds = raidInfoEntity.softresId.split(";");
-  const softReservesInformation: SoftReserveInformation[] = await Promise.all(
-    softResIds.map(async (currId) => {
-      const softReserveRaidInstance = await getRaid(currId);
-      const charactersThatReserved = softReserveRaidInstance.reserved.map(
-        (t) => t.name,
-      );
+  const softReservesInformation: SoftReserveInformation[] = (
+    await Promise.all(
+      softResIds.map(async (currId) => {
+        const softReserveRaidInstance = await getRaid(currId);
+        if (softReserveRaidInstance === null) {
+          return null;
+        }
+        const charactersThatReserved = softReserveRaidInstance.reserved.map(
+          (t) => t.name,
+        );
 
-      // Now find who's missing
-      const [presentPlayers, missingPlayers] = filterTwo(
-        allPlayersOfRaid.characters,
-        (t) => hasPlayerSoftReserved(t.player, charactersThatReserved),
-      );
-      const instanceRoster = getRosterForDungeon(
-        softReserveRaidInstance.instances[0],
-        presentPlayers,
-        charactersThatReserved,
-      );
+        // Now find who's missing
+        const [presentPlayers, missingPlayers] = filterTwo(
+          allPlayersOfRaid.characters,
+          (t) => hasPlayerSoftReserved(t.player, charactersThatReserved),
+        );
+        const instanceRoster = getRosterForDungeon(
+          softReserveRaidInstance.instances[0],
+          presentPlayers,
+          charactersThatReserved,
+        );
 
-      return {
-        instanceRoster,
-        missingPlayers: missingPlayers.map((t) => t.player),
-      };
-    }),
-  );
+        return {
+          instanceRoster,
+          missingPlayers: missingPlayers.map((t) => t.player),
+        };
+      }),
+    )
+  ).filter((t): t is SoftReserveInformation => {
+    return t !== null;
+  });
 
   return softReservesInformation;
 }

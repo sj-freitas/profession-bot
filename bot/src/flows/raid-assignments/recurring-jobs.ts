@@ -29,10 +29,15 @@ export async function pollChannelForWorldBuffAssignments(
     return;
   }
 
-  const roster = await getRosterFromRaidEvent(raidEvent);
+  const roster = await getRosterFromRaidEvent(raidEvent, database);
 
   // Stuff that should be done even if the hash doesn't change
-  await tryAdvertiseMissingSoftReserves(discordClient, sheetClient, raidEvent);
+  await tryAdvertiseMissingSoftReserves(
+    discordClient,
+    database,
+    sheetClient,
+    raidEvent,
+  );
 
   if (raidInfo.rosterHash === roster.rosterHash) {
     return;

@@ -21,6 +21,7 @@ export const SUPPORTED_ENCOUNTERS = Object.keys(ENCOUNTER_HANDLERS);
 
 export const raidAssignHandler: CommandHandler<Database> = async ({
   options,
+  payload: database,
   reply,
 }): Promise<void> => {
   const encounter = options.getString("encounter");
@@ -48,7 +49,7 @@ export const raidAssignHandler: CommandHandler<Database> = async ({
     await reply(`${eventId} refers to an invalid event.`);
     return;
   }
-  const roster = await getRosterFromRaidEvent(event);
+  const roster = await getRosterFromRaidEvent(event, database);
   const allPlayers = roster.characters.map((t) => t.player).flatMap((t) => t);
   const assignments = getAssignmentForEncounter(
     roster.characters.map((t) => ({

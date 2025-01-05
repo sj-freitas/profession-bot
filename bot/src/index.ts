@@ -1,5 +1,7 @@
 /* eslint-disable no-console */
 import { CONFIG } from "./config";
+import { Database } from "./exports/mem-database";
+import { refreshDatabase } from "./exports/utils";
 import {
   findRepeatedPlayers,
   getSoftReserveInformation,
@@ -12,6 +14,9 @@ const { INFO_SHEET } = CONFIG.GUILD;
 
 async function main() {
   const sheetClient = createSheetClient();
+  const database = new Database();
+  await refreshDatabase(database);
+
   const softResInfoTable = new SoftresRaidDataTable(sheetClient, INFO_SHEET);
   const raidEvent = await fetchEvent("1323050296871489626");
   if (!raidEvent) {
@@ -21,6 +26,7 @@ async function main() {
   const allSoftresRaidInfo = await softResInfoTable.getAllValues();
   const raidReserveInformation = await getSoftReserveInformation(
     raidEvent,
+    database,
     sheetClient,
     INFO_SHEET,
   );
