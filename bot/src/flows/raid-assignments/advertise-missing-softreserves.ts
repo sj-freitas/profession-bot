@@ -33,13 +33,13 @@ export async function tryAdvertiseMissingSoftReserves(
   );
 
   // Format
-  const formatted = softReserveInfo
+  const formatted = `## Missing Soft Reserves
+${softReserveInfo
     .map(
-      (curr) => `## Missing Soft Reserves
-### For ${allSoftresRaidInfo.find((t) => t.softresId === curr.instanceRoster.instanceName)?.raidName}
+      (curr) => `### For ${allSoftresRaidInfo.find((t) => t.softresId === curr.instanceRoster.instanceName)?.raidName}
 The following players haven't soft-reserved yet: ${curr.missingPlayers.map((t) => `<@${t.discordId}>`).join(", ")}`,
     )
-    .join("\n");
+    .join("\n")}`;
 
   // Post or Edit message
   const message = await findMessageInHistory(

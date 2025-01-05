@@ -23,19 +23,21 @@ export const handleMissingSoftreserves: CommandHandler<Database> = async ({
   const softResInfoTable = new SoftresRaidDataTable(sheetClient, INFO_SHEET);
   const raidEvent = await fetchEvent("1323050296871489626");
   const allSoftresRaidInfo = await softResInfoTable.getAllValues();
-  const raidReserveInformation = await getSoftReserveInformation(
+  const softReserveInfo = await getSoftReserveInformation(
     raidEvent,
     sheetClient,
     INFO_SHEET,
   );
 
-  const formatted = raidReserveInformation
-    .map(
-      (curr) => `## Missing Soft Reserves
-### For ${allSoftresRaidInfo.find((t) => t.softresId === curr.instanceRoster.instanceName)?.raidName}
+  const formatted = `## Missing Soft Reserves
+${softReserveInfo
+  .map(
+    (
+      curr,
+    ) => `### For ${allSoftresRaidInfo.find((t) => t.softresId === curr.instanceRoster.instanceName)?.raidName}
 The following players haven't soft-reserved yet: ${curr.missingPlayers.map((t) => `<@${t.discordId}>`).join(", ")}`,
-    )
-    .join("\n");
+  )
+  .join("\n")}`;
 
   await reply(formatted);
 };
