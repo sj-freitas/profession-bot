@@ -35,7 +35,7 @@ export async function raidCompositionMessageExists(
   discordClient: Client,
   raidEvent: RaidEvent,
 ): Promise<boolean> {
-  const raidCompositionAndAssignmentsMessageTag = getMessageTag(raidEvent);
+  const raidCompositionAndAssignmentsMessageTag = `# ${getMessageTag(raidEvent)}`;
 
   return Boolean(
     await findMessageInHistory(
