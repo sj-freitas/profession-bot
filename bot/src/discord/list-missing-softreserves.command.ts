@@ -13,7 +13,6 @@ export const handleMissingSoftreserves: CommandHandler<Database> = async ({
   reply,
 }): Promise<void> => {
   const eventId = options.getString("event-id");
-
   if (eventId === null) {
     await reply("Failed to provide a valid event-id, please try another one.");
     return;
@@ -21,7 +20,11 @@ export const handleMissingSoftreserves: CommandHandler<Database> = async ({
 
   const sheetClient = createSheetClient();
   const softResInfoTable = new SoftresRaidDataTable(sheetClient, INFO_SHEET);
-  const raidEvent = await fetchEvent("1323050296871489626");
+  const raidEvent = await fetchEvent(eventId);
+  if (!raidEvent) {
+    return;
+  }
+
   const allSoftresRaidInfo = await softResInfoTable.getAllValues();
   const softReserveInfo = await getSoftReserveInformation(
     raidEvent,

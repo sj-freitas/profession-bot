@@ -7,7 +7,7 @@ import {
   serverEventsSchema,
 } from "./types";
 
-export async function fetchEvent(eventId: string): Promise<RaidEvent> {
+export async function fetchEvent(eventId: string): Promise<RaidEvent | null> {
   const response = await fetch(
     `${CONFIG.RAID_HELPER_API.HOST_NAME}/events/${eventId}`,
     {
@@ -16,14 +16,18 @@ export async function fetchEvent(eventId: string): Promise<RaidEvent> {
       },
     },
   );
-  const json = await response.json();
+  try {
+    const json = await response.json();
 
-  return eventSchema.parse(json);
+    return eventSchema.parse(json);
+  } catch {
+    return null;
+  }
 }
 
 export async function fetchServerEvents(
   serverId: string,
-): Promise<ServerEvents> {
+): Promise<ServerEvents | null> {
   const response = await fetch(
     `${CONFIG.RAID_HELPER_API.HOST_NAME}/servers/${serverId}/events`,
     {
@@ -32,7 +36,11 @@ export async function fetchServerEvents(
       },
     },
   );
-  const json = await response.json();
+  try {
+    const json = await response.json();
 
-  return serverEventsSchema.parse(json);
+    return serverEventsSchema.parse(json);
+  } catch {
+    return null;
+  }
 }

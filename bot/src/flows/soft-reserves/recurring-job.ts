@@ -12,6 +12,7 @@ import { fetchServerEvents } from "../../integrations/raid-helper/raid-helper-cl
 import { getRaid } from "../../integrations/softres/softres-client";
 import { SoftresRaidDataTable } from "../../integrations/sheets/softres-raid-data";
 import { sendMessageToChannel } from "../../discord/utils";
+import { RaidInstance } from "../../integrations/softres/types";
 
 export async function pollChannelsForSoftReserves(
   discordClient: Client,
@@ -20,6 +21,9 @@ export async function pollChannelsForSoftReserves(
 ): Promise<void> {
   const channelsIdsSet = new Set(channelIds);
   const events = await fetchServerEvents(CONFIG.GUILD.DISCORD_SERVER_ID);
+  if (events === null) {
+    return;
+  }
   const raidsOfChannels = (events.postedEvents ?? []).filter(
     (t) => channelsIdsSet.has(t.channelId) && t.description,
   );
@@ -76,12 +80,21 @@ export async function pollChannelsForSoftReserves(
         token: softReserveTokens[idx],
       }));
 
-      const associatedSoftReserves = await Promise.all(
-        softReserves.map(async (t) => ({
-          ...(await getRaid(t.raidId)),
-          token: t.token,
-        })),
-      );
+      const associatedSoftReserves = (
+        await Promise.all(
+          softReserves.map(async (t) => {
+            const raid = await getRaid(t.raidId);
+
+            if (!raid) {
+              return null;
+            }
+            return {
+              ...raid,
+              token: t.token,
+            };
+          }),
+        )
+      ).filter((t): t is RaidInstance & { token: string } => t !== null);
 
       await sendMessageToChannel(
         discordClient,

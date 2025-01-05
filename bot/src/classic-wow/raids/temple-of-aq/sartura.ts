@@ -93,12 +93,12 @@ export function exportToDiscord(
 
   player.forEach((currPlayer) => {
     currPlayer.characters.forEach((currCharacter) => {
-      characterDiscordHandleMap.set(currCharacter, currPlayer.discordHandle);
+      characterDiscordHandleMap.set(currCharacter, currPlayer.discordId);
     });
   });
 
   const printAssignment = (currAssignment: AssignmentDetails) =>
-    `${currAssignment.description} ${currAssignment.characters.map((t) => characterDiscordHandleMap.get(t.name)).join(", ")}`;
+    `${currAssignment.description} ${currAssignment.characters.map((t) => `<@${characterDiscordHandleMap.get(t.name)}>`).join(", ")}`;
 
   return `## Sartura Stun and Tank Assignment
 ${sarturaAssignment.map((t) => `- ${t.raidTarget.icon.discordEmoji} [${t.raidTarget.icon.name}] (${t.raidTarget.name}): ${t.assignments.map(printAssignment).join(" ")} `).join("\n")}`;

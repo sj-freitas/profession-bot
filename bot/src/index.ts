@@ -14,6 +14,10 @@ async function main() {
   const sheetClient = createSheetClient();
   const softResInfoTable = new SoftresRaidDataTable(sheetClient, INFO_SHEET);
   const raidEvent = await fetchEvent("1323050296871489626");
+  if (!raidEvent) {
+    return;
+  }
+
   const allSoftresRaidInfo = await softResInfoTable.getAllValues();
   const raidReserveInformation = await getSoftReserveInformation(
     raidEvent,

@@ -6,11 +6,15 @@ export async function fetchCharacterData(
   region: string,
   realmName: string,
   characterName: string,
-): Promise<CharacterDetails> {
+): Promise<CharacterDetails | null> {
   const response = await fetch(
     `${CONFIG.RAIDER_IO_API.HOST_NAME}/characters/${region}/${realmName}/${characterName}?tier=30`,
   );
-  const json = await response.json();
+  try {
+    const json = await response.json();
 
-  return characterDetailsSchema.parse(json);
+    return characterDetailsSchema.parse(json);
+  } catch {
+    return null;
+  }
 }

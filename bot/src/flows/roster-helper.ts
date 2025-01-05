@@ -34,18 +34,13 @@ async function safeCharacterFetch(
   region: string,
   realmName: string,
 ): Promise<Omit<Character, "role">> {
-  try {
-    const result = await fetchCharacterData(
-      region,
-      slugify(realmName),
-      characterName,
-    );
+  const result = await fetchCharacterData(
+    region,
+    slugify(realmName),
+    characterName,
+  );
 
-    return {
-      name: characterName,
-      class: result.characterDetails.character.class.name,
-    };
-  } catch {
+  if (!result) {
     // Can override this by considering this person is a "mage" - mage are almost like misc so that works.
     // mages don't buff but can also benefit from buffs. This however probably gets "fixed" when crossed with
     // the character data.
@@ -54,6 +49,11 @@ async function safeCharacterFetch(
       class: DEFAULT_CLASS_IN_CASE_OF_CHARACTER_NOT_FOUND,
     };
   }
+
+  return {
+    name: characterName,
+    class: result.characterDetails.character.class.name,
+  };
 }
 
 function createSignUpsHash(array: SimplifiedSignUp[]): string {

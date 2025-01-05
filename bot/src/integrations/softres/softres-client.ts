@@ -27,7 +27,7 @@ function mapToRaidConfigSchema(raidConfig: SimplifiedRaidConfig): RaidConfig {
 
 export async function raidCreate(
   raidConfig: SimplifiedRaidConfig,
-): Promise<RaidInstance> {
+): Promise<RaidInstance | null> {
   const response = await fetch(
     `${CONFIG.SOFTRES_IT.API_HOST_NAME}/raid/create`,
     {
@@ -39,16 +39,25 @@ export async function raidCreate(
       body: JSON.stringify(mapToRaidConfigSchema(raidConfig)),
     },
   );
-  const json = await response.json();
+  try {
+    const json = await response.json();
 
-  return raidInstanceSchema.parse(json);
+    return raidInstanceSchema.parse(json);
+  } catch {
+    return null;
+  }
 }
 
-export async function getRaid(raidId: string): Promise<RaidInstance> {
+export async function getRaid(raidId: string): Promise<RaidInstance | null> {
   const response = await fetch(
     `${CONFIG.SOFTRES_IT.API_HOST_NAME}/raid/${raidId}`,
   );
-  const json = await response.json();
 
-  return raidInstanceSchema.parse(json);
+  try {
+    const json = await response.json();
+
+    return raidInstanceSchema.parse(json);
+  } catch {
+    return null;
+  }
 }

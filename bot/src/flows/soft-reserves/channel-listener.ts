@@ -11,10 +11,13 @@ export async function handleRaidCreatedEvent(
   officerChannelId?: string,
 ): Promise<void> {
   const events = await fetchServerEvents(CONFIG.GUILD.DISCORD_SERVER_ID);
+  if (events === null) {
+    return;
+  }
+
   const raidOfChannel = (events.postedEvents ?? []).find(
     (t) => t.channelId === channelId,
   );
-
   const description = raidOfChannel?.description?.toLowerCase();
   if (!raidOfChannel || !description) {
     // No raid, nothing to do.

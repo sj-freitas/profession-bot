@@ -59,9 +59,9 @@ const commands = [
     )
     .addStringOption((option) =>
       option
-        .setName("roster")
+        .setName("event-id")
         .setDescription(
-          "The discord handles for all raid participants, should be copied from the Raid-Helper announcement",
+          "The event id on the discord server",
         ),
     ),
   new SlashCommandBuilder()

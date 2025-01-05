@@ -75,17 +75,19 @@ export async function createAndAdvertiseSoftres(
     // Should we return here ?
   }
 
-  const associatedSoftReserves = await Promise.all(
-    [...matchingRaids].map(
-      async (t) =>
-        await raidCreate({
-          allowDuplicate: true,
-          amount: 2,
-          faction: "Alliance",
-          instances: [t],
-        }),
-    ),
-  );
+  const associatedSoftReserves = (
+    await Promise.all(
+      [...matchingRaids].map(
+        async (t) =>
+          await raidCreate({
+            allowDuplicate: true,
+            amount: 2,
+            faction: "Alliance",
+            instances: [t],
+          }),
+      ),
+    )
+  ).filter((t): t is RaidInstance => t !== null);
 
   if (associatedSoftReserves.length !== 0) {
     await sendMessageToChannel(

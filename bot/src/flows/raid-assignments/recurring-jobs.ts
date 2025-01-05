@@ -25,6 +25,10 @@ export async function pollChannelForWorldBuffAssignments(
   raidInfo: RaidInfo,
 ): Promise<void> {
   const raidEvent = await fetchEvent(raidInfo.eventId);
+  if (raidEvent === null) {
+    return;
+  }
+
   const roster = await getRosterFromRaidEvent(raidEvent);
 
   // Stuff that should be done even if the hash doesn't change
@@ -58,6 +62,9 @@ export async function pollChannelsForAssignments(
   const raidInfoTable = new RaidInfoTable(sheetClient, CONFIG.GUILD.INFO_SHEET);
   const allRaids = await raidInfoTable.getAllValues();
   const serverEvents = await fetchServerEvents(CONFIG.GUILD.DISCORD_SERVER_ID);
+  if (serverEvents === null) {
+    return;
+  }
 
   // Channels with raids
   const trackedServerEvents = (serverEvents.postedEvents ?? []).filter((t) =>
