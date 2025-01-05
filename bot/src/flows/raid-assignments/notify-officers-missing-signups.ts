@@ -15,6 +15,26 @@ const raiderRolesSet = new Set(RAIDER_ROLES);
 
 const THREE_DAYS_BEFORE_RAID = 3 * 24 * 60 * 60 * 1000;
 
+function getMessageTag(raidEvent: RaidEvent): string {
+  const raidMarkdownLink = `[${raidEvent.id}](https://discord.com/channels/${DISCORD_SERVER_ID}/${raidEvent.channelId}/${raidEvent.id})`;
+  return `### Missing sign-ups for raid ${raidMarkdownLink}`;
+}
+
+export async function officerNotificationMissingSignUpsMessageExists(
+  discordClient: Client,
+  raidEvent: RaidEvent,
+): Promise<boolean> {
+  const messageTag = getMessageTag(raidEvent);
+
+  return Boolean(
+    await findMessageInHistory(
+      discordClient,
+      STAFF_RAID_CHANNEL_ID,
+      messageTag,
+    ),
+  );
+}
+
 export async function tryNotifyOfficersMissingSignUps(
   discordClient: Client,
   database: Database,
@@ -51,15 +71,14 @@ export async function tryNotifyOfficersMissingSignUps(
   const roles = await Promise.all(
     RAIDER_ROLES.map(async (roleId) => guild.roles.fetch(roleId)),
   );
-  const raidMarkdownLink = `[${raidEvent.id}](https://discord.com/channels/${DISCORD_SERVER_ID}/${raidEvent.channelId}/${raidEvent.id})`;
-  const formatted = `### Missing sign-ups for raid ${raidMarkdownLink} ${raidEvent.title}
+  const formatted = `${getMessageTag(raidEvent)} ${raidEvent.title}
 This is a list of players registered as ${roles.map((t) => t?.name).join(" or ")} that haven't signed-up yet.
 ${notSignedUpPlayers.map((t) => ` - <@${t.discordId}> ${t.characters[0]}`).join("\n")}`;
 
   const message = await findMessageInHistory(
     discordClient,
     STAFF_RAID_CHANNEL_ID,
-    `### Missing sign-ups for raid ${raidMarkdownLink}`,
+    getMessageTag(raidEvent),
   );
   if (message !== null) {
     // Edit

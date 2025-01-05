@@ -35,6 +35,17 @@ function getAssignmentConfigAndHistory(database: Database) {
   };
 }
 
+export async function worldBuffAssignmentMessageExists(
+  discordClient: Client,
+  raidEvent: RaidEvent,
+): Promise<boolean> {
+  const messageTag = "## World buff item rotation";
+
+  return Boolean(
+    await findMessageInHistory(discordClient, raidEvent.channelId, messageTag),
+  );
+}
+
 export async function tryPostWorldBuffAssignments(
   discordClient: Client,
   database: Database,

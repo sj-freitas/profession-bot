@@ -38,7 +38,8 @@ RAID_HELPER_API_KEY="{RAIDER_HELPER_API_KEY_CAN_BE_OBTAINED_WITH_COMMAND_ON_DISC
 
 # Raid Assignment Features
 - Flows:
-    - Show Raid Assignments [NOTDONE] - we have all parts for this but need to do a couple of fixes:
+    - Show Raid Assignments [DONE]
+    - Configure Raid Assignments
         - Missing Twin Emps tactic
         - Missing Bug Trio
         - Fix: Sartura Assignments [LOWPRIO]

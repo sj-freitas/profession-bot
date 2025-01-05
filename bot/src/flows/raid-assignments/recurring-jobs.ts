@@ -2,11 +2,20 @@ import { Client } from "discord.js";
 import { CONFIG } from "../../config";
 import { getRosterFromRaidEvent } from "../roster-helper";
 import { Database } from "../../exports/mem-database";
-import { tryPostWorldBuffAssignments } from "./world-buff-assignments";
-import { tryPostRaidComposition } from "./raid-composition-assignments";
+import {
+  tryPostWorldBuffAssignments,
+  worldBuffAssignmentMessageExists,
+} from "./world-buff-assignments";
+import {
+  raidCompositionMessageExists,
+  tryPostRaidComposition,
+} from "./raid-composition-assignments";
 import { tryPostFightAssignments } from "./raid-encounter-assignments";
 import { tryAdvertiseMissingSoftReserves } from "./advertise-missing-softreserves";
-import { tryNotifyOfficersMissingSignUps } from "./notify-officers-missing-signups";
+import {
+  officerNotificationMissingSignUpsMessageExists,
+  tryNotifyOfficersMissingSignUps,
+} from "./notify-officers-missing-signups";
 import { RaidInfo, RaidInfoTable } from "../../integrations/sheets/raid-info";
 import {
   fetchEvent,
@@ -31,7 +40,8 @@ export async function pollChannelForWorldBuffAssignments(
 
   const roster = await getRosterFromRaidEvent(raidEvent, database);
 
-  // Stuff that should be done even if the hash doesn't change
+  // Stuff that should be done even if the hash doesn't changed, since this
+  // isn't really tracked by the hash itself.
   await tryAdvertiseMissingSoftReserves(
     discordClient,
     sheetClient,
@@ -39,15 +49,48 @@ export async function pollChannelForWorldBuffAssignments(
     roster,
   );
 
+  const worldBuffAssignmentMessageExistsInHistory =
+    await worldBuffAssignmentMessageExists(discordClient, raidEvent);
+  if (!worldBuffAssignmentMessageExistsInHistory) {
+    await tryPostWorldBuffAssignments(
+      discordClient,
+      database,
+      raidEvent,
+      roster,
+    );
+  }
+
+  const raidCompositionMessageExistsInHistory =
+    await raidCompositionMessageExists(discordClient, raidEvent);
+  if (!raidCompositionMessageExistsInHistory) {
+    await tryPostRaidComposition(discordClient, raidEvent, roster);
+    await tryPostFightAssignments(
+      discordClient,
+      sheetClient,
+      raidEvent,
+      roster,
+    );
+  }
+
+  const officerNotificationMissingSignUpsMessageExistsInHistory =
+    await officerNotificationMissingSignUpsMessageExists(
+      discordClient,
+      raidEvent,
+    );
+  if (!officerNotificationMissingSignUpsMessageExistsInHistory) {
+    await tryNotifyOfficersMissingSignUps(discordClient, database, raidEvent);
+  }
+
   if (raidInfo.rosterHash === roster.rosterHash) {
+    // Hashes match, nothing needs to change.
     return;
   }
 
   // Roster has updated, trigger all post changes and assignments
   await tryPostWorldBuffAssignments(discordClient, database, raidEvent, roster);
   await tryNotifyOfficersMissingSignUps(discordClient, database, raidEvent);
-  await tryPostRaidComposition(discordClient, sheetClient, raidEvent, roster);
-  await tryPostFightAssignments();
+  await tryPostRaidComposition(discordClient, raidEvent, roster);
+  await tryPostFightAssignments(discordClient, sheetClient, raidEvent, roster);
 
   // Update the hash
   await raidInfoTable.updateValue({

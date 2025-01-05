@@ -102,7 +102,7 @@ export function exportToDiscord(
   const printAssignment = (currAssignment: AssignmentDetails) =>
     `${currAssignment.description} ${currAssignment.characters.map((t) => `<@${characterDiscordHandleMap.get(t.name)}>`).join(", ")}`;
 
-  return `## Sartura Stun and Tank Assignment
+  return `### Sartura Stun and Tank Assignment
 ${sarturaAssignment.map((t) => `- ${t.raidTarget.icon.discordEmoji} [${t.raidTarget.icon.name}] (${t.raidTarget.name}): ${t.assignments.map(printAssignment).join(" ")} `).join("\n")}`;
 }
 
@@ -148,14 +148,14 @@ export function getSarturaAssignment({
   const assignments = makeAssignments(characters);
 
   const dmAssignment = `
-## Copy the following assignments to their specific use cases
+# Copy the following assignments to their specific use cases
 
-### Discord Assignment for the specific raid channel:
+## Discord Assignment for the specific raid channel:
 \`\`\`
 ${exportToDiscord(assignments, players)}
 \`\`\`
 
-### To be used as a raiding warning, copy these and use them in-game before the encounter:
+## To be used as a raiding warning, copy these and use them in-game before the encounter:
 \`\`\`
 ${exportToRaidWarning(assignments)}
 \`\`\`

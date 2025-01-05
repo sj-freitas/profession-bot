@@ -2,99 +2,89 @@ import { Client } from "discord.js";
 import { RaidEvent } from "../../integrations/raid-helper/types";
 import { Roster, toRaidAssignmentRoster } from "../roster-helper";
 import { isRaidEventInAmountOfTime } from "../time-utils";
-import { SheetClient } from "../../integrations/sheets/config";
 import { CONFIG } from "../../config";
-import { getInstanceInfosFromRaidEventId } from "../raid-info-utils";
-import { INSTANCE_ASSIGNMENT_MAKERS } from "../../classic-wow/raids";
-import { createOrEditDiscordMessage } from "../../discord/utils";
+import {
+  createOrEditDiscordMessage,
+  findMessageInHistory,
+} from "../../discord/utils";
+import { getGenericRaidAssignment } from "../../classic-wow/raids/generic";
 
-const THREE_DAYS_BEFORE_RAID = 6 * 60 * 60 * 1000;
-const { INFO_SHEET, STAFF_RAID_CHANNEL_ID } = CONFIG.GUILD;
+const SIX_HOURS = 6 * 60 * 60 * 1000;
+const { DISCORD_SERVER_ID, STAFF_RAID_CHANNEL_ID } = CONFIG.GUILD;
 
-interface AssignmentMessage {
-  messageTag: string;
-  officerChannelMessage?: string;
-  raidSignUpChannelMessage?: string;
+function formatDateToCET(date: Date): string {
+  const options: Intl.DateTimeFormatOptions = {
+    weekday: "long",
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "CET",
+    hour12: false,
+  };
+
+  const formatter = new Intl.DateTimeFormat("en-UK", options);
+  return formatter.format(date).replace(/,/g, "");
+}
+
+function getMessageTag(raidEvent: RaidEvent): string {
+  return `Setup for ${formatDateToCET(new Date(raidEvent.startTime * 1000))}`;
+}
+
+export async function raidCompositionMessageExists(
+  discordClient: Client,
+  raidEvent: RaidEvent,
+): Promise<boolean> {
+  const raidCompositionAndAssignmentsMessageTag = getMessageTag(raidEvent);
+
+  return Boolean(
+    await findMessageInHistory(
+      discordClient,
+      raidEvent.channelId,
+      raidCompositionAndAssignmentsMessageTag,
+    ),
+  );
 }
 
 export async function tryPostRaidComposition(
   discordClient: Client,
-  sheetClient: SheetClient,
   raidEvent: RaidEvent,
   roster: Roster,
 ): Promise<void> {
-  // Check if it's 3 days before the raid
-  if (!isRaidEventInAmountOfTime(raidEvent, THREE_DAYS_BEFORE_RAID)) {
+  // Check if it's 6 hours before the raid
+  if (!isRaidEventInAmountOfTime(raidEvent, SIX_HOURS)) {
     return;
   }
 
-  const instanceInfos = await getInstanceInfosFromRaidEventId(
-    sheetClient,
-    INFO_SHEET,
-    raidEvent.id,
-  );
+  const messageTitle = getMessageTag(raidEvent);
   const raidAssignmentRoster = toRaidAssignmentRoster(roster);
 
-  // Get Assignment Data for each raid
-  const assignmentData: AssignmentMessage[] = instanceInfos
-    .map((currRaid) => {
-      const raidConfig = INSTANCE_ASSIGNMENT_MAKERS.get(currRaid.raidId);
+  const { officerAssignment, announcementAssignment } =
+    getGenericRaidAssignment(raidAssignmentRoster);
 
-      if (!raidConfig) {
-        return null;
-      }
+  const raidEventUrl = `[${messageTitle}](https://discord.com/channels/${DISCORD_SERVER_ID}/${raidEvent.channelId}/${raidEvent.id})`;
 
-      const allAssignments = raidConfig.assignmentMakers.map((makeAssignment) =>
-        makeAssignment(raidAssignmentRoster),
-      );
+  if (officerAssignment) {
+    const officerMessage = `# ${raidEventUrl}
+${officerAssignment}`;
 
-      const allOfficerChannelMessages = allAssignments
-        .map((t) => t.officerAssignment)
-        .filter((t): t is string => Boolean(t));
-      const allRaidSignUpChannelMessages = allAssignments
-        .map((t) => t.announcementAssignment)
-        .filter((t): t is string => Boolean(t));
+    await createOrEditDiscordMessage(
+      discordClient,
+      STAFF_RAID_CHANNEL_ID,
+      `# ${raidEventUrl}`,
+      officerMessage,
+    );
+  }
 
-      const officerChannelMessage =
-        allOfficerChannelMessages.length >= 0
-          ? `## Assignments for ${currRaid.raidName}
-${allOfficerChannelMessages.join("\n\n")}`
-          : undefined;
-      const raidSignUpChannelMessage =
-        allRaidSignUpChannelMessages.length >= 0
-          ? `## Assignments for ${currRaid.raidName}
-${allRaidSignUpChannelMessages.join("\n\n")}`
-          : undefined;
+  if (announcementAssignment) {
+    const raidSignUpMessage = `# ${messageTitle}
+${announcementAssignment}`;
 
-      const assignmentMessageOfRaid: AssignmentMessage = {
-        messageTag: `## Assignments for ${currRaid.raidName}`,
-        officerChannelMessage,
-        raidSignUpChannelMessage,
-      };
-
-      return assignmentMessageOfRaid;
-    })
-    .filter((currRaid): currRaid is AssignmentMessage => currRaid !== null);
-
-  for (const curr of assignmentData) {
-    const { officerChannelMessage, raidSignUpChannelMessage, messageTag } =
-      curr;
-    if (officerChannelMessage) {
-      await createOrEditDiscordMessage(
-        discordClient,
-        STAFF_RAID_CHANNEL_ID,
-        messageTag,
-        officerChannelMessage,
-      );
-    }
-
-    if (raidSignUpChannelMessage) {
-      await createOrEditDiscordMessage(
-        discordClient,
-        raidEvent.channelId,
-        messageTag,
-        raidSignUpChannelMessage,
-      );
-    }
+    await createOrEditDiscordMessage(
+      discordClient,
+      raidEvent.channelId,
+      `# ${messageTitle}`,
+      raidSignUpMessage,
+    );
   }
 }

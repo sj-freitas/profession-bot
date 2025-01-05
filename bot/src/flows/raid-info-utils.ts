@@ -46,7 +46,7 @@ export async function getInstanceInfosFromRaidEventId(
     await Promise.all(raidInfo.softresIds.map(async (t) => getRaid(t)))
   )
     .filter((t): t is RaidInstance => t !== null)
-    .map((t) => allSoftReservesData.find((x) => x.softresId === t.raidId[0]))
+    .map((t) => allSoftReservesData.find((x) => x.softresId === t.instances[0]))
     .filter((t): t is SoftresRaidData => t !== undefined);
 
   return softReserves.map((t) => ({
