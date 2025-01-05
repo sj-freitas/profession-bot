@@ -45,7 +45,7 @@ The following players haven't soft-reserved yet: ${curr.missingPlayers.map((t) =
   const message = await findMessageInHistory(
     discordClient,
     raidEvent.channelId,
-    "# Missing Soft Reserves",
+    "## Missing Soft Reserves",
   );
 
   if (message && softReserveInfo.every((t) => t.missingPlayers.length === 0)) {

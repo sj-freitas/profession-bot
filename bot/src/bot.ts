@@ -21,6 +21,7 @@ import { runJob } from "./discord/crafting-list.job";
 import { addChannelListener } from "./flows/soft-reserves/channel-listener";
 import { pollChannelsForSoftReserves } from "./flows/soft-reserves/recurring-job";
 import { pollChannelsForAssignments } from "./flows/raid-assignments/recurring-jobs";
+import { handleMissingSoftreserves } from "./discord/list-missing-softreserves.command";
 
 const { RAID_SIGN_UP_CHANNELS, STAFF_RAID_CHANNEL_ID } = CONFIG.GUILD;
 const FIVE_MINUTES = 5 * 60 * 1000;
@@ -93,6 +94,17 @@ const commands = [
   new SlashCommandBuilder()
     .setName("nuke")
     .setDescription("Deletes all messages from a channel"),
+  new SlashCommandBuilder()
+    .setName("missing-sr")
+    .setDescription(
+      "Lists all players for a specific raid event that are missing their SRs",
+    )
+    .addStringOption((option) =>
+      option
+        .setName("event-id")
+        .setDescription("The raid event to list missing soft-reserves")
+        .setRequired(true),
+    ),
 ];
 
 async function setupClient(database: Database): Promise<Client> {
@@ -120,6 +132,10 @@ async function setupClient(database: Database): Promise<Client> {
     {
       id: "nuke",
       handler: deleteMessagesHandler,
+    },
+    {
+      id: "missing-sr",
+      handler: handleMissingSoftreserves,
     },
   ]);
 

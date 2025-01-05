@@ -38,9 +38,6 @@ RAID_HELPER_API_KEY="{RAIDER_HELPER_API_KEY_CAN_BE_OBTAINED_WITH_COMMAND_ON_DISC
 
 # Raid Assignment Features
 - Flows:
-    - List who misses SRs [STARTED]
-        - Recurring Job [DONE]
-        - Command /missing-srs <eventId> [NOTDONE] - Very EASY
     - Show Raid Assignments [NOTDONE] - we have all parts for this but need to do a couple of fixes:
         - Sartura Assignments
         - Missing Twin Emps tactic

@@ -27,7 +27,7 @@ export const handleCrafter: CommandHandler<Database> = async ({
   // Search the database
   type SimplifiedPlayer = {
     characterName: string;
-    serverHandle: string;
+    discordId: string;
   };
   const allPlayers = new Map(
     database
@@ -35,7 +35,7 @@ export const handleCrafter: CommandHandler<Database> = async ({
       .map((t) =>
         t.characters.map((x) => ({
           characterName: x,
-          serverHandle: t.serverHandle,
+          discordId: t.discordId,
         })),
       )
       .flatMap((t: SimplifiedPlayer[]) => t)
@@ -98,7 +98,7 @@ export const handleCrafter: CommandHandler<Database> = async ({
 
   const mapped = groupedRecipes.map(
     ({ name, url, crafters }) =>
-      `[${name}](${url}) crafters: ${crafters.map((t) => `${t.characterName} (${t.serverHandle})`).join(", ")}`,
+      `[${name}](${url}) crafters: ${crafters.map((t) => `${t.characterName} (<@${t.discordId}>)`).join(", ")}`,
   );
 
   await reply(mapped.join("\n"));
