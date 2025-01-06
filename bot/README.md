@@ -36,14 +36,17 @@ RAID_HELPER_API_KEY="{RAIDER_HELPER_API_KEY_CAN_BE_OBTAINED_WITH_COMMAND_ON_DISC
 - More accurate word matching (tolerant to typos) [HARD]
 - Support item IDs directly [MEDIUM]
 
+# Known bugs
+- Cthun assignment -> figure out bug with Broederbeer [DONE??]
+- Paladins should go on melee groups [DONE]
+
 # Raid Assignment Features
 - Flows:
-    - Show Raid Assignments [DONE]
     - Configure Raid Assignments
         - Missing Twin Emps tactic
         - Missing Bug Trio
         - Fix: Sartura Assignments [LOWPRIO]
         - Fix: Merge Groups [LOWPRIO]
     - Clean up Raid Channels [NOTDONE]
-        - Every day at 2 am delete all non-bot messages
+        - Every day at 2 am delete all non-bot messages [DONE]
         - 4 hours after the raid, delete current raid and create a new one with default description also sets the final buff groups as history

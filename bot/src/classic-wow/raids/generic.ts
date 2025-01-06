@@ -138,7 +138,12 @@ export function makeAssignments(roster: Character[]): Raid {
       if (meleeBuffer) {
         currGroup.push(meleeBuffer);
       }
-      const paladin = pickOneAtRandomAndRemoveFromArray(meleePaladins);
+
+      // Paladins give horn buff, make them sure they are in melee groups.
+      // If there aren't sufficient melee paladins, use the healer ones.
+      const paladin =
+        pickOneAtRandomAndRemoveFromArray(meleePaladins) ??
+        pickOneAtRandomAndRemoveFromArray(healerPaladins);
       if (paladin) {
         currGroup.push(paladin);
       }
