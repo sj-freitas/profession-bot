@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { Client, Message, TextChannel } from "discord.js";
 
 const AUTHORS_TO_PRESERVE: string[] = [
@@ -30,6 +31,7 @@ export async function cleanUpRaidChannels(
     return;
   }
 
+  console.log(`It's 2 am, deleting all messages now`);
   const channels = (
     await Promise.all(
       channelIds.map(async (currChannelId) =>
