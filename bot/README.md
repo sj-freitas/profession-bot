@@ -39,6 +39,7 @@ RAID_HELPER_API_KEY="{RAIDER_HELPER_API_KEY_CAN_BE_OBTAINED_WITH_COMMAND_ON_DISC
 # Known bugs
 - Cthun assignment -> figure out bug with Broederbeer [DONE??]
 - Paladins should go on melee groups [DONE]
+- Assignments with less than 2 tanks break (Sartura??)
 
 # Raid Assignment Features
 - Flows:

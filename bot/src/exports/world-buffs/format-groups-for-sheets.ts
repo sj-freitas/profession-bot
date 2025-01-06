@@ -20,10 +20,11 @@ function getArrayFromSingleOrArray<T>(entry: T | T[]): T[] {
 export function formatGroupsForSheets(
   groupsConfig: GroupPreConfig[],
   worldBuffConfig: WorldBuffAssignments[],
+  dateString = "[DATE]",
 ): string {
   return groupsConfig
     .map((group, index) => {
-      const groupName = `ASSIGNMENTS [DATE] ${incrementLetter("A", index)}`;
+      const groupName = `ASSIGNMENTS ${dateString} ${incrementLetter("A", index)}`;
 
       const inOrder = worldBuffConfig.map((currBuff) =>
         getArrayFromSingleOrArray(

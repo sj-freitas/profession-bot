@@ -1,14 +1,11 @@
 import { findNextAssignment } from "../buff-management/find-next-assignment";
-import {
-  mapRawAssignmentConfig,
-  mapRawHistory,
-} from "../buff-management/utils";
 import { Database } from "../exports/mem-database";
 import { formatGroupAssignmentsToMarkdown } from "../exports/world-buffs/format-group-assigments-md";
 import { formatGroupsForSheets } from "../exports/world-buffs/format-groups-for-sheets";
-import { Player } from "../integrations/sheets/get-players";
+import { getAssignmentConfigAndHistory } from "../flows/raid-assignments/world-buff-assignments";
+import { getRosterFromRaidEvent } from "../flows/roster-helper";
+import { fetchEvent } from "../integrations/raid-helper/raid-helper-client";
 import { CommandHandler } from "./commandHandler";
-import { parseDiscordHandles } from "./utils";
 
 const NUMBER_OF_GROUPS = 2;
 
@@ -19,34 +16,28 @@ export const worldBuffsHandler: CommandHandler<Database> = async ({
   reply,
   payload: database,
 }): Promise<void> => {
-  const roster = options.getString("roster");
+  const eventId = options.getString("event-id");
 
-  if (roster === null) {
+  if (eventId === null) {
     await reply("Failed to provide a valid roster.");
     return;
   }
+  const event = await fetchEvent(eventId);
+  if (!event) {
+    await reply(`${eventId} refers to an invalid event.`);
+    return;
+  }
 
-  const parsedRoster = parseDiscordHandles(roster);
-  const players = database.getPlayersRoster();
-  const rawHistory = database.getWorldBuffHistory();
-  const rawAssignmentConfig = database.getWorldBuffAssignments();
-  const serverHandleMap = new Map(players.map((t) => [t.serverHandle, t]));
-  const mappedRoster = parsedRoster
-    .map((t) => serverHandleMap.get(t))
-    .filter((t): t is Player => Boolean(t));
-
-  const playerMap = new Map(players.map((t) => [t.discordHandle, t]));
-
-  const history = mapRawHistory(rawHistory, playerMap);
-  const assignmentConfig = mapRawAssignmentConfig(
-    rawAssignmentConfig,
-    playerMap,
-  );
-
+  const roster = await getRosterFromRaidEvent(event, database);
+  const allPlayersWithMains = roster.characters
+    .filter((t) => t.isMainCharacter)
+    .map((t) => t.player);
+  const { assignmentConfig, rawAssignmentConfig, history } =
+    getAssignmentConfigAndHistory(database);
   const assignment = findNextAssignment({
     history,
     assignmentConfig,
-    roster: mappedRoster,
+    roster: allPlayersWithMains,
     numberOfGroups: NUMBER_OF_GROUPS,
   });
 

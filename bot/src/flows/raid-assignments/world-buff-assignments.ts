@@ -10,14 +10,30 @@ import { NUMBER_OF_GROUPS } from "../../integrations/sheets/get-buffers";
 import { Roster } from "../roster-helper";
 import { RaidEvent } from "../../integrations/raid-helper/types";
 import {
+  createOrEditDiscordMessage,
   findMessageInHistory,
-  sendMessageToChannel,
 } from "../../discord/utils";
 import { isRaidEventInAmountOfTime } from "../time-utils";
+import { formatGroupsForSheets } from "../../exports/world-buffs/format-groups-for-sheets";
+import { CONFIG } from "../../config";
 
 const THREE_DAYS_BEFORE_RAID = 3 * 24 * 60 * 60 * 1000;
+const { STAFF_RAID_CHANNEL_ID } = CONFIG.GUILD;
 
-function getAssignmentConfigAndHistory(database: Database) {
+function formatDate(date: Date): string {
+  const options: Intl.DateTimeFormatOptions = {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    timeZone: "CET",
+    hour12: false,
+  };
+
+  const formatter = new Intl.DateTimeFormat("de-DE", options);
+  return formatter.format(date).replace(/,/g, "");
+}
+
+export function getAssignmentConfigAndHistory(database: Database) {
   const rawHistory = database.getWorldBuffHistory();
   const rawAssignmentConfig = database.getWorldBuffAssignments();
   const allPlayers = database.getPlayersRoster();
@@ -78,17 +94,27 @@ export async function tryPostWorldBuffAssignments(
     ),
   );
 
-  // Post or Edit message
-  const message = await findMessageInHistory(
+  // Raid Channel
+  await createOrEditDiscordMessage(
     discordClient,
     raidEvent.channelId,
     "## World buff item rotation",
+    formatted,
   );
-  if (message !== null) {
-    // Edit
-    await message.edit(formatted);
-  } else {
-    // Send
-    await sendMessageToChannel(discordClient, raidEvent.channelId, formatted);
-  }
+
+  // Staff Channel
+  const eventDateFormatted = formatDate(new Date(raidEvent.startTime * 1000));
+  const tag = `ASSIGNMENTS ${eventDateFormatted}`;
+  const formattedForSheets = formatGroupsForSheets(
+    assignment,
+    rawAssignmentConfig,
+    eventDateFormatted,
+  );
+
+  await createOrEditDiscordMessage(
+    discordClient,
+    STAFF_RAID_CHANNEL_ID,
+    tag,
+    formattedForSheets,
+  );
 }

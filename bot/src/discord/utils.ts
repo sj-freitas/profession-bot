@@ -91,11 +91,15 @@ export async function createOrEditDiscordMessage(
     channelId,
     messageTag,
   );
-  if (message !== null) {
-    // Edit
-    await message.edit(messageContent);
-  } else {
-    // Send
+
+  if (message === null) {
     await sendMessageToChannel(discordClient, channelId, messageContent);
+    return;
   }
+
+  if (message.content === messageContent) {
+    return;
+  }
+
+  await message.edit(messageContent);
 }
