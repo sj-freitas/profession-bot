@@ -26,7 +26,7 @@ export async function cleanUpRaidChannels(
   channelIds: string[],
 ): Promise<void> {
   // Every day at 02:00
-  if (new Date().getHours() < 2 && new Date().getHours() > 3) {
+  if (new Date().getHours() === 2) {
     return;
   }
 
