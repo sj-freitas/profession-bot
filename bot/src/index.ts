@@ -9,7 +9,7 @@ import {
 import { fetchEvent } from "./integrations/raid-helper/raid-helper-client";
 
 async function main() {
-  const encounter = "aq-sartura";
+  const encounter = "aq-bug-trio";
   const database = new Database();
   await refreshDatabase(database);
 

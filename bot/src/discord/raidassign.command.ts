@@ -11,6 +11,8 @@ import {
 import { fetchEvent } from "../integrations/raid-helper/raid-helper-client";
 import { RaidAssignmentRoster } from "../classic-wow/raids/raid-assignment-roster";
 import { RaidAssignmentResult } from "../classic-wow/raids/assignment-config";
+import { getTwinsAssignment } from "../classic-wow/raids/temple-of-aq/twin-emps";
+import { getBugTrioAssignment } from "../classic-wow/raids/temple-of-aq/bug-trio";
 
 type RaidAssignment = (
   roster: RaidAssignmentRoster,
@@ -19,7 +21,9 @@ type RaidAssignment = (
 export const ENCOUNTER_HANDLERS: { [key: string]: RaidAssignment } = {
   raid: getGenericRaidAssignment,
   "aq-sartura": getSarturaAssignment,
+  "aq-twins": getTwinsAssignment,
   "aq-cthun": getCthunAssignment,
+  "aq-bug-trio": getBugTrioAssignment,
 };
 
 export const SUPPORTED_ENCOUNTERS = Object.keys(ENCOUNTER_HANDLERS);

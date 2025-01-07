@@ -39,13 +39,9 @@ RAID_HELPER_API_KEY="{RAIDER_HELPER_API_KEY_CAN_BE_OBTAINED_WITH_COMMAND_ON_DISC
 # Raid Assignment Features
 - Flows:
     - Configure Raid Assignments
-        - Missing Twin Emps tactic [Easy] (use raid groups?)
-        - Missing Bug Trio [Easy]
         - Fix: Merge Groups [LOWPRIO]
     - Clean up Raid Channels [NOTDONE]
         - 4 hours after the raid, delete current raid and create a new one with default description also sets the final buff groups as history
 
 - World buff history
-    - Add /rw messages for buffer groups [1A, 1B, 2A, 2B]
-    - Add backup buffer options (officers only)
     - Add rule to not include WBs on all raids [IMPORTANT]

@@ -8,6 +8,20 @@ export function pickOnePutOnTop<T>(array: T[], preselected?: T): T[] {
   return [element, ...array.filter((t) => t !== element)];
 }
 
+export function shuffleArray<T>(array: T[]): T[] {
+  let originalArrayCopied = [...array];
+  const newArray: T[] = [];
+  for (let i = 0; i < array.length; i += 1) {
+    const [randomElement, ...restOfTheArray] =
+      pickOnePutOnTop(originalArrayCopied);
+
+    originalArrayCopied = restOfTheArray;
+    newArray.push(randomElement);
+  }
+
+  return newArray;
+}
+
 export function pickOneAtRandomAndRemoveFromArray<T>(
   array: T[],
   random: () => number = Math.random,

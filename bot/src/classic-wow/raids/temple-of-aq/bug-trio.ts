@@ -10,70 +10,43 @@ import { RaidAssignmentResult } from "../assignment-config";
 import { RaidAssignmentRoster } from "../raid-assignment-roster";
 import { shuffleArray } from "../utils";
 
-const CASTER_TWIN = {
+const YAUJ = {
   raidTarget: {
-    icon: ALL_RAID_TARGETS.Moon,
-    name: `Left (Vek'lor on pull)`,
+    icon: ALL_RAID_TARGETS.Skull,
+    name: `Yauj`,
   },
 };
-const MELEE_TWIN = {
+const KRI = {
   raidTarget: {
-    icon: ALL_RAID_TARGETS.Circle,
-    name: `Right (Vek'nilash on pull)`,
+    icon: ALL_RAID_TARGETS.Cross,
+    name: `Kri`,
+  },
+};
+const VEM = {
+  raidTarget: {
+    icon: ALL_RAID_TARGETS.Square,
+    name: `Vem`,
   },
 };
 
 export function makeAssignments(roster: Character[]): TargetAssignment[] {
   const tanks = roster.filter((t) => t.role === "Tank");
-  const [casterMainTank, casterOffTank, meleeMainTank] = shuffleArray(tanks);
-  const [healerCaster, healerMelee] = [
-    ...shuffleArray(
-      roster.filter((t) => t.class === "Paladin" && t.role === "Healer"),
-    ),
-    ...shuffleArray(
-      roster.filter(
-        (t) =>
-          !(t.class === "Paladin" || t.class === "Mage") && t.role === "Healer",
-      ),
-    ),
-  ];
+  const shuffledTanks = shuffleArray(tanks);
 
-  return [
-    {
-      ...CASTER_TWIN,
-      assignments: [
-        {
-          id: "Tanks",
-          description: "tanked by",
-          characters: [casterMainTank, casterOffTank],
-        },
-        {
-          id: "Healer",
-          description: "healed by",
-          characters: [healerCaster],
-        }
-      ],
-    },
-    {
-      ...MELEE_TWIN,
-      assignments: [
-        {
-          id: "Tank",
-          description: "tanked by",
-          characters: [meleeMainTank],
-        },
-        {
-          id: "Healer",
-          description: "healed by",
-          characters: [healerMelee],
-        }
-      ]
-    }
-  ];
+  return [YAUJ, KRI, VEM].map((currBug, idx) => ({
+    ...currBug,
+    assignments: [
+      {
+        id: "Tanks",
+        description: "tanked by",
+        characters: [shuffledTanks[idx]],
+      },
+    ],
+  }));
 }
 
 export function exportToDiscord(
-  twinsAssignment: TargetAssignment[],
+  bugTrioAssignment: TargetAssignment[],
   player: Player[],
 ): string {
   const characterDiscordHandleMap = new Map<string, string>();
@@ -87,8 +60,8 @@ export function exportToDiscord(
   const printAssignment = (currAssignment: AssignmentDetails) =>
     `${currAssignment.description} ${currAssignment.characters.map((t) => `<@${characterDiscordHandleMap.get(t.name)}>`).join(", ")}`;
 
-  return `### Twin Emps Tank Assignment
-${twinsAssignment.map((t) => `- ${t.raidTarget.icon.discordEmoji} [${t.raidTarget.icon.name}] (${t.raidTarget.name}): ${t.assignments.map(printAssignment).join(" ")} `).join("\n")}`;
+  return `### Bug Trio Emps Tank Assignment
+${bugTrioAssignment.map((t) => `- ${t.raidTarget.icon.discordEmoji} [${t.raidTarget.icon.name}] (${t.raidTarget.name}): ${t.assignments.map(printAssignment).join(" ")} `).join("\n")}`;
 }
 
 interface AssignmentInfo {
@@ -99,9 +72,9 @@ interface AssignmentInfo {
 }
 
 export function exportToRaidWarning(
-  twinsAssignment: TargetAssignment[],
+  bugTrioAssignment: TargetAssignment[],
 ): string {
-  const groupedByAssignmentTypeId = twinsAssignment.reduce<AssignmentInfo>(
+  const groupedByAssignmentTypeId = bugTrioAssignment.reduce<AssignmentInfo>(
     (res, curr) => {
       curr.assignments.forEach((t) => {
         res[t.id] = [
@@ -126,7 +99,7 @@ export function exportToRaidWarning(
     .join("\n");
 }
 
-export function getTwinsAssignment({
+export function getBugTrioAssignment({
   characters,
   players,
 }: RaidAssignmentRoster): Promise<RaidAssignmentResult> {
@@ -147,7 +120,7 @@ ${exportToRaidWarning(assignments)}
   `;
 
   const announcementAssignment = exportToDiscord(assignments, players);
-  const officerAssignment = `### Twins assignments to post as a \`/rw\` in-game
+  const officerAssignment = `### Bug Trio assignments to post as a \`/rw\` in-game
 \`\`\`
 ${exportToRaidWarning(assignments)}
 \`\`\``;
