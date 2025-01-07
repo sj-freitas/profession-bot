@@ -10,11 +10,14 @@ import { getSoftresLink } from "../../integrations/softres/utils";
 import { RaidInstance } from "../../integrations/softres/types";
 
 const SOFT_RESERVE_MESSAGE_TITLE = "## Soft-Reserves for this raid are up!";
+const DEFAULT_SOFT_RESERVE_AMOUNT = 2;
 
 export interface SoftresInfo {
   instances: string[];
   raidId: string;
   token?: string | null;
+  allowDuplicate: boolean;
+  amount: number;
 }
 
 export function isSoftReserveMessage(content: string) {
@@ -28,7 +31,7 @@ export function createSoftReserveMessage(
   return `${SOFT_RESERVE_MESSAGE_TITLE}
 Please make sure that your name is spelled exactly the same in-game.
 ${associatedSoftReserves.map((t) => ` - **[${raidNames.get(t.instances[0])}](${getSoftresLink(t.raidId)})** SR x2`).join("\n")}
-${associatedSoftReserves.find((t) => t.instances[0].indexOf("aq40") >= 0) ? "Any double SR'd AQ tokens will be rolled at the end with the top rollers winning a token per winning roll." : ""}`;
+${associatedSoftReserves.find((t) => t.instances[0].indexOf("aq40") >= 0 && t.allowDuplicate && t.amount >= 2) ? "Any double SR'd AQ tokens will be rolled at the end with the top rollers winning a token per winning roll." : ""}`;
 }
 
 async function getRaidIdsFromDescription(
@@ -89,7 +92,7 @@ export async function createAnyMissingSoftresRaids(
         async (t) =>
           await raidCreate({
             allowDuplicate: true,
-            amount: 2,
+            amount: DEFAULT_SOFT_RESERVE_AMOUNT,
             faction: "Alliance",
             instances: [t],
           }),
@@ -101,10 +104,9 @@ export async function createAnyMissingSoftresRaids(
       raidId: t.raidId,
       token: t.token,
       instances: t.instances,
+      amount: t.amount,
+      allowDuplicate: t.allowDuplicate,
     }));
-
-  // Now return the matching raids
-  // NEED TO KEEP THE ORDER HERE, VERY IMPORTANT
 
   const originalInOrder = raidInfo.softresIds
     .map((oldRaidId, idx) => {
@@ -120,6 +122,8 @@ export async function createAnyMissingSoftresRaids(
         raidId: oldRaidId,
         token: raidInfo.softresTokens[idx],
         instances: existing.instances,
+        amount: existing.amount,
+        allowDuplicate: existing.allowDuplicate,
       };
       return softResInfo;
     })
@@ -146,10 +150,6 @@ export async function createAndAdvertiseSoftres(
   const raids = new Map(softresRaidData.map((t) => [t.softresId, t.raidName]));
   const matchingRaids = await getRaidIdsFromDescription(unsanitizedDescription);
   if (matchingRaids.length === 0) {
-    console.log(
-      `Could not find a corresponding raid for "${unsanitizedDescription}"`,
-    );
-    // Should we return here ?
     return;
   }
 

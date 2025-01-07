@@ -25,6 +25,7 @@ import { handleMissingSoftreserves } from "./discord/list-missing-softreserves.c
 import { cleanUpRaidChannels } from "./flows/clean-up-raid-channels/recurring-job";
 import { tryUpdateWorldBuffItemRotation } from "./flows/world-buff-config/recurring-job";
 import { createSheetClient } from "./integrations/sheets/config";
+import { getAllSoftresTokens } from "./discord/get-softres-token.command";
 
 const { RAID_SIGN_UP_CHANNELS } = CONFIG.GUILD;
 const FIVE_MINUTES = 5 * 60 * 1000;
@@ -105,6 +106,9 @@ const commands = [
         .setDescription("The raid event to list missing soft-reserves")
         .setRequired(true),
     ),
+  new SlashCommandBuilder()
+    .setName("get-sr-tokens")
+    .setDescription("Gets all softres tokens for this channel"),
 ];
 
 async function setupClient(database: Database): Promise<Client> {
@@ -136,6 +140,10 @@ async function setupClient(database: Database): Promise<Client> {
     {
       id: "missing-sr",
       handler: handleMissingSoftreserves,
+    },
+    {
+      id: "get-sr-tokens",
+      handler: getAllSoftresTokens,
     },
   ]);
 

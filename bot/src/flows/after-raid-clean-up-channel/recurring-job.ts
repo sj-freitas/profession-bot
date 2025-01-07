@@ -1,8 +1,7 @@
 import { Client, TextChannel } from "discord.js";
 import { fetchEvent } from "../../integrations/raid-helper/raid-helper-client";
 import { RaidEvent } from "../../integrations/raid-helper/types";
-
-const RAID_HELPER_AUTHOR = "579155972115660803";
+import { RAID_HELPER_AUTHOR } from "../../integrations/raid-helper/constants";
 
 async function tryCleanUpEvent(): Promise<void> {
   // discordClient: Client,

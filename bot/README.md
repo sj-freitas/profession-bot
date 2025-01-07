@@ -65,5 +65,4 @@ RAID_HELPER_API_KEY="{RAIDER_HELPER_API_KEY_CAN_BE_OBTAINED_WITH_COMMAND_ON_DISC
     - World buff assigns
 
 SOFTRES
-- Add back the x2
-- Add the officer message
+- Add the token message via command
