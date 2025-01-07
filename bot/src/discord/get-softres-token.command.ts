@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import { MessageFlags } from "discord.js";
 import { CONFIG } from "../config";
 import { Database } from "../exports/mem-database";
 import { RAID_HELPER_AUTHOR } from "../integrations/raid-helper/constants";
@@ -82,6 +83,10 @@ export const getAllSoftresTokens: CommandHandler<Database> = async ({
     return;
   }
 
-  await reply(`## Soft reserves for this channel
-${allSoftresRaids.map((t) => `- [${raidNameMap.get(t.instances[0])}](${getSoftresLink(t.raidId)}) - token = \`${t.token}\` `)}`);
+  await interaction.reply({
+    content: `### Softres tokens and ids
+${allSoftresRaids.map((t) => `- [${raidNameMap.get(t.instances[0])} (${t.raidId})](${getSoftresLink(t.raidId)}) - token = \`${t.token}\` `).join("\n")}`,
+    ephemeral: true,
+    flags: MessageFlags.SuppressEmbeds,
+  });
 };

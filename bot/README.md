@@ -53,16 +53,9 @@ RAID_HELPER_API_KEY="{RAIDER_HELPER_API_KEY_CAN_BE_OBTAINED_WITH_COMMAND_ON_DISC
 
 
 - Add switcher table to sheet
-    - Use switcher info on roster metadata to signify the switcher with a role
+    - Add switchers to roster, set min number of tanks and healers (3 tanks 3 healers)
 
 - World buff history
     - Add /rw messages for buffer groups [1A, 1B, 2A, 2B]
     - Add backup buffer options (officers only)
-
-- SINGLE SOURCE OF TRUTH
-   - Automatically refresh and update specific posts from the tables to the messages:
-    - Switchers
-    - World buff assigns
-
-SOFTRES
-- Add the token message via command
+    - Add rule to not include WBs on all raids
