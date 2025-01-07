@@ -1,14 +1,39 @@
 /* eslint-disable no-console */
-
-import { createClient } from "./discord/create-client";
-import { pollChannelsForSoftReserves } from "./flows/soft-reserves/recurring-job";
+import { ENCOUNTER_HANDLERS } from "./discord/raidassign.command";
+import { Database } from "./exports/mem-database";
+import { refreshDatabase } from "./exports/utils";
+import {
+  getRosterFromRaidEvent,
+  toRaidAssignmentRoster,
+} from "./flows/roster-helper";
+import { fetchEvent } from "./integrations/raid-helper/raid-helper-client";
 
 async function main() {
-  const discordClient = await createClient();
+  const encounter = "aq-sartura";
+  const database = new Database();
+  await refreshDatabase(database);
 
-  await pollChannelsForSoftReserves(discordClient, ["1289209696263077918"]);
+  const getAssignmentForEncounter = ENCOUNTER_HANDLERS[encounter];
+  if (!getAssignmentForEncounter) {
+    return;
+  }
 
-  await discordClient.destroy();
+  const eventId = "1325581857605287986";
+  // const eventId = "1324107615948636256";
+  if (eventId === null) {
+    return;
+  }
+
+  const event = await fetchEvent(eventId);
+  if (!event) {
+    return;
+  }
+
+  const roster = await getRosterFromRaidEvent(event, database);
+  const raidAssignmentRoster = toRaidAssignmentRoster(roster);
+  const assignments = await getAssignmentForEncounter(raidAssignmentRoster);
+
+  console.log(assignments);
 }
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises

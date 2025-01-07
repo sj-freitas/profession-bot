@@ -4,6 +4,7 @@ import {
   WorldBuffHistory,
 } from "../integrations/sheets/get-buffers";
 import { Player } from "../integrations/sheets/get-players";
+import { Switcher } from "../integrations/sheets/switcher-role-data";
 import { AvailableProfession, GuildProfessionData } from "./types";
 
 interface RecipeInfo {
@@ -32,6 +33,8 @@ export class Database {
   private playerRoster: Player[] = [];
 
   private characterRoster: Character[] = [];
+
+  private switchers: Switcher[] = [];
 
   queryRecipes(searchTerm: string): RecipeInfo[] {
     // Can do with some magic here to make some words more similar to others and resolve
@@ -75,6 +78,14 @@ export class Database {
 
   setCharacterRoster(characters: Character[]) {
     this.characterRoster = characters;
+  }
+
+  getSwitchers(): Switcher[] {
+    return this.switchers;
+  }
+
+  setSwitchers(switchers: Switcher[]) {
+    this.switchers = switchers;
   }
 }
 

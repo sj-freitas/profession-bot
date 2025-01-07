@@ -13,6 +13,10 @@ import { fetchCharacterData } from "../integrations/raider-io/raider-io-client";
 import { RaidRole } from "../integrations/raider-io/utils";
 import { Database } from "../exports/mem-database";
 import { RaidAssignmentRoster } from "../classic-wow/raids/raid-assignment-roster";
+import { Switcher } from "../integrations/sheets/switcher-role-data";
+
+export const MIN_NUMBER_OF_TANKS_PER_RAID = 3;
+export const MIN_NUMBER_OF_HEALERS_PER_RAID = 3;
 
 const DEFAULT_CLASS_IN_CASE_OF_CHARACTER_NOT_FOUND = "Mage";
 
@@ -76,6 +80,82 @@ export interface Roster {
   rosterHash: string;
 }
 
+function sortByPreference(switchers: Switcher[]) {
+  return switchers.sort(
+    (a, b) => (a.isMainBackup ? 0 : 1) - (b.isMainBackup ? 0 : 1),
+  );
+}
+
+export function calibrateRoster(roster: Roster, database: Database): Roster {
+  const allSwitchers = database.getSwitchers();
+  const switchersInRaids = allSwitchers.filter((t) =>
+    roster.characters.find(
+      // Make sure that the switchers are playing their normal spec
+      // Otherwise we might get duplicates
+      (x) => x.name === t.characterName && x.role !== t.switcherRole,
+    ),
+  );
+  const groupedByRole = switchersInRaids.reduce((map, next) => {
+    map.set(
+      next.switcherRole,
+      sortByPreference([...(map.get(next.switcherRole) ?? []), next]),
+    );
+    return map;
+  }, new Map<string, Switcher[]>());
+  const switchersByRoleMap = new Map(
+    [...groupedByRole.entries()].map(([key, values]) => [
+      key,
+      values
+        .map((t) => {
+          const foundCharacter = roster.characters.find(
+            (x) => x.name === t.characterName,
+          );
+          if (!foundCharacter) {
+            return null;
+          }
+
+          return {
+            ...foundCharacter,
+            role: key,
+          };
+        })
+        .filter((t): t is CharacterWithMetadata => t !== null),
+    ]),
+  );
+
+  const tanks = roster.characters.filter((t) => t.role === "Tank");
+  const amountOfMissingTanks = MIN_NUMBER_OF_TANKS_PER_RAID - tanks.length;
+  if (amountOfMissingTanks > 0) {
+    // Get more tanks!
+    const tankSwitchers = switchersByRoleMap.get("Tank") ?? [];
+    const playersToSwitch = tankSwitchers.slice(0, amountOfMissingTanks);
+
+    tanks.push(...playersToSwitch);
+  }
+
+  const healers = roster.characters.filter((t) => t.role === "Healer");
+  const amountOfMissingHealers =
+    MIN_NUMBER_OF_HEALERS_PER_RAID - healers.length;
+  if (amountOfMissingHealers > 0) {
+    // Get more tanks!
+    const healerSwitchers = switchersByRoleMap.get("Healer") ?? [];
+    const playersToSwitch = healerSwitchers.slice(0, amountOfMissingTanks);
+
+    healers.push(...playersToSwitch);
+  }
+
+  // Tanks and Healers should be sorted now... Add the rest but remove the switchers
+  const healersAndTanks = [...healers, ...tanks];
+  const remainingRoster = roster.characters.filter((t) =>
+    !healersAndTanks.find((x) => x.name === t.name),
+  );
+
+  return {
+    ...roster,
+    characters: [...healersAndTanks, ...remainingRoster],
+  };
+}
+
 export async function getRosterFromRaidEvent(
   raidEvent: RaidEvent,
   database: Database,
@@ -91,7 +171,7 @@ export async function getRosterFromRaidEvent(
     }));
 
   // Create a hash from this - this is the roster.
-  type Potato = SimplifiedSignUp & { player: Player };
+  type SignUpWithPlayer = SimplifiedSignUp & { player: Player };
 
   const hash = createSignUpsHash(signUps);
   const allPlayers = database.getPlayersRoster();
@@ -102,9 +182,9 @@ export async function getRosterFromRaidEvent(
         ({
           ...t,
           player: playerMap.get(t.userId!),
-        }) as Potato,
+        }) as SignUpWithPlayer,
     )
-    .filter((t): t is Potato => {
+    .filter((t): t is SignUpWithPlayer => {
       if (!t.player) {
         console.log(
           `Player ${t.simplifiedDiscordHandle} could not be found in our sheet!`,
@@ -168,10 +248,13 @@ export async function getRosterFromRaidEvent(
     )
   ).filter((t): t is CharacterWithMetadata => Boolean(t));
 
-  return {
-    rosterHash: hash,
-    characters,
-  };
+  return calibrateRoster(
+    {
+      rosterHash: hash,
+      characters,
+    },
+    database,
+  );
 }
 
 export function toRaidAssignmentRoster(roster: Roster): RaidAssignmentRoster {

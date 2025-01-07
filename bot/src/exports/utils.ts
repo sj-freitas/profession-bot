@@ -7,6 +7,7 @@ import {
 } from "../integrations/sheets/get-buffers";
 import { getPlayers } from "../integrations/sheets/get-players";
 import { readProfessionData } from "../integrations/sheets/parse-prof";
+import { SwitcherRoleDataTable } from "../integrations/sheets/switcher-role-data";
 import { Database, toFlattenData } from "./mem-database";
 import { getGuildInfo } from "./wowHeadIntegration";
 
@@ -14,6 +15,7 @@ export async function refreshDatabase(database: Database): Promise<void> {
   console.log("Database refresh started.");
 
   const sheetClient = createSheetClient();
+  const switcherDataTable = new SwitcherRoleDataTable(sheetClient, CONFIG.GUILD.INFO_SHEET);
   const data = await readProfessionData(sheetClient, CONFIG.GUILD.INFO_SHEET);
   const parsed = await getGuildInfo(data.professionData);
   const roster = await getPlayers(sheetClient, CONFIG.GUILD.INFO_SHEET);
@@ -26,11 +28,13 @@ export async function refreshDatabase(database: Database): Promise<void> {
     CONFIG.GUILD.INFO_SHEET,
     worldBuffAssignments,
   );
+  const switchers = await switcherDataTable.getAllValues();
 
   database.setAllRecipes(toFlattenData(parsed));
   database.setPlayersRoster(roster);
   database.setWorldBuffAssignments(worldBuffAssignments);
   database.setWorldBuffHistory(worldBuffHistory);
+  database.setSwitchers(switchers);
 
   console.log("Database refresh complete.");
 }

@@ -30,8 +30,9 @@ export function makeAssignments(
     .filter((t) => t.role === "Melee")
     .filter((t) => CLASS_ROLE_MAP[t.class][t.role].canStun);
 
-  const numberOfStunnersPerTarget = Math.floor(
-    stunners.length / NUMBER_OF_ADDS,
+  const numberOfStunnersPerTarget = Math.max(
+    1,
+    Math.floor(stunners.length / NUMBER_OF_ADDS),
   );
 
   // Reduce each group of stunners into
@@ -49,7 +50,11 @@ export function makeAssignments(
       // This prevents the skull tank from being picked onto another target, this makes it
       // less pressure to be on the nuke target.
       const assignedTank =
-        restOfTheTanks[index === 0 ? 0 : index % restOfTheTanks.length || 1];
+        restOfTheTanks[
+          index === 0
+            ? 0
+            : index % restOfTheTanks.length || restOfTheTanks.length - 1
+        ];
 
       return {
         raidTarget: {

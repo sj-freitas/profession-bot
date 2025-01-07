@@ -36,26 +36,16 @@ RAID_HELPER_API_KEY="{RAIDER_HELPER_API_KEY_CAN_BE_OBTAINED_WITH_COMMAND_ON_DISC
 - More accurate word matching (tolerant to typos) [HARD]
 - Support item IDs directly [MEDIUM]
 
-# Known bugs
-- Assignments with less than 2 tanks break (Sartura??) - still broken -> can consider switchers here
-
 # Raid Assignment Features
 - Flows:
     - Configure Raid Assignments
         - Missing Twin Emps tactic [Easy] (use raid groups?)
         - Missing Bug Trio [Easy]
-        - Fix: Sartura Assignments [LOWPRIO]
         - Fix: Merge Groups [LOWPRIO]
-    - Automatic World Buff assignment from sheets being the source of truth
     - Clean up Raid Channels [NOTDONE]
-        - Every day at 2 am delete all non-bot messages [DONE]
         - 4 hours after the raid, delete current raid and create a new one with default description also sets the final buff groups as history
-
-
-- Add switcher table to sheet
-    - Add switchers to roster, set min number of tanks and healers (3 tanks 3 healers)
 
 - World buff history
     - Add /rw messages for buffer groups [1A, 1B, 2A, 2B]
     - Add backup buffer options (officers only)
-    - Add rule to not include WBs on all raids
+    - Add rule to not include WBs on all raids [IMPORTANT]

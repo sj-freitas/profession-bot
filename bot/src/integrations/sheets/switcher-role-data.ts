@@ -1,14 +1,14 @@
 import { SheetClient } from "./config";
 import { SheetTableConfig, TableWrapper } from "./table-wrapper";
 
-export interface SoftresRaidData {
+export interface Switcher {
   characterName: string;
   switcherRole: string;
   originalRole: string;
   isMainBackup: boolean;
 }
 
-const config: SheetTableConfig<SoftresRaidData> = {
+const config: SheetTableConfig<Switcher> = {
   tableRange: "A2:D",
   idColumnName: "characterName",
   mapRawToEntity: ([
@@ -35,7 +35,7 @@ const config: SheetTableConfig<SoftresRaidData> = {
   ],
 };
 
-export class SwitcherRoleDataTable extends TableWrapper<SoftresRaidData> {
+export class SwitcherRoleDataTable extends TableWrapper<Switcher> {
   constructor(sheetClient: SheetClient, sheetId: string) {
     super(sheetClient, sheetId, "Switchers", config);
   }

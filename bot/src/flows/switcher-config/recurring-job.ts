@@ -4,20 +4,20 @@ import { CONFIG } from "../../config";
 import { getPlayers } from "../../integrations/sheets/get-players";
 import { findMessageInHistoryById } from "../../discord/utils";
 import {
-  SoftresRaidData,
+  Switcher,
   SwitcherRoleDataTable,
 } from "../../integrations/sheets/switcher-role-data";
 import { SwitcherRoleConfigTable } from "../../integrations/sheets/switcher-post-config";
 
 const { INFO_SHEET, DISCORD_SERVER_ID } = CONFIG.GUILD;
 
-function sortByPreference(switchers: SoftresRaidData[]) {
+function sortByPreference(switchers: Switcher[]) {
   return switchers.sort(
     (a, b) => (a.isMainBackup ? 0 : 1) - (b.isMainBackup ? 0 : 1),
   );
 }
 
-function getFormattedName({ characterName, isMainBackup }: SoftresRaidData) {
+function getFormattedName({ characterName, isMainBackup }: Switcher) {
   return isMainBackup ? `**${characterName}**` : characterName;
 }
 
@@ -34,7 +34,7 @@ export async function tryUpdateSwitcherPost(
       sortByPreference([...(map.get(next.switcherRole) ?? []), next]),
     );
     return map;
-  }, new Map<string, SoftresRaidData[]>());
+  }, new Map<string, Switcher[]>());
 
   const playerInfo = await getPlayers(sheetClient, INFO_SHEET);
   const flattenedCharacter: [character: string, discordId: string][] =
