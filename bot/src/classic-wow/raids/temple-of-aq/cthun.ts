@@ -148,7 +148,7 @@ export function exportToDiscord(composition: Raid): string {
   const raidTargets = Object.values(ALL_RAID_TARGETS).reverse();
 
   return `### C'thun composition
-Check your positioning on [this map](https://discord.com/channels/1170959696174272663/1266480999781502976/1321583474641076284)
+Check your positioning on the map below, the map is dynamically generated and it **might change to optimize with the current setup.**
 Each melee has a "group leader" stack on top of your group's leader.
 
 \`\`\`

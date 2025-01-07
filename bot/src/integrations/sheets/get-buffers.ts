@@ -101,7 +101,7 @@ export async function getAllBuffHistory(
   buffData: WorldBuffAssignments[],
   numberOfGroups: number = NUMBER_OF_GROUPS,
 ): Promise<WorldBuffHistory[]> {
-  const START_COLUMN = "C";
+  const START_COLUMN = "A";
   const groupHistory: WorldBuffHistory[] = [];
 
   let index = 0;
@@ -113,7 +113,7 @@ export async function getAllBuffHistory(
     const readCurrGroup = await readGoogleSheet(
       sheetClient,
       sheetId,
-      "WBManagement",
+      "WBHistory",
       range,
     );
 
