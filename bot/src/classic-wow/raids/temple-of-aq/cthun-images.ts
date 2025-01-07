@@ -1,0 +1,86 @@
+/* eslint-disable no-console */
+import * as path from "path";
+import { createCanvas, loadImage } from "canvas";
+
+type Orientation = "left" | "right";
+type CthunGroupCoordinates = [x: number, y: number, orientation: Orientation];
+
+const FOUR_GROUPS: CthunGroupCoordinates[] = [
+  [211, 191, "right"],
+  [512, 191, "left"],
+  [211, 388, "right"],
+  [512, 388, "left"],
+];
+
+const FIVE_GROUPS: CthunGroupCoordinates[] = [
+  [245, 180, "right"],
+];
+
+const SIX_GROUPS: CthunGroupCoordinates[] = [
+  [245, 180, "right"],
+  [495, 180, "left"],
+  [155, 300, "right"],
+  [557, 300, "left"],
+  [245, 415, "right"],
+  [495, 415, "left"],
+];
+
+const SEVEN_GROUPS: CthunGroupCoordinates[] = [
+  [104, 191, "left"],
+  [502, 191, "right"],
+  [0, 0, "left"],
+  [0, 0, "right"],
+];
+
+const EIGHT_GROUPS: CthunGroupCoordinates[] = [
+  [104, 264, "left"],
+  [0, 0, "right"],
+  [0, 0, "left"],
+  [0, 0, "right"],
+];
+
+function selectGroups(array: string[]): CthunGroupCoordinates[] {
+  if (array.length <= 4) {
+    return FOUR_GROUPS;
+  }
+
+  switch (array.length) {
+    case 5:
+      return FIVE_GROUPS;
+    case 6:
+      return SIX_GROUPS;
+    case 7:
+      return SEVEN_GROUPS;
+    case 8:
+    default:
+      return EIGHT_GROUPS;
+  }
+}
+
+export async function drawImageAssignments(groupLeaders: string[]): Promise<Buffer> {
+  const groupCount = Math.max(Math.min(groupLeaders.length, 8), 4);
+  const imageName = `cthun-assign-${groupCount}.png`;
+  const imageDir = `${path.resolve(__dirname, "../../../..")}/images/${imageName}`;
+
+  const image = await loadImage(imageDir);
+  const canvas = createCanvas(image.width, image.height);
+  const ctx = canvas.getContext("2d");
+
+  ctx.drawImage(image, 0, 0);
+
+  ctx.font = "20px Calibri";
+  ctx.fillStyle = "rgb(255, 255, 255)";
+  ctx.textBaseline = "top";
+
+  const groupsToUse = selectGroups(groupLeaders);
+
+  for (let idx = 0; idx < groupLeaders.length; idx += 1) {
+    const currName = groupLeaders[idx];
+    const [x, y, textAlign] = groupsToUse[idx];
+
+    ctx.textAlign = textAlign;
+    ctx.fillText(currName, x, y);
+  }
+
+  return canvas.toBuffer();
+}

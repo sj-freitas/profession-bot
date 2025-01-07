@@ -16,7 +16,7 @@ import {
   exportRaidGroupsToTable,
   getRaidsortLuaAssignment,
   pickOneAtRandomAndRemoveFromArray,
-} from "./utilts";
+} from "./utils";
 
 const MAX_NUMBER_OF_TANKS_PER_GROUP = 1;
 const MAX_NUMBER_OF_HEALERS_PER_GROUP = 2;
@@ -323,7 +323,7 @@ export function makeAssignments(roster: Character[]): Raid {
 
 export function getGenericRaidAssignment(
   roster: RaidAssignmentRoster,
-): RaidAssignmentResult {
+): Promise<RaidAssignmentResult> {
   const raid = makeAssignments(roster.characters);
 
   const dmAssignment = getRaidsortLuaAssignment(raid);
@@ -334,9 +334,9 @@ ${exportRaidGroupsToTable(raid)}
 
   const officerAssignment = getRaidsortLuaAssignment(raid);
 
-  return {
+  return Promise.resolve({
     dmAssignment,
     announcementAssignment,
     officerAssignment,
-  };
+  });
 }

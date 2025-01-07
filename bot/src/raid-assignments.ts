@@ -10,7 +10,7 @@ import {
   exportToDiscord as exportToDiscordSartura,
   makeAssignments as makeAssignmentsSartura,
 } from "./classic-wow/raids/temple-of-aq/sartura";
-import { exportToLuaTable } from "./classic-wow/raids/utilts";
+import { exportToLuaTable } from "./classic-wow/raids/utils";
 import { getRoleFromCharacter } from "./integrations/raider-io/utils";
 import { fetchCharacterData } from "./integrations/raider-io/raider-io-client";
 import { CharacterDetails } from "./integrations/raider-io/types";

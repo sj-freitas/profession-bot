@@ -1,14 +1,32 @@
 /* eslint-disable no-console */
-import { CONFIG } from "./config";
-import { createClient } from "./discord/create-client";
-import { cleanUpRaidChannels } from "./flows/clean-up-raid-channels/recurring-job";
 
-const { RAID_SIGN_UP_CHANNELS } = CONFIG.GUILD;
+import { drawImageAssignments } from "./classic-wow/raids/temple-of-aq/cthun-images";
+import { createClient } from "./discord/create-client";
 
 async function main() {
   const discordClient = await createClient();
 
-  await cleanUpRaidChannels(discordClient, RAID_SIGN_UP_CHANNELS);
+  const testChannel = await discordClient.channels.fetch("1324886806533115914");
+  if (
+    testChannel === null ||
+    !testChannel.isTextBased() ||
+    !testChannel.isSendable()
+  ) {
+    return;
+  }
+
+  const imageBuffer = await drawImageAssignments([
+    "Darkshivan\nPotato",
+    "Tearyn\nBoomstronk",
+    "Paynex\nSnace",
+    "Bibibamp\nWwolf",
+    "Svajone\nPest",
+    "Dato",
+  ]);
+  await testChannel.send({
+    content: "Test text",
+    files: [{ attachment: imageBuffer, name: "cthun-assignment.png" }],
+  });
 
   await discordClient.destroy();
 }

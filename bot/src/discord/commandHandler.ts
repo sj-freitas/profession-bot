@@ -1,6 +1,8 @@
 /* eslint-disable no-console */
 import {
   APIUser,
+  CacheType,
+  ChatInputCommandInteraction,
   CommandInteractionOptionResolver,
   Interaction,
   InteractionResponse,
@@ -28,7 +30,7 @@ export type StringReply = (
 ) => Promise<InteractionResponse>;
 
 export interface CommandHandlerInput<TContext> {
-  interaction: Interaction;
+  interaction: ChatInputCommandInteraction<CacheType>;
   options: CommandOptions;
   reply: StringReply;
   payload: TContext;

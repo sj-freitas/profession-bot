@@ -60,7 +60,7 @@ export async function tryPostRaidComposition(
   const raidAssignmentRoster = toRaidAssignmentRoster(roster);
 
   const { officerAssignment, announcementAssignment } =
-    getGenericRaidAssignment(raidAssignmentRoster);
+    await getGenericRaidAssignment(raidAssignmentRoster);
 
   const raidEventUrl = `[${messageTitle}](https://discord.com/channels/${DISCORD_SERVER_ID}/${raidEvent.channelId}/${raidEvent.id})`;
 

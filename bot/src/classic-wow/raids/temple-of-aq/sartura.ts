@@ -9,7 +9,7 @@ import {
 } from "../../raid-assignment";
 import { RaidAssignmentResult } from "../assignment-config";
 import { RaidAssignmentRoster } from "../raid-assignment-roster";
-import { pickOnePutOnTop } from "../utilts";
+import { pickOnePutOnTop } from "../utils";
 
 const NUMBER_OF_ADDS = 3;
 
@@ -21,6 +21,10 @@ export function makeAssignments(
     [])[0];
   const tanks = roster.filter((t) => t.role === "Tank");
   const [mainTank, ...restOfTheTanks] = pickOnePutOnTop(tanks, biasedMainTank);
+
+  if (restOfTheTanks.length === 0) {
+    restOfTheTanks.push(mainTank);
+  }
 
   const stunners = roster
     .filter((t) => t.role === "Melee")
@@ -144,7 +148,7 @@ export function exportToRaidWarning(
 export function getSarturaAssignment({
   characters,
   players,
-}: RaidAssignmentRoster): RaidAssignmentResult {
+}: RaidAssignmentRoster): Promise<RaidAssignmentResult> {
   const assignments = makeAssignments(characters);
 
   const dmAssignment = `
@@ -167,9 +171,9 @@ ${exportToRaidWarning(assignments)}
 ${exportToRaidWarning(assignments)}
 \`\`\``;
 
-  return {
+  return Promise.resolve({
     dmAssignment,
     announcementAssignment,
     officerAssignment,
-  };
+  });
 }

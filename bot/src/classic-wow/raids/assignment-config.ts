@@ -4,11 +4,15 @@ export interface RaidAssignmentResult {
   dmAssignment: string;
   announcementAssignment?: string;
   officerAssignment?: string;
+  files?: {
+    attachment: Buffer;
+    name: string;
+  }[];
 }
 
 export type RaidAssignmentMaker = (
   roster: RaidAssignmentRoster,
-) => RaidAssignmentResult;
+) => Promise<RaidAssignmentResult>;
 
 export interface AssignmentConfig {
   instanceId: string;

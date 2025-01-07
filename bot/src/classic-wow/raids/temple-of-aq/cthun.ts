@@ -11,7 +11,8 @@ import {
   exportRaidGroupsToTable,
   exportToLuaTable,
   pickOneAtRandomAndRemoveFromArray,
-} from "../utilts";
+} from "../utils";
+import { drawImageAssignments } from "./cthun-images";
 
 export const IDEAL_NUMBER_OF_MELEE_PER_GROUP = 2;
 export const ABSOLUTE_MAXIMUM_AMOUNT_OF_MELEE_IN_GROUP = 3;
@@ -169,10 +170,17 @@ ${exportRaidGroupsToTable({
 \`\`\``;
 }
 
-export function getCthunAssignment(
+function getLeaderOfEachGroup(composition: Raid): string[] {
+  return composition.groups.map(
+    (t) => t.slots.filter((s) => s?.role === "Melee" || s?.role === "Tank").join("\n"),
+  );
+}
+
+export async function getCthunAssignment(
   roster: RaidAssignmentRoster,
-): RaidAssignmentResult {
+): Promise<RaidAssignmentResult> {
   const assignments = makeAssignments(roster.characters);
+  const cthunImageBuffer = await drawImageAssignments(getLeaderOfEachGroup(assignments));
   const dmAssignment = `# Copy the following assignments to their specific use cases
 
 ## Discord Assignment for the specific raid channel:
@@ -199,5 +207,6 @@ Once the setup is loaded you can \`/raidsort load\` to sort groups or \`/raidsor
     dmAssignment,
     announcementAssignment,
     officerAssignment,
+    files: [{ attachment: cthunImageBuffer, name: "cthun-positions" }]
   };
 }

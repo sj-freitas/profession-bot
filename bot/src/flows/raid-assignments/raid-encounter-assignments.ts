@@ -36,45 +36,49 @@ export async function tryPostFightAssignments(
   const raidAssignmentRoster = toRaidAssignmentRoster(roster);
 
   // Get Assignment Data for each raid
-  const assignmentData: AssignmentMessage[] = instanceInfos
-    .map((currRaid) => {
-      const raidConfig = INSTANCE_ASSIGNMENT_MAKERS.get(currRaid.raidId);
+  const assignmentData: AssignmentMessage[] = (
+    await Promise.all(
+      instanceInfos.map(async (currRaid) => {
+        const raidConfig = INSTANCE_ASSIGNMENT_MAKERS.get(currRaid.raidId);
 
-      if (!raidConfig) {
-        return null;
-      }
+        if (!raidConfig) {
+          return null;
+        }
 
-      const allAssignments = raidConfig.assignmentMakers.map((makeAssignment) =>
-        makeAssignment(raidAssignmentRoster),
-      );
+        const allAssignments = await Promise.all(
+          raidConfig.assignmentMakers.map((makeAssignment) =>
+            makeAssignment(raidAssignmentRoster),
+          ),
+        );
 
-      const allOfficerChannelMessages = allAssignments
-        .map((t) => t.officerAssignment)
-        .filter((t): t is string => Boolean(t));
-      const allRaidSignUpChannelMessages = allAssignments
-        .map((t) => t.announcementAssignment)
-        .filter((t): t is string => Boolean(t));
+        const allOfficerChannelMessages = allAssignments
+          .map((t) => t.officerAssignment)
+          .filter((t): t is string => Boolean(t));
+        const allRaidSignUpChannelMessages = allAssignments
+          .map((t) => t.announcementAssignment)
+          .filter((t): t is string => Boolean(t));
 
-      const officerChannelMessage =
-        allOfficerChannelMessages.length >= 0
-          ? `## Assignments for ${currRaid.raidName}
+        const officerChannelMessage =
+          allOfficerChannelMessages.length >= 0
+            ? `## Assignments for ${currRaid.raidName}
 ${allOfficerChannelMessages.join("\n")}`
-          : undefined;
-      const raidSignUpChannelMessage =
-        allRaidSignUpChannelMessages.length >= 0
-          ? `## Assignments for ${currRaid.raidName}
+            : undefined;
+        const raidSignUpChannelMessage =
+          allRaidSignUpChannelMessages.length >= 0
+            ? `## Assignments for ${currRaid.raidName}
 ${allRaidSignUpChannelMessages.join("\n")}`
-          : undefined;
+            : undefined;
 
-      const assignmentMessageOfRaid: AssignmentMessage = {
-        messageTag: `## Assignments for ${currRaid.raidName}`,
-        officerChannelMessage,
-        raidSignUpChannelMessage,
-      };
+        const assignmentMessageOfRaid: AssignmentMessage = {
+          messageTag: `## Assignments for ${currRaid.raidName}`,
+          officerChannelMessage,
+          raidSignUpChannelMessage,
+        };
 
-      return assignmentMessageOfRaid;
-    })
-    .filter((currRaid): currRaid is AssignmentMessage => currRaid !== null);
+        return assignmentMessageOfRaid;
+      }),
+    )
+  ).filter((currRaid): currRaid is AssignmentMessage => currRaid !== null);
 
   for (const curr of assignmentData) {
     const { officerChannelMessage, raidSignUpChannelMessage, messageTag } =
