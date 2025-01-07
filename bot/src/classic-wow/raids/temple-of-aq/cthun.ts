@@ -171,8 +171,12 @@ ${exportRaidGroupsToTable({
 }
 
 function getLeaderOfEachGroup(composition: Raid): string[] {
-  return composition.groups.map(
-    (t) => t.slots.filter((s) => s?.role === "Melee" || s?.role === "Tank").join("\n"),
+  return composition.groups.map((t) =>
+    t.slots
+      .filter((s): s is Character => Boolean(s))
+      .filter((s) => s.role === "Melee" || s.role === "Tank")
+      .map((s) => s.name)
+      .join("\n"),
   );
 }
 
@@ -180,7 +184,9 @@ export async function getCthunAssignment(
   roster: RaidAssignmentRoster,
 ): Promise<RaidAssignmentResult> {
   const assignments = makeAssignments(roster.characters);
-  const cthunImageBuffer = await drawImageAssignments(getLeaderOfEachGroup(assignments));
+  const cthunImageBuffer = await drawImageAssignments(
+    getLeaderOfEachGroup(assignments),
+  );
   const dmAssignment = `# Copy the following assignments to their specific use cases
 
 ## Discord Assignment for the specific raid channel:
@@ -207,6 +213,6 @@ Once the setup is loaded you can \`/raidsort load\` to sort groups or \`/raidsor
     dmAssignment,
     announcementAssignment,
     officerAssignment,
-    files: [{ attachment: cthunImageBuffer, name: "cthun-positions.png" }]
+    files: [{ attachment: cthunImageBuffer, name: "cthun-positions.png" }],
   };
 }

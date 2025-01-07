@@ -2,7 +2,7 @@
 import * as path from "path";
 import { createCanvas, loadImage } from "canvas";
 
-type Orientation = "left" | "right";
+type Orientation = "left" | "right" | "center";
 type CthunGroupCoordinates = [x: number, y: number, orientation: Orientation];
 
 const FOUR_GROUPS: CthunGroupCoordinates[] = [
@@ -13,7 +13,11 @@ const FOUR_GROUPS: CthunGroupCoordinates[] = [
 ];
 
 const FIVE_GROUPS: CthunGroupCoordinates[] = [
-  [245, 180, "right"],
+  [227, 182, "right"],
+  [516, 182, "left"],
+  [165, 323, "right"],
+  [564, 323, "left"],
+  [416, 432, "left"],
 ];
 
 const SIX_GROUPS: CthunGroupCoordinates[] = [
