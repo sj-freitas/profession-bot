@@ -197,9 +197,14 @@ ${exportToDiscord(assignments)}
 \`\`\`
 ${exportToLuaTable(assignments)}
 \`\`\`
+
+### The following image contains assignments for all groups:
 `;
 
-  const announcementAssignment = exportToDiscord(assignments);
+  const announcementAssignment = `${exportToDiscord(assignments)}
+
+**The following image contains assignments for all groups:**
+`;
   const officerAssignment = `### C'thun composition for Raidsort AddOn
 Do \`/raidsort import\` in-game to open the AddOn and copy the following value:
 \`\`\`

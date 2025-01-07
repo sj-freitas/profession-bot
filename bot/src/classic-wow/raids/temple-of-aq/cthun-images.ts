@@ -30,17 +30,24 @@ const SIX_GROUPS: CthunGroupCoordinates[] = [
 ];
 
 const SEVEN_GROUPS: CthunGroupCoordinates[] = [
-  [104, 191, "left"],
-  [502, 191, "right"],
-  [0, 0, "left"],
-  [0, 0, "right"],
+  [392, 136, "left"],
+  [524, 215, "left"],
+  [159, 334, "right"],
+  [479, 425, "left"],
+  [265, 425, "right"],
+  [558, 334, "left"],
+  [195, 215, "right"],
 ];
 
 const EIGHT_GROUPS: CthunGroupCoordinates[] = [
-  [104, 264, "left"],
-  [0, 0, "right"],
-  [0, 0, "left"],
-  [0, 0, "right"],
+  [259, 156, "right"],
+  [547, 237, "left"],
+  [177, 345, "right"],
+  [475, 425, "left"],
+  [259, 425, "right"],
+  [547, 345, "left"],
+  [177, 237, "right"],
+  [475, 156, "left"],
 ];
 
 function selectGroups(array: string[]): CthunGroupCoordinates[] {
@@ -61,7 +68,9 @@ function selectGroups(array: string[]): CthunGroupCoordinates[] {
   }
 }
 
-export async function drawImageAssignments(groupLeaders: string[]): Promise<Buffer> {
+export async function drawImageAssignments(
+  groupLeaders: string[],
+): Promise<Buffer> {
   const groupCount = Math.max(Math.min(groupLeaders.length, 8), 4);
   const imageName = `cthun-assign-${groupCount}.png`;
   const imageDir = `${path.resolve(__dirname, "../../../..")}/images/${imageName}`;

@@ -21,6 +21,9 @@ async function main() {
     "Paynex\nSnace",
     "Bibibamp\nWwolf",
     "Svajone\nPest",
+    "Svajone\nPest",
+    "Svajone\nPest",
+    "Svajone\nPest",
   ]);
   await testChannel.send({
     content: "Test text",

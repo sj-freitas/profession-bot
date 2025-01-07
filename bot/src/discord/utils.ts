@@ -1,4 +1,10 @@
-import { Client, Message, MessageFlags, TextChannel } from "discord.js";
+import {
+  AttachmentBuilder,
+  Client,
+  Message,
+  MessageFlags,
+  TextChannel,
+} from "discord.js";
 
 export function parseDiscordHandles(handles: string): string[] {
   return handles
@@ -30,6 +36,7 @@ export async function sendMessageToChannel(
   discordClient: Client,
   channelId: string,
   message: string,
+  files?: AttachmentBuilder[],
 ): Promise<void> {
   const channel = await discordClient.channels.fetch(channelId);
 
@@ -42,6 +49,7 @@ export async function sendMessageToChannel(
 
   await channel.send({
     content: message,
+    files,
     flags: MessageFlags.SuppressEmbeds,
   });
 }
@@ -85,6 +93,7 @@ export async function createOrEditDiscordMessage(
   channelId: string,
   messageTag: string,
   messageContent: string,
+  files?: AttachmentBuilder[],
 ): Promise<void> {
   const message = await findMessageInHistory(
     discordClient,
@@ -101,5 +110,9 @@ export async function createOrEditDiscordMessage(
     return;
   }
 
-  await message.edit(messageContent);
+  await message.edit({
+    content: messageContent,
+    flags: MessageFlags.SuppressEmbeds,
+    files,
+  });
 }
