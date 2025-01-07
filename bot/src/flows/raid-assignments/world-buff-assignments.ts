@@ -68,6 +68,8 @@ export async function worldBuffAssignmentMessageExists(
   );
 }
 
+const MESSAGE_TAG = "## World buff item rotation";
+
 export async function tryPostWorldBuffAssignments(
   discordClient: Client,
   database: Database,
@@ -83,9 +85,36 @@ export async function tryPostWorldBuffAssignments(
     INFO_SHEET,
     raidEvent.id,
   );
+  // Staff Channel
+  const eventDateFormatted = formatDate(new Date(raidEvent.startTime * 1000));
+  const officerChatMessageTag = `ASSIGNMENTS ${eventDateFormatted}`;
 
-  if (!instanceInfos.every((t) => !t.useWorldBuffs)) {
+  if (
+    instanceInfos.length === 0 ||
+    !instanceInfos.every((t) => !t.useWorldBuffs)
+  ) {
     // None of these dungeons require world buffs
+    // We might have to delete existing messages
+    const message = await findMessageOfBotInHistory(
+      discordClient,
+      raidEvent.channelId,
+      MESSAGE_TAG,
+    );
+
+    if (message) {
+      await message.delete();
+    }
+
+    const officerChatMessage = await findMessageOfBotInHistory(
+      discordClient,
+      STAFF_RAID_CHANNEL_ID,
+      officerChatMessageTag,
+    );
+
+    if (officerChatMessage) {
+      await officerChatMessage.delete();
+    }
+
     return;
   }
 
@@ -114,23 +143,20 @@ export async function tryPostWorldBuffAssignments(
   await createOrEditDiscordMessage(
     discordClient,
     raidEvent.channelId,
-    "## World buff item rotation",
+    MESSAGE_TAG,
     formatted,
   );
 
-  // Staff Channel
-  const eventDateFormatted = formatDate(new Date(raidEvent.startTime * 1000));
-  const tag = `ASSIGNMENTS ${eventDateFormatted}`;
+  // Staff Chat
   const formattedForSheets = formatGroupsForSheets(
     assignment,
     rawAssignmentConfig,
     eventDateFormatted,
   );
-
   await createOrEditDiscordMessage(
     discordClient,
     STAFF_RAID_CHANNEL_ID,
-    tag,
+    officerChatMessageTag,
     formattedForSheets,
   );
 }
