@@ -12,7 +12,9 @@ import { fetchEvent } from "../integrations/raid-helper/raid-helper-client";
 import { RaidAssignmentRoster } from "../classic-wow/raids/raid-assignment-roster";
 import { RaidAssignmentResult } from "../classic-wow/raids/assignment-config";
 
-type RaidAssignment = (roster: RaidAssignmentRoster) => Promise<RaidAssignmentResult>;
+type RaidAssignment = (
+  roster: RaidAssignmentRoster,
+) => Promise<RaidAssignmentResult>;
 
 export const ENCOUNTER_HANDLERS: { [key: string]: RaidAssignment } = {
   raid: getGenericRaidAssignment,
@@ -57,9 +59,9 @@ export const raidAssignHandler: CommandHandler<Database> = async ({
   const raidAssignmentRoster = toRaidAssignmentRoster(roster);
   const assignments = await getAssignmentForEncounter(raidAssignmentRoster);
 
-  
   await interaction.reply({
     content: assignments.dmAssignment,
     files: assignments.files,
-  })
+    ephemeral: true,
+  });
 };

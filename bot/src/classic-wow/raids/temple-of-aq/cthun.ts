@@ -207,6 +207,6 @@ Once the setup is loaded you can \`/raidsort load\` to sort groups or \`/raidsor
     dmAssignment,
     announcementAssignment,
     officerAssignment,
-    files: [{ attachment: cthunImageBuffer, name: "cthun-positions" }]
+    files: [{ attachment: cthunImageBuffer, name: "cthun-positions.png" }]
   };
 }
