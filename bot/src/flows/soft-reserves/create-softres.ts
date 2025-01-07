@@ -150,6 +150,7 @@ export async function createAndAdvertiseSoftres(
       `Could not find a corresponding raid for "${unsanitizedDescription}"`,
     );
     // Should we return here ?
+    return;
   }
 
   const associatedSoftReserves = (

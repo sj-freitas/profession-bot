@@ -63,3 +63,7 @@ RAID_HELPER_API_KEY="{RAIDER_HELPER_API_KEY_CAN_BE_OBTAINED_WITH_COMMAND_ON_DISC
    - Automatically refresh and update specific posts from the tables to the messages:
     - Switchers
     - World buff assigns
+
+SOFTRES
+- Add back the x2
+- Add the officer message
