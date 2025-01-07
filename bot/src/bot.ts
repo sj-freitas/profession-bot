@@ -26,6 +26,7 @@ import { cleanUpRaidChannels } from "./flows/clean-up-raid-channels/recurring-jo
 import { tryUpdateWorldBuffItemRotation } from "./flows/world-buff-config/recurring-job";
 import { createSheetClient } from "./integrations/sheets/config";
 import { getAllSoftresTokens } from "./discord/get-softres-token.command";
+import { tryUpdateSwitcherPost } from "./flows/switcher-config/recurring-job";
 
 const { RAID_SIGN_UP_CHANNELS } = CONFIG.GUILD;
 const FIVE_MINUTES = 5 * 60 * 1000;
@@ -190,7 +191,7 @@ async function bootstrapServer(): Promise<void> {
     FORTY_FIVE_MINUTES,
   );
   void loop(
-    async () => tryUpdateWorldBuffItemRotation(discordClient, sheetClient),
+    async () => tryUpdateSwitcherPost(discordClient, sheetClient),
     FORTY_FIVE_MINUTES,
   );
 

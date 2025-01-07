@@ -15,7 +15,10 @@ export async function refreshDatabase(database: Database): Promise<void> {
   console.log("Database refresh started.");
 
   const sheetClient = createSheetClient();
-  const switcherDataTable = new SwitcherRoleDataTable(sheetClient, CONFIG.GUILD.INFO_SHEET);
+  const switcherDataTable = new SwitcherRoleDataTable(
+    sheetClient,
+    CONFIG.GUILD.INFO_SHEET,
+  );
   const data = await readProfessionData(sheetClient, CONFIG.GUILD.INFO_SHEET);
   const parsed = await getGuildInfo(data.professionData);
   const roster = await getPlayers(sheetClient, CONFIG.GUILD.INFO_SHEET);

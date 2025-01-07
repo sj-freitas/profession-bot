@@ -42,6 +42,4 @@ RAID_HELPER_API_KEY="{RAIDER_HELPER_API_KEY_CAN_BE_OBTAINED_WITH_COMMAND_ON_DISC
         - Fix: Merge Groups [LOWPRIO]
     - Clean up Raid Channels [NOTDONE]
         - 4 hours after the raid, delete current raid and create a new one with default description also sets the final buff groups as history
-
-- World buff history
-    - Add rule to not include WBs on all raids [IMPORTANT] Use the softres table
+- Cthun fix 3 melee in group when less than 8

@@ -51,7 +51,7 @@ export function makeAssignments(roster: Character[]): TargetAssignment[] {
           id: "Healer",
           description: "healed by",
           characters: [healerCaster],
-        }
+        },
       ],
     },
     {
@@ -66,9 +66,9 @@ export function makeAssignments(roster: Character[]): TargetAssignment[] {
           id: "Healer",
           description: "healed by",
           characters: [healerMelee],
-        }
-      ]
-    }
+        },
+      ],
+    },
   ];
 }
 

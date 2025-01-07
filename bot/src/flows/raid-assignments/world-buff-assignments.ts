@@ -16,9 +16,11 @@ import {
 import { isRaidEventInAmountOfTime } from "../time-utils";
 import { formatGroupsForSheets } from "../../exports/world-buffs/format-groups-for-sheets";
 import { CONFIG } from "../../config";
+import { getInstanceInfosFromRaidEventId } from "../raid-info-utils";
+import { createSheetClient } from "../../integrations/sheets/config";
 
 const THREE_DAYS_BEFORE_RAID = 3 * 24 * 60 * 60 * 1000;
-const { STAFF_RAID_CHANNEL_ID } = CONFIG.GUILD;
+const { STAFF_RAID_CHANNEL_ID, INFO_SHEET } = CONFIG.GUILD;
 
 function formatDate(date: Date): string {
   const options: Intl.DateTimeFormatOptions = {
@@ -74,6 +76,16 @@ export async function tryPostWorldBuffAssignments(
 ): Promise<void> {
   // Check if it's 3 days before the raid
   if (!isRaidEventInAmountOfTime(raidEvent, THREE_DAYS_BEFORE_RAID)) {
+    return;
+  }
+  const instanceInfos = await getInstanceInfosFromRaidEventId(
+    createSheetClient(),
+    INFO_SHEET,
+    raidEvent.id,
+  );
+
+  if (!instanceInfos.every((t) => !t.useWorldBuffs)) {
+    // None of these dungeons require world buffs
     return;
   }
 

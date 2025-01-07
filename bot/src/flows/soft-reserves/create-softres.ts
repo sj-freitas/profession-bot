@@ -44,7 +44,7 @@ async function getRaidIdsFromDescription(
     CONFIG.GUILD.INFO_SHEET,
   );
   const softresRaidData = (await softresRaidDataTable.getAllValues()).filter(
-    (t) => t.useSoftRes === "TRUE",
+    (t) => t.useSoftRes,
   );
   const matchingTerms = softresRaidData
     .map((t) =>

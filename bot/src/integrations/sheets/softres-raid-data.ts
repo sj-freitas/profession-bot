@@ -6,7 +6,8 @@ export interface SoftresRaidData {
   softresId: string;
   raidNameMatchingTerms: string[];
   raidName: string;
-  useSoftRes: string;
+  useSoftRes: boolean;
+  useWbItems: boolean;
 }
 
 const config: SheetTableConfig<SoftresRaidData> = {
@@ -17,18 +18,27 @@ const config: SheetTableConfig<SoftresRaidData> = {
     raidNameMatchingTerms,
     raidName,
     useSoftRes,
+    useWbItems,
   ]) => ({
     softresId,
     raidNameMatchingTerms: toEntityValue(raidNameMatchingTerms),
     raidName,
-    useSoftRes,
+    useSoftRes: useSoftRes === "TRUE",
+    useWbItems: useWbItems === "TRUE",
   }),
   mapEntityToRaw: ({
     softresId,
     raidNameMatchingTerms,
     raidName,
     useSoftRes,
-  }) => [softresId, toColumnValue(raidNameMatchingTerms), raidName, useSoftRes],
+    useWbItems,
+  }) => [
+    softresId,
+    toColumnValue(raidNameMatchingTerms),
+    raidName,
+    useSoftRes ? "TRUE" : "FALSE",
+    useWbItems ? "TRUE" : "FALSE",
+  ],
 };
 
 export class SoftresRaidDataTable extends TableWrapper<SoftresRaidData> {

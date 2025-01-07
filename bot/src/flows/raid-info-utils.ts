@@ -10,6 +10,8 @@ import { RaidInstance } from "../integrations/softres/types";
 export interface InstanceInfo {
   raidName: string;
   raidId: string;
+  useSoftres: boolean;
+  useWorldBuffs: boolean;
 }
 
 /**
@@ -52,5 +54,7 @@ export async function getInstanceInfosFromRaidEventId(
   return softReserves.map((t) => ({
     raidName: t.raidName,
     raidId: t.softresId,
+    useSoftres: t.useSoftRes,
+    useWorldBuffs: t.useWbItems,
   }));
 }

@@ -146,8 +146,8 @@ export function calibrateRoster(roster: Roster, database: Database): Roster {
 
   // Tanks and Healers should be sorted now... Add the rest but remove the switchers
   const healersAndTanks = [...healers, ...tanks];
-  const remainingRoster = roster.characters.filter((t) =>
-    !healersAndTanks.find((x) => x.name === t.name),
+  const remainingRoster = roster.characters.filter(
+    (t) => !healersAndTanks.find((x) => x.name === t.name),
   );
 
   return {
