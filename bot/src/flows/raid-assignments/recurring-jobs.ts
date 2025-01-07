@@ -96,7 +96,7 @@ export async function pollChannelForWorldBuffAssignments(
   await raidInfoTable.updateValue({
     ...raidInfo,
     rosterHash: roster.rosterHash,
-    lastUpdated: new Date().toString(),
+    lastUpdated: new Date(),
   });
 }
 

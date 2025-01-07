@@ -3,7 +3,7 @@ import { Database } from "../../exports/mem-database";
 import { CONFIG } from "../../config";
 import { getRosterFromRaidEvent } from "../roster-helper";
 import {
-  findMessageInHistory,
+  findMessageOfBotInHistory,
   sendMessageToChannel,
 } from "../../discord/utils";
 import { Player } from "../../integrations/sheets/get-players";
@@ -27,7 +27,7 @@ export async function officerNotificationMissingSignUpsMessageExists(
   const messageTag = getMessageTag(raidEvent);
 
   return Boolean(
-    await findMessageInHistory(
+    await findMessageOfBotInHistory(
       discordClient,
       STAFF_RAID_CHANNEL_ID,
       messageTag,
@@ -75,7 +75,7 @@ export async function tryNotifyOfficersMissingSignUps(
 This is a list of players registered as ${roles.map((t) => t?.name).join(" or ")} that haven't signed-up yet.
 ${notSignedUpPlayers.map((t) => ` - <@${t.discordId}> ${t.characters[0]}`).join("\n")}`;
 
-  const message = await findMessageInHistory(
+  const message = await findMessageOfBotInHistory(
     discordClient,
     STAFF_RAID_CHANNEL_ID,
     getMessageTag(raidEvent),

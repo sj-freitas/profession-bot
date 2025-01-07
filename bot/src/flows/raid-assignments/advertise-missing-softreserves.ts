@@ -1,7 +1,7 @@
 import { Client } from "discord.js";
 import { CONFIG } from "../../config";
 import {
-  findMessageInHistory,
+  findMessageOfBotInHistory,
   sendMessageToChannel,
 } from "../../discord/utils";
 import { RaidEvent } from "../../integrations/raid-helper/types";
@@ -47,7 +47,7 @@ The following players haven't soft-reserved yet: ${curr.missingPlayers.map((t) =
   .join("\n")}`;
 
   // Post or Edit message
-  const message = await findMessageInHistory(
+  const message = await findMessageOfBotInHistory(
     discordClient,
     raidEvent.channelId,
     "## Missing Soft Reserves",

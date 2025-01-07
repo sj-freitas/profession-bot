@@ -54,7 +54,26 @@ export async function sendMessageToChannel(
   });
 }
 
-export async function findMessageInHistory(
+export async function findMessageInHistoryById(
+  discordClient: Client,
+  channelId: string,
+  messageId: string,
+): Promise<Message<boolean> | null> {
+  const channel = await discordClient.channels.fetch(channelId);
+  if (!channel || !channel.isTextBased()) {
+    return null;
+  }
+
+  const messages = await channel.messages.fetch();
+  const foundMessage = messages.find((t) => t.id === messageId);
+  if (!foundMessage) {
+    return null;
+  }
+
+  return foundMessage;
+}
+
+export async function findMessageOfBotInHistory(
   discordClient: Client,
   channelId: string,
   messageStartsWith: string,
@@ -71,7 +90,6 @@ export async function findMessageInHistory(
   const foundMessage = messagesOfBot.find(
     (t) => t.content.indexOf(messageStartsWith) === 0,
   );
-
   if (!foundMessage) {
     return null;
   }
@@ -95,7 +113,7 @@ export async function createOrEditDiscordMessage(
   messageContent: string,
   files?: AttachmentBuilder[],
 ): Promise<void> {
-  const message = await findMessageInHistory(
+  const message = await findMessageOfBotInHistory(
     discordClient,
     channelId,
     messageTag,

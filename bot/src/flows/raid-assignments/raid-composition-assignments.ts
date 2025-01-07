@@ -5,7 +5,7 @@ import { isRaidEventInAmountOfTime } from "../time-utils";
 import { CONFIG } from "../../config";
 import {
   createOrEditDiscordMessage,
-  findMessageInHistory,
+  findMessageOfBotInHistory,
 } from "../../discord/utils";
 import { getGenericRaidAssignment } from "../../classic-wow/raids/generic";
 
@@ -38,7 +38,7 @@ export async function raidCompositionMessageExists(
   const raidCompositionAndAssignmentsMessageTag = `# ${getMessageTag(raidEvent)}`;
 
   return Boolean(
-    await findMessageInHistory(
+    await findMessageOfBotInHistory(
       discordClient,
       raidEvent.channelId,
       raidCompositionAndAssignmentsMessageTag,

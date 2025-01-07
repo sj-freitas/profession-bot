@@ -8,7 +8,6 @@ const RAID_HELPER_BOT_ID = "579155972115660803";
 export async function handleRaidCreatedEvent(
   discordClient: Client,
   channelId: string,
-  officerChannelId?: string,
 ): Promise<void> {
   const events = await fetchServerEvents(CONFIG.GUILD.DISCORD_SERVER_ID);
   if (events === null) {
@@ -24,17 +23,12 @@ export async function handleRaidCreatedEvent(
     return;
   }
 
-  await createAndAdvertiseSoftres(
-    discordClient,
-    raidOfChannel,
-    officerChannelId,
-  );
+  await createAndAdvertiseSoftres(discordClient, raidOfChannel);
 }
 
 export function addChannelListener(
   client: Client,
   raidSignUpChannels: string[],
-  officerChannelId?: string,
 ) {
   const channelSet = new Set(raidSignUpChannels);
   client.on("messageCreate", (event) => {
@@ -45,10 +39,6 @@ export function addChannelListener(
       return;
     }
 
-    void handleRaidCreatedEvent(
-      event.client,
-      event.channel.id,
-      officerChannelId,
-    );
+    void handleRaidCreatedEvent(event.client, event.channel.id);
   });
 }

@@ -9,7 +9,7 @@ export interface RaidInfo {
   softresIds: string[];
   softresTokens: string[];
   rosterHash: string;
-  lastUpdated: string;
+  lastUpdated: Date;
 }
 
 const config: SheetTableConfig<RaidInfo> = {
@@ -30,7 +30,7 @@ const config: SheetTableConfig<RaidInfo> = {
     softresIds: toEntityValue(softresIds),
     softresTokens: toEntityValue(softresTokens),
     rosterHash,
-    lastUpdated,
+    lastUpdated: new Date(lastUpdated),
   }),
   mapEntityToRaw: ({
     eventId,
@@ -47,7 +47,7 @@ const config: SheetTableConfig<RaidInfo> = {
     toColumnValue(softresIds),
     toColumnValue(softresTokens),
     rosterHash,
-    lastUpdated,
+    lastUpdated.toString(),
   ],
 };
 

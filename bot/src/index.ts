@@ -1,34 +1,12 @@
 /* eslint-disable no-console */
 
-import { drawImageAssignments } from "./classic-wow/raids/temple-of-aq/cthun-images";
 import { createClient } from "./discord/create-client";
+import { pollChannelsForSoftReserves } from "./flows/soft-reserves/recurring-job";
 
 async function main() {
   const discordClient = await createClient();
 
-  const testChannel = await discordClient.channels.fetch("1324886806533115914");
-  if (
-    testChannel === null ||
-    !testChannel.isTextBased() ||
-    !testChannel.isSendable()
-  ) {
-    return;
-  }
-
-  const imageBuffer = await drawImageAssignments([
-    "Darkshivan\nPotato",
-    "Tearyn\nBoomstronk",
-    "Paynex\nSnace",
-    "Bibibamp\nWwolf",
-    "Svajone\nPest",
-    "Svajone\nPest",
-    "Svajone\nPest",
-    "Svajone\nPest",
-  ]);
-  await testChannel.send({
-    content: "Test text",
-    files: [{ attachment: imageBuffer, name: "cthun-assignment.png" }],
-  });
+  await pollChannelsForSoftReserves(discordClient, ["1289209696263077918"]);
 
   await discordClient.destroy();
 }

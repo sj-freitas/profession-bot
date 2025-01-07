@@ -23,8 +23,10 @@ import { pollChannelsForSoftReserves } from "./flows/soft-reserves/recurring-job
 import { pollChannelsForAssignments } from "./flows/raid-assignments/recurring-jobs";
 import { handleMissingSoftreserves } from "./discord/list-missing-softreserves.command";
 import { cleanUpRaidChannels } from "./flows/clean-up-raid-channels/recurring-job";
+import { tryUpdateWorldBuffItemRotation } from "./flows/world-buff-config/recurring-job";
+import { createSheetClient } from "./integrations/sheets/config";
 
-const { RAID_SIGN_UP_CHANNELS, STAFF_RAID_CHANNEL_ID } = CONFIG.GUILD;
+const { RAID_SIGN_UP_CHANNELS } = CONFIG.GUILD;
 const FIVE_MINUTES = 5 * 60 * 1000;
 const FORTY_FIVE_MINUTES = 45 * 60 * 1000;
 
@@ -138,7 +140,7 @@ async function setupClient(database: Database): Promise<Client> {
   ]);
 
   return await createClient((client) => {
-    addChannelListener(client, RAID_SIGN_UP_CHANNELS, STAFF_RAID_CHANNEL_ID);
+    addChannelListener(client, RAID_SIGN_UP_CHANNELS);
     client.on(Events.ClientReady, (readyClient) => {
       console.log(`Logged in as ${readyClient.user.tag}!`);
     });
@@ -147,6 +149,7 @@ async function setupClient(database: Database): Promise<Client> {
 }
 
 async function bootstrapServer(): Promise<void> {
+  const sheetClient = createSheetClient();
   const database = new Database();
   await refreshDatabase(database);
 
@@ -162,11 +165,7 @@ async function bootstrapServer(): Promise<void> {
   void loop(async () => runJob(discordClient), FIVE_MINUTES);
   void loop(
     async () =>
-      pollChannelsForSoftReserves(
-        discordClient,
-        RAID_SIGN_UP_CHANNELS,
-        STAFF_RAID_CHANNEL_ID,
-      ),
+      pollChannelsForSoftReserves(discordClient, RAID_SIGN_UP_CHANNELS),
     FIVE_MINUTES,
   );
   void loop(
@@ -177,6 +176,14 @@ async function bootstrapServer(): Promise<void> {
         RAID_SIGN_UP_CHANNELS,
       ),
     FIVE_MINUTES,
+  );
+  void loop(
+    async () => tryUpdateWorldBuffItemRotation(discordClient, sheetClient),
+    FORTY_FIVE_MINUTES,
+  );
+  void loop(
+    async () => tryUpdateWorldBuffItemRotation(discordClient, sheetClient),
+    FORTY_FIVE_MINUTES,
   );
 
   try {

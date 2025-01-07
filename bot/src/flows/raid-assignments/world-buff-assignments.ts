@@ -11,7 +11,7 @@ import { Roster } from "../roster-helper";
 import { RaidEvent } from "../../integrations/raid-helper/types";
 import {
   createOrEditDiscordMessage,
-  findMessageInHistory,
+  findMessageOfBotInHistory,
 } from "../../discord/utils";
 import { isRaidEventInAmountOfTime } from "../time-utils";
 import { formatGroupsForSheets } from "../../exports/world-buffs/format-groups-for-sheets";
@@ -58,7 +58,11 @@ export async function worldBuffAssignmentMessageExists(
   const messageTag = "## World buff item rotation";
 
   return Boolean(
-    await findMessageInHistory(discordClient, raidEvent.channelId, messageTag),
+    await findMessageOfBotInHistory(
+      discordClient,
+      raidEvent.channelId,
+      messageTag,
+    ),
   );
 }
 

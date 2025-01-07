@@ -1,7 +1,7 @@
 import { Client } from "discord.js";
 import {
   createAndAdvertiseSoftres,
-  createOfficerSoftReserveMessage,
+  createAnyMissingSoftresRaids,
   createSoftReserveMessage,
   isSoftReserveMessage,
 } from "./create-softres";
@@ -17,7 +17,6 @@ import { RaidInstance } from "../../integrations/softres/types";
 export async function pollChannelsForSoftReserves(
   discordClient: Client,
   channelIds: string[],
-  officerChannelId?: string,
 ): Promise<void> {
   const channelsIdsSet = new Set(channelIds);
   const events = await fetchServerEvents(CONFIG.GUILD.DISCORD_SERVER_ID);
@@ -51,22 +50,56 @@ export async function pollChannelsForSoftReserves(
         (t) => t.author.id === discordClient.application?.id,
       );
 
-      const hasSoftReserveMessage = messagesOfBot.find((t) =>
+      const existingSoftReserveMessage = messagesOfBot.find((t) =>
         isSoftReserveMessage(t.content),
       );
-      if (hasSoftReserveMessage) {
-        // Channel already has soft reserves, nothing to do here.
+      if (existingSoftReserveMessage) {
+        // Channel already has soft reserves
+        const existMessageContent = existingSoftReserveMessage.content;
+        const raidEvent = await raidInfo.getValueById(serverRaidEvent.id);
+
+        if (!raidEvent) {
+          return;
+        }
+
+        const softReserveInfos = await createAnyMissingSoftresRaids(
+          serverRaidEvent,
+          raidEvent,
+        );
+        if (softReserveInfos.length === 0) {
+          // Delete Flow
+          await existingSoftReserveMessage.delete();
+          await raidInfo.updateValue({
+            ...raidEvent,
+            softresIds: [],
+            softresTokens: [],
+            lastUpdated: new Date(),
+          });
+          return;
+        }
+
+        // Update Flow
+        await raidInfo.updateValue({
+          ...raidEvent,
+          softresIds: softReserveInfos.map((t) => t.raidId),
+          softresTokens: softReserveInfos.map((t) => t.token ?? "xxxxxxxxx"),
+          lastUpdated: new Date(),
+        });
+
+        const newMessage = createSoftReserveMessage(softReserveInfos, raids);
+        if (existMessageContent === newMessage) {
+          return;
+        }
+
+        await existingSoftReserveMessage.edit(newMessage);
+
         return;
       }
 
       // No message exists, we can also see if a record already exists for this raid
       const raidEvent = await raidInfo.getValueById(serverRaidEvent.id);
       if (!raidEvent || raidEvent.softresTokens.length === 0) {
-        await createAndAdvertiseSoftres(
-          discordClient,
-          serverRaidEvent,
-          officerChannelId,
-        );
+        await createAndAdvertiseSoftres(discordClient, serverRaidEvent);
         return;
       }
 
@@ -97,13 +130,6 @@ export async function pollChannelsForSoftReserves(
         serverRaidEvent.channelId,
         createSoftReserveMessage(associatedSoftReserves, raids),
       );
-      if (officerChannelId) {
-        await sendMessageToChannel(
-          discordClient,
-          officerChannelId,
-          createOfficerSoftReserveMessage(associatedSoftReserves, raids),
-        );
-      }
     }),
   );
 }
