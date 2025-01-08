@@ -130,46 +130,44 @@ export function makeAssignments(roster: Character[]): Raid {
 
   // We should try making 1 paladin per group too if possible
   const numberOfMeleeGroups = Math.ceil(nonCasters.length / MAX_GROUP_SIZE);
-  const pureMeleeGroups = new Array(numberOfMeleeGroups)
-    .fill(null)
-    .map((_, index) => {
-      const currGroup: Character[] = [];
-      const meleeBuffer = pickOneAtRandomAndRemoveFromArray(meleeBuffers);
-      if (meleeBuffer) {
-        currGroup.push(meleeBuffer);
-      }
+  const pureMeleeGroups = new Array(numberOfMeleeGroups).fill(null).map(() => {
+    const currGroup: Character[] = [];
+    const meleeBuffer = pickOneAtRandomAndRemoveFromArray(meleeBuffers);
+    if (meleeBuffer) {
+      currGroup.push(meleeBuffer);
+    }
 
-      // Paladins give horn buff, make them sure they are in melee groups.
-      // If there aren't sufficient melee paladins, use the healer ones.
-      const paladin =
-        pickOneAtRandomAndRemoveFromArray(meleePaladins) ??
-        pickOneAtRandomAndRemoveFromArray(healerPaladins);
-      if (paladin) {
-        currGroup.push(paladin);
-      }
-      const druid = pickOneAtRandomAndRemoveFromArray(meleeDruids);
-      if (druid) {
-        currGroup.push(druid);
-      }
+    // Paladins give horn buff, make them sure they are in melee groups.
+    // If there aren't sufficient melee paladins, use the healer ones.
+    const paladin =
+      pickOneAtRandomAndRemoveFromArray(meleePaladins) ??
+      pickOneAtRandomAndRemoveFromArray(healerPaladins);
+    if (paladin) {
+      currGroup.push(paladin);
+    }
+    const druid = pickOneAtRandomAndRemoveFromArray(meleeDruids);
+    if (druid) {
+      currGroup.push(druid);
+    }
 
-      for (let i = 0; i < MAX_NUMBER_OF_TANKS_PER_GROUP; i += 1) {
-        const tank = pickOneAtRandomAndRemoveFromArray(meleeTanks);
-        if (!tank) {
-          break;
-        }
-        currGroup.push(tank);
+    for (let i = 0; i < MAX_NUMBER_OF_TANKS_PER_GROUP; i += 1) {
+      const tank = pickOneAtRandomAndRemoveFromArray(meleeTanks);
+      if (!tank) {
+        break;
       }
+      currGroup.push(tank);
+    }
 
-      for (let i = currGroup.length; i < MAX_GROUP_SIZE; i += 1) {
-        const meleeDps = pickOneAtRandomAndRemoveFromArray(remainingMelee);
-        if (!meleeDps) {
-          break;
-        }
-        currGroup.push(meleeDps);
+    for (let i = currGroup.length; i < MAX_GROUP_SIZE; i += 1) {
+      const meleeDps = pickOneAtRandomAndRemoveFromArray(remainingMelee);
+      if (!meleeDps) {
+        break;
       }
+      currGroup.push(meleeDps);
+    }
 
-      return currGroup;
-    });
+    return currGroup;
+  });
 
   const [completeMeleeGroups, incompleteMeleeGroups] = filterTwo(
     pureMeleeGroups,
@@ -303,17 +301,20 @@ export function makeAssignments(roster: Character[]): Raid {
 
   // If we have more than 8 groups we need to split the smaller groups ?
 
-  const adjustedGroups = [...groups, ...hunterGroups].map(
+  const merged = tryMergeGroups(
+    [...groups, ...hunterGroups].map((t) => ({ slots: t } as Group)),
+  );
+  const adjustedGroups = merged.map(
     (currGroup) =>
       ({
         slots: new Array(MAX_GROUP_SIZE)
           .fill(null)
-          .map((_, idx) => currGroup[idx] ?? null),
+          .map((_, idx) => currGroup.slots[idx] ?? null),
       }) as Group,
   );
 
   return {
-    groups: tryMergeGroups(adjustedGroups).sort(
+    groups: adjustedGroups.sort(
       (group1, group2) =>
         group2.slots.filter((t) => t !== null).length -
         group1.slots.filter((t) => t !== null).length,
