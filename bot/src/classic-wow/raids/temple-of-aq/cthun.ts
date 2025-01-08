@@ -42,7 +42,7 @@ export function makeAssignments(roster: Character[]): Raid {
   );
 
   const numberOfGroups = Math.min(
-    Math.floor(
+    Math.ceil(
       (allMeleeBuffers.length + remainingMelee.length) /
         IDEAL_NUMBER_OF_MELEE_PER_GROUP,
     ),

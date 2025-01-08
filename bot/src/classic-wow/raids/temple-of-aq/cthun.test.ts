@@ -385,8 +385,8 @@ describe("cthun", () => {
   describe("makeAssignments", () => {
     it.each([
       ["Large Roster", LARGE_ROSTER, 8],
-      ["Small Roster", SMALL_ROSTER, 4],
-      ["Small Roster Melee Heavy", SMALL_ROSTER_MELEE_HEAVY, 6],
+      ["Small Roster", SMALL_ROSTER, 5],
+      ["Small Roster Melee Heavy", SMALL_ROSTER_MELEE_HEAVY, 7],
     ])(
       "Given a %s, it will find the best way to fit a Cthun group",
       (_, roster, expectedGroupCount) => {

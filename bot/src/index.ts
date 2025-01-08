@@ -1,25 +1,39 @@
 /* eslint-disable no-console */
-import { createClient } from "./discord/create-client";
+import { ENCOUNTER_HANDLERS } from "./discord/raidassign.command";
 import { Database } from "./exports/mem-database";
 import { refreshDatabase } from "./exports/utils";
-import { tryPostWorldBuffAssignments } from "./flows/raid-assignments/world-buff-assignments";
-import { getRosterFromRaidEvent } from "./flows/roster-helper";
+import {
+  getRosterFromRaidEvent,
+  toRaidAssignmentRoster,
+} from "./flows/roster-helper";
 import { fetchEvent } from "./integrations/raid-helper/raid-helper-client";
 
 async function main() {
-  // eslint-disable-next-line no-undef
-  const raidEvent = await fetchEvent("1324107615948636256");
-  if (!raidEvent) {
+  const encounter = "aq-cthun";
+  const database = new Database();
+  await refreshDatabase(database);
+
+  const getAssignmentForEncounter = ENCOUNTER_HANDLERS[encounter];
+  if (!getAssignmentForEncounter) {
     return;
   }
 
-  const discordClient = await createClient();
-  const database = new Database();
-  await refreshDatabase(database)
-  const roster = await getRosterFromRaidEvent(raidEvent, database);
-  await tryPostWorldBuffAssignments(discordClient, database, raidEvent, roster);
+  const eventId = "1325581857605287986";
+  // const eventId = "1324107615948636256";
+  if (eventId === null) {
+    return;
+  }
 
-  await discordClient.destroy();
+  const event = await fetchEvent(eventId);
+  if (!event) {
+    return;
+  }
+
+  const roster = await getRosterFromRaidEvent(event, database);
+  const raidAssignmentRoster = toRaidAssignmentRoster(roster);
+  const assignments = await getAssignmentForEncounter(raidAssignmentRoster);
+
+  console.log(assignments);
 }
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
