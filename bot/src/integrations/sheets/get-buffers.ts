@@ -1,5 +1,5 @@
 import { SheetClient } from "./config";
-import { readGoogleSheet } from "./utils";
+import { calculateRange, readGoogleSheet } from "./utils";
 
 export const NUMBER_OF_GROUPS = 2;
 export interface WorldBuffInfo {
@@ -95,6 +95,51 @@ function isInvalidGroup(nextGroup: any[][] | null | undefined): boolean {
   return true;
 }
 
+const WORLD_BUFF_HISTORY_TAB_NAME = "WBHistory";
+
+export async function getNamesOfAllGroups(
+  sheetClient: SheetClient,
+  sheetId: string,
+): Promise<string[]> {
+  const allGroupNames = await readGoogleSheet(
+    sheetClient,
+    sheetId,
+    WORLD_BUFF_HISTORY_TAB_NAME,
+    "A1:ZZ1",
+  );
+  const singleRow: string[] = allGroupNames?.[0] ?? [];
+
+  return singleRow;
+}
+
+export async function addToHistory(
+  sheetClient: SheetClient,
+  spreadsheetId: string,
+  groups: string[][],
+): Promise<void> {
+  const [allGroupNames] =
+    (await readGoogleSheet(
+      sheetClient,
+      spreadsheetId,
+      WORLD_BUFF_HISTORY_TAB_NAME,
+      "A1:ZZ1",
+    )) ?? [];
+  if (!allGroupNames) {
+    return;
+  }
+
+  const startColumn = incrementLetter("A", allGroupNames.length);
+  await sheetClient.spreadsheets.values.append({
+    spreadsheetId,
+    range: `${WORLD_BUFF_HISTORY_TAB_NAME}!${calculateRange({ x: startColumn, y: 1 }, 1)}`, // : "A3:C3"
+    valueInputOption: "RAW",
+    requestBody: {
+      majorDimension: "COLUMNS",
+      values: groups,
+    },
+  });
+}
+
 export async function getAllBuffHistory(
   sheetClient: SheetClient,
   sheetId: string,
@@ -113,7 +158,7 @@ export async function getAllBuffHistory(
     const readCurrGroup = await readGoogleSheet(
       sheetClient,
       sheetId,
-      "WBHistory",
+      WORLD_BUFF_HISTORY_TAB_NAME,
       range,
     );
 

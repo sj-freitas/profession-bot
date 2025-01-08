@@ -24,7 +24,7 @@ export async function readGoogleSheet(
   return res.data.values;
 }
 
-function calculateRange(
+export function calculateRange(
   { x, y }: { x: string; y: number },
   range: number,
 ): string {

@@ -74,7 +74,7 @@ export async function tryPostWorldBuffAssignments(
 
   if (
     instanceInfos.length === 0 ||
-    !instanceInfos.every((t) => !t.useWorldBuffs)
+    instanceInfos.every((t) => !t.useWorldBuffs)
   ) {
     // None of these dungeons require world buffs
     // We might have to delete existing messages

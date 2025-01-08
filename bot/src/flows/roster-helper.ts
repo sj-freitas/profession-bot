@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { createHash } from "crypto";
-import { Character } from "../classic-wow/raid-assignment";
+import { Character, MAX_GROUP_SIZE } from "../classic-wow/raid-assignment";
 import { ClassName, RaidEvent } from "../integrations/raid-helper/types";
 import {
   inferWowClassFromSpec,
@@ -15,8 +15,26 @@ import { Database } from "../exports/mem-database";
 import { RaidAssignmentRoster } from "../classic-wow/raids/raid-assignment-roster";
 import { Switcher } from "../integrations/sheets/switcher-role-data";
 
-export const MIN_NUMBER_OF_TANKS_PER_RAID = 3;
-export const MIN_NUMBER_OF_HEALERS_PER_RAID = 3;
+const tankNumberBasedOnRosterSize = [0, 1, 2, 2, 2, 3, 3, 3, 3];
+const healerNumberBasedOnRosterSize = [0, 1, 2, 2, 3, 3, 3, 4, 4];
+
+function getMinNumberOfTanksBasedOnRosterSize(rosterCount: number): number {
+  const groupCount = Math.max(
+    Math.ceil(rosterCount / MAX_GROUP_SIZE),
+    MAX_GROUP_SIZE,
+  );
+
+  return tankNumberBasedOnRosterSize[groupCount];
+}
+
+function getMinNumberOfHealersBasedOnRosterSize(rosterCount: number): number {
+  const groupCount = Math.max(
+    Math.ceil(rosterCount / MAX_GROUP_SIZE),
+    MAX_GROUP_SIZE,
+  );
+
+  return healerNumberBasedOnRosterSize[groupCount];
+}
 
 const DEFAULT_CLASS_IN_CASE_OF_CHARACTER_NOT_FOUND = "Mage";
 
@@ -124,7 +142,9 @@ export function calibrateRoster(roster: Roster, database: Database): Roster {
   );
 
   const tanks = roster.characters.filter((t) => t.role === "Tank");
-  const amountOfMissingTanks = MIN_NUMBER_OF_TANKS_PER_RAID - tanks.length;
+  const amountOfMissingTanks =
+    getMinNumberOfTanksBasedOnRosterSize(roster.characters.length) -
+    tanks.length;
   if (amountOfMissingTanks > 0) {
     // Get more tanks!
     const tankSwitchers = switchersByRoleMap.get("Tank") ?? [];
@@ -135,7 +155,8 @@ export function calibrateRoster(roster: Roster, database: Database): Roster {
 
   const healers = roster.characters.filter((t) => t.role === "Healer");
   const amountOfMissingHealers =
-    MIN_NUMBER_OF_HEALERS_PER_RAID - healers.length;
+    getMinNumberOfHealersBasedOnRosterSize(roster.characters.length) -
+    healers.length;
   if (amountOfMissingHealers > 0) {
     // Get more tanks!
     const healerSwitchers = switchersByRoleMap.get("Healer") ?? [];

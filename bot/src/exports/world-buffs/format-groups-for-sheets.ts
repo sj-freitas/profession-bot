@@ -21,23 +21,19 @@ export function formatGroupsForSheets(
   groupsConfig: GroupPreConfig[],
   worldBuffConfig: WorldBuffAssignments[],
   dateString = "[DATE]",
-): string {
-  return groupsConfig
-    .map((group, index) => {
-      const groupName = `ASSIGNMENTS ${dateString} ${incrementLetter("A", index)}`;
+): string[][] {
+  return groupsConfig.map((group, index) => {
+    const groupName = `ASSIGNMENTS ${dateString} ${incrementLetter("A", index)}`;
 
-      const inOrder = worldBuffConfig.map((currBuff) =>
-        getArrayFromSingleOrArray(
-          group[currBuff.buffInfo.shortName as keyof GroupPreConfig],
-        )
-          .filter((t): t is Player => t !== null)
-          .map((t) => t.discordHandle)
-          .join(";"),
-      );
+    const inOrder = worldBuffConfig.map((currBuff) =>
+      getArrayFromSingleOrArray(
+        group[currBuff.buffInfo.shortName as keyof GroupPreConfig],
+      )
+        .filter((t): t is Player => t !== null)
+        .map((t) => t.discordHandle)
+        .join(";"),
+    );
 
-      return `${groupName}
-${inOrder.join("\n")}
-    `;
-    })
-    .join("\n\n");
+    return [groupName, ...inOrder];
+  });
 }

@@ -34,11 +34,8 @@ export async function getInstanceInfosFromRaidEventId(
 ): Promise<InstanceInfo[]> {
   // Cross check roster with soft-reserves
   const raidInfoTable = new RaidInfoTable(sheetClient, INFO_SHEET);
-  const softReservesDataTable = new RaidConfigTable(
-    sheetClient,
-    INFO_SHEET,
-  );
-  const allSoftReservesData = await softReservesDataTable.getAllValues();
+  const raidConfigDataTable = new RaidConfigTable(sheetClient, INFO_SHEET);
+  const allRaidsConfigData = await raidConfigDataTable.getAllValues();
   const raidInfo = await raidInfoTable.getValueById(eventId);
   if (!raidInfo) {
     return [];
@@ -48,7 +45,7 @@ export async function getInstanceInfosFromRaidEventId(
     await Promise.all(raidInfo.softresIds.map(async (t) => getRaid(t)))
   )
     .filter((t): t is RaidInstance => t !== null)
-    .map((t) => allSoftReservesData.find((x) => x.raidId === t.instances[0]))
+    .map((t) => allRaidsConfigData.find((x) => x.raidId === t.instances[0]))
     .filter((t): t is RaidConfig => t !== undefined);
 
   return softReserves.map((t) => ({

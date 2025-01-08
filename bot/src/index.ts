@@ -2,14 +2,13 @@
 import { ENCOUNTER_HANDLERS } from "./discord/raidassign.command";
 import { Database } from "./exports/mem-database";
 import { refreshDatabase } from "./exports/utils";
-import {
-  getRosterFromRaidEvent,
-  toRaidAssignmentRoster,
-} from "./flows/roster-helper";
+import { updateWorldBuffHistory } from "./flows/update-wb-history/recurring-job";
 import { fetchEvent } from "./integrations/raid-helper/raid-helper-client";
+import { createSheetClient } from "./integrations/sheets/config";
 
 async function main() {
   const encounter = "raid";
+  const sheetClient = createSheetClient();
   const database = new Database();
   await refreshDatabase(database);
 
@@ -28,11 +27,7 @@ async function main() {
     return;
   }
 
-  const roster = await getRosterFromRaidEvent(event, database);
-  const raidAssignmentRoster = toRaidAssignmentRoster(roster);
-  const assignments = await getAssignmentForEncounter(raidAssignmentRoster);
-
-  console.log(assignments);
+  await updateWorldBuffHistory(sheetClient, database, event);
 }
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises

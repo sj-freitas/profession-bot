@@ -125,8 +125,6 @@ export async function pollChannelsForAssignments(
       if (!matchingRaid) {
         return;
       }
-
-      // Only do this IF we are 24 hours before the raid!
       if (!trackedEvent.startTime) {
         return;
       }

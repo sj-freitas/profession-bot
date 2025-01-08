@@ -1,4 +1,3 @@
-/* eslint-disable no-useless-return */
 /* eslint-disable no-console */
 import { REST, Routes, Events, SlashCommandBuilder, Client } from "discord.js";
 import { CONFIG } from "./config";
@@ -27,6 +26,7 @@ import { tryUpdateWorldBuffItemRotation } from "./flows/world-buff-config/recurr
 import { createSheetClient } from "./integrations/sheets/config";
 import { getAllSoftresTokens } from "./discord/get-softres-token.command";
 import { tryUpdateSwitcherPost } from "./flows/switcher-config/recurring-job";
+import { pollChannelsForWorldBuffHistory } from "./flows/update-wb-history/recurring-job";
 
 const { RAID_SIGN_UP_CHANNELS } = CONFIG.GUILD;
 const FIVE_MINUTES = 5 * 60 * 1000;
@@ -168,6 +168,14 @@ async function bootstrapServer(): Promise<void> {
   void loop(
     async () =>
       cleanUpRaidChannels(discordClient, CONFIG.GUILD.RAID_SIGN_UP_CHANNELS),
+    FORTY_FIVE_MINUTES,
+  );
+  void loop(
+    async () =>
+      pollChannelsForWorldBuffHistory(
+        database,
+        CONFIG.GUILD.RAID_SIGN_UP_CHANNELS,
+      ),
     FORTY_FIVE_MINUTES,
   );
   void loop(async () => refreshDatabase(database), FIVE_MINUTES);
