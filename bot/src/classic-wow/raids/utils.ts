@@ -95,7 +95,7 @@ export function exportRaidGroupsToTable(
   );
 
   const maxWidthOverride = Math.max(
-    ...markedGroups.flatMap((t) => t.slots).map((t) => t?.name.length ?? 0),
+    ...markedGroups.flatMap((t) => t.slots).map((t) => t?.name?.length ?? 0),
   );
   const tables: Table[] = [];
   for (let i = 0; i < maxNumberOfTablesPerLine; i += 1) {
