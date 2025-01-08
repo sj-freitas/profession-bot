@@ -13,3 +13,7 @@ This makes group sorting and invite process incredibly trivial since it's not up
 
 - Add presets (import to an ID) `/raidsort import cthun` & `/raidsort load cthun` [EASY]
 - Support Marks, Assist and MainTanks in the LUA table [MEDIUM] - requires some duck typing `{ "Darkshivan", { name: "Tearyn", assist: true, mainTank: false }, "C", ... }`
+
+### Compile and post
+
+zip -vr Raidsort.zip ./Raidsort/ -x "*.DS_Store"

@@ -65,16 +65,18 @@ function GetCurrentRaidInfo()
         while currRaidIndex <= MAX_RAID_MEMBERS do
             local playerName, _, groupId = GetRaidRosterInfo(currRaidIndex)
             if playerName ~= nil then
-                currRaidInfo[#currRaidInfo + 1] = {playerName = playerName, raidId = currRaidIndex, groupId = groupId}
+                currRaidInfo[#currRaidInfo + 1] = { playerName = playerName, raidId = currRaidIndex, groupId = groupId }
             end
             currRaidIndex = currRaidIndex + 1
         end
     end
     return currRaidInfo
 end
+
 function getGroupIdFromRaidId(raidIdIndex)
     return math.floor((raidIdIndex - 1) / MAX_GROUP_SIZE) + 1
 end
+
 function FindAFreeGroup(raidInfo)
     do
         local i = 0
@@ -93,6 +95,7 @@ function FindAFreeGroup(raidInfo)
     print("If the raid is full this will not work...")
     return -1
 end
+
 function SolvePlayerPosition(player, directive)
     local raidInfo = GetCurrentRaidInfo()
     local destinationGroupId = player.destinationGroupId
@@ -133,15 +136,18 @@ function SolvePlayerPosition(player, directive)
     end
     SetRaidSubgroup(existingCurrentPlayer.raidId, destinationGroupId)
 end
+
 function SortRaid(raid)
-    local sortState = {unknownPlayers = {}, preSortState = {}}
+    local sortState = { unknownPlayers = {}, preSortState = {} }
     local flatRaid = __TS__ArrayFlatMap(
         __TS__ArrayMap(
             raid,
-            function(____, t, gIdx) return __TS__ArrayMap(
-                t,
-                function(____, x, sIdx) return {destinationIndex = gIdx * MAX_GROUP_SIZE + sIdx + 1, name = x} end
-            ) end
+            function(____, t, gIdx)
+                return __TS__ArrayMap(
+                    t,
+                    function(____, x, sIdx) return { destinationIndex = gIdx * MAX_GROUP_SIZE + sIdx + 1, name = x } end
+                )
+            end
         ),
         function(____, t) return t end
     )
@@ -156,7 +162,8 @@ function SortRaid(raid)
                 )
                 if not foundPlayer then
                     local ____sortState_unknownPlayers_2 = sortState.unknownPlayers
-                    ____sortState_unknownPlayers_2[#____sortState_unknownPlayers_2 + 1] = {currentIndex = currRaidIndex, playerName = currPlayer}
+                    ____sortState_unknownPlayers_2[#____sortState_unknownPlayers_2 + 1] = { currentIndex = currRaidIndex, playerName =
+                    currPlayer }
                 else
                     local ____sortState_preSortState_3 = sortState.preSortState
                     ____sortState_preSortState_3[#____sortState_preSortState_3 + 1] = {
@@ -187,10 +194,19 @@ function SortRaid(raid)
             end
         end
         local ____sortState_preSortState_4 = sortState.preSortState
-        ____sortState_preSortState_4[#____sortState_preSortState_4 + 1] = {currentIndex = curr.currentIndex, destinationGroupId = groupWithSmallestCount, playerName = curr.playerName}
+        ____sortState_preSortState_4[#____sortState_preSortState_4 + 1] = { currentIndex = curr.currentIndex, destinationGroupId =
+        groupWithSmallestCount, playerName = curr.playerName }
     end
     for ____, curr in ipairs(sortState.preSortState) do
         SolvePlayerPosition(curr, sortState.preSortState)
+    end
+end
+
+local function InviteUnitAux(characterName)
+    InviteUnit(characterName)
+    if not IsInGroup("raid") then
+        -- If it is a raid, trigger the raid invite after one second
+        C_Timer.After(1,function() ConvertToRaid() end)
     end
 end
 
@@ -198,29 +214,31 @@ local function Invite(raid)
     local characterNames = __TS__ArrayFlatMap(
         __TS__ArrayMap(
             raid,
-            function(____, t) return __TS__ArrayMap(
-                t,
-                function(____, characterName) return characterName end
-            ) end
+            function(____, t)
+                return __TS__ArrayMap(
+                    t,
+                    function(____, characterName) return characterName end
+                )
+            end
         ),
         function(____, t) return t end
     )
 
     -- Iterate through the raid and invite everyone
     for ____, currName in ipairs(characterNames) do
-        InviteUnit(currName)
+        InviteUnitAux(currName)
     end
 end
 
 local Raidsort = {}
-Raidsort.savedGroups = nil
+Raidsort.savedGroups = {}
 
 -- Frame for receiving slash commands
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("ADDON_LOADED")
 
 -- Function to create an import window
-function Raidsort:ShowImportWindow()
+function Raidsort:ShowImportWindow(presetId)
     local popup = CreateFrame("Frame", "RaidsortPopup", UIParent, "BasicFrameTemplateWithInset")
     popup:SetSize(400, 200)
     popup:SetPoint("CENTER")
@@ -245,7 +263,7 @@ function Raidsort:ShowImportWindow()
     editBox:SetAutoFocus(true)
     editBox:SetText("")
     editBox:SetScript("OnEscapePressed", function() editBox:ClearFocus() end)
-    
+
     scrollFrame:SetScrollChild(editBox)
 
     local saveButton = CreateFrame("Button", nil, popup, "GameMenuButtonTemplate")
@@ -258,8 +276,8 @@ function Raidsort:ShowImportWindow()
         if not status or type(groups) ~= "table" then
             print("[Raidsort]: Error: Invalid Group format.")
         else
-            Raidsort.savedGroups = groups
-            print("[Raidsort]: Group imported and saved.")
+            Raidsort.savedGroups[presetId] = groups
+            print("[Raidsort]: Group imported and saved as " ..presetId)
             popup:Hide()
         end
     end)
@@ -276,8 +294,9 @@ function Raidsort:ShowImportWindow()
 end
 
 -- Function to sort the raid
-function Raidsort:SortRaid()
-    if Raidsort.savedGroups == nil then
+function Raidsort:SortRaid(presetId)
+    local preset = Raidsort.savedGroups[presetId];
+    if preset == nil then
         print("[Raidsort]: Error: No Setup is stored!")
         return
     end
@@ -290,19 +309,20 @@ function Raidsort:SortRaid()
     -- We can iterate this a few times making sure that it'll be fixed,
     -- it seems that the SetRaidSubgroup function isn't synchronous and
     -- there's a delay between calling it and getting the results.
-    SortRaid(Raidsort.savedGroups);
+    SortRaid(preset);
 
     print("[Raidsort]: Raid sorted!")
 end
 
-function Raidsort:Invite()
+function Raidsort:Invite(presetId)
+    local preset = Raidsort.savedGroups[presetId];
     -- Throws out invites to everyone in the raid
-    if Raidsort.savedGroups == nil then
+    if preset == nil then
         print("[Raidsort]: Error: No Setup is stored!")
         return
     end
 
-    Invite(Raidsort.savedGroups);
+    Invite(preset);
 end
 
 -- Slash command handler
@@ -313,12 +333,13 @@ function SlashCmdList.RAIDSORT(msg)
         table.insert(args, word)
     end
 
+    local presetId = args[2] or "default";
     if args[1] == "import" then
-        Raidsort:ShowImportWindow()
+        Raidsort:ShowImportWindow(presetId)
     elseif args[1] == "load" then
-        Raidsort:SortRaid()
+        Raidsort:SortRaid(presetId)
     elseif args[1] == "invite" then
-        Raidsort:Invite()
+        Raidsort:Invite(presetId)
     else
         print("[Raidsort]: Usage:")
         print("  /raidsort import (Opens a UI to paste the raid roster config)")
