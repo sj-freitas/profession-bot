@@ -26,15 +26,6 @@ RAID_HELPER_API_KEY="{RAIDER_HELPER_API_KEY_CAN_BE_OBTAINED_WITH_COMMAND_ON_DISC
 ```
 
 # Missing features
-
 ## Profession Features
-
 - More accurate word matching (tolerant to typos) [HARD]
 - Support item IDs directly [MEDIUM]
-
-# Raid Assignment Features
-
-- Flows:
-  - Make 2 flows:
-    - A: At 15 mins after raid start time we store the World Buff History. We check if the current history is already stored and if it is, we don't store anymore.
-    - B: /nuke (?) delete everything or run it automatically at 22 ST

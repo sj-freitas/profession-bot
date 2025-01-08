@@ -196,9 +196,17 @@ export async function getRosterFromRaidEvent(
     }));
 
   // Create a hash from this - this is the roster.
+  // We should use the hash with all sign ups - this ensures that we don't exclude editing
+  // The posts when someone signs-off
   type SignUpWithPlayer = SimplifiedSignUp & { player: Player };
+  const allSignUpsRegardlessOfAbsence = raidEvent.signUps.map((t) => ({
+    wowClass: inferWowClassFromSpec(t.specName!),
+    simplifiedDiscordHandle: t.name.toLowerCase(),
+    role: t.className,
+    userId: t.userId,
+  }));
 
-  const hash = createSignUpsHash(signUps);
+  const hash = createSignUpsHash(allSignUpsRegardlessOfAbsence);
   const allPlayers = database.getPlayersRoster();
   const playerMap = new Map(allPlayers.map((t) => [t.discordId, t]));
   const matchedPlayers = signUps
