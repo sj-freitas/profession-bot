@@ -10,7 +10,7 @@ import { CONFIG } from "../../config";
 import { RaidInfoTable } from "../../integrations/sheets/raid-info";
 import { fetchServerEvents } from "../../integrations/raid-helper/raid-helper-client";
 import { getRaid } from "../../integrations/softres/softres-client";
-import { SoftresRaidDataTable } from "../../integrations/sheets/softres-raid-data";
+import { RaidConfigTable } from "../../integrations/sheets/raid-config-table";
 import { sendMessageToChannel } from "../../discord/utils";
 import { RaidInstance } from "../../integrations/softres/types";
 
@@ -28,12 +28,12 @@ export async function pollChannelsForSoftReserves(
   );
 
   const sheetClient = createSheetClient();
-  const softresRaidDataTable = new SoftresRaidDataTable(
+  const raidConfigDataTable = new RaidConfigTable(
     sheetClient,
     CONFIG.GUILD.INFO_SHEET,
   );
-  const softresRaidData = await softresRaidDataTable.getAllValues();
-  const raids = new Map(softresRaidData.map((t) => [t.softresId, t.raidName]));
+  const raidConfigData = await raidConfigDataTable.getAllValues();
+  const raids = new Map(raidConfigData.map((t) => [t.raidId, t.raidName]));
   const raidInfo = new RaidInfoTable(sheetClient, CONFIG.GUILD.INFO_SHEET);
 
   await Promise.all(

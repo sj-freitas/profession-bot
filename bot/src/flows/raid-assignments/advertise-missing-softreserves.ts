@@ -8,7 +8,7 @@ import { RaidEvent } from "../../integrations/raid-helper/types";
 import { SheetClient } from "../../integrations/sheets/config";
 import { isRaidEventInAmountOfTime } from "../time-utils";
 import { getSoftReserveInformation } from "../soft-reserves/missing-softreserves";
-import { SoftresRaidDataTable } from "../../integrations/sheets/softres-raid-data";
+import { RaidConfigTable } from "../../integrations/sheets/raid-config-table";
 import { Roster } from "../roster-helper";
 
 const ONE_HOUR_BEFORE_RAID = 60 * 60 * 1000;
@@ -26,7 +26,7 @@ export async function tryAdvertiseMissingSoftReserves(
   }
 
   // Get the soft reserve info
-  const softResInfoTable = new SoftresRaidDataTable(sheetClient, INFO_SHEET_ID);
+  const softResInfoTable = new RaidConfigTable(sheetClient, INFO_SHEET_ID);
   const allSoftresRaidInfo = await softResInfoTable.getAllValues();
   const softReserveInfo = await getSoftReserveInformation(
     raidEvent,
@@ -41,7 +41,7 @@ ${softReserveInfo
   .map(
     (
       curr,
-    ) => `### For ${allSoftresRaidInfo.find((t) => t.softresId === curr.instanceRoster.instanceName)?.raidName}
+    ) => `### For ${allSoftresRaidInfo.find((t) => t.raidId === curr.instanceRoster.instanceName)?.raidName}
 The following players haven't soft-reserved yet: ${curr.missingPlayers.map((t) => `<@${t.discordId}>`).join(", ")}`,
   )
   .join("\n")}`;

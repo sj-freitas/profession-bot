@@ -1,9 +1,9 @@
 import { SheetClient } from "../integrations/sheets/config";
 import { RaidInfoTable } from "../integrations/sheets/raid-info";
 import {
-  SoftresRaidData,
-  SoftresRaidDataTable,
-} from "../integrations/sheets/softres-raid-data";
+  RaidConfig,
+  RaidConfigTable,
+} from "../integrations/sheets/raid-config-table";
 import { getRaid } from "../integrations/softres/softres-client";
 import { RaidInstance } from "../integrations/softres/types";
 
@@ -34,7 +34,7 @@ export async function getInstanceInfosFromRaidEventId(
 ): Promise<InstanceInfo[]> {
   // Cross check roster with soft-reserves
   const raidInfoTable = new RaidInfoTable(sheetClient, INFO_SHEET);
-  const softReservesDataTable = new SoftresRaidDataTable(
+  const softReservesDataTable = new RaidConfigTable(
     sheetClient,
     INFO_SHEET,
   );
@@ -48,12 +48,12 @@ export async function getInstanceInfosFromRaidEventId(
     await Promise.all(raidInfo.softresIds.map(async (t) => getRaid(t)))
   )
     .filter((t): t is RaidInstance => t !== null)
-    .map((t) => allSoftReservesData.find((x) => x.softresId === t.instances[0]))
-    .filter((t): t is SoftresRaidData => t !== undefined);
+    .map((t) => allSoftReservesData.find((x) => x.raidId === t.instances[0]))
+    .filter((t): t is RaidConfig => t !== undefined);
 
   return softReserves.map((t) => ({
     raidName: t.raidName,
-    raidId: t.softresId,
+    raidId: t.raidId,
     useSoftres: t.useSoftRes,
     useWorldBuffs: t.useWbItems,
   }));

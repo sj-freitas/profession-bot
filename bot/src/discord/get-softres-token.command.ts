@@ -5,7 +5,7 @@ import { Database } from "../exports/mem-database";
 import { RAID_HELPER_AUTHOR } from "../integrations/raid-helper/constants";
 import { createSheetClient } from "../integrations/sheets/config";
 import { RaidInfoTable } from "../integrations/sheets/raid-info";
-import { SoftresRaidDataTable } from "../integrations/sheets/softres-raid-data";
+import { RaidConfigTable } from "../integrations/sheets/raid-config-table";
 import { getRaid } from "../integrations/softres/softres-client";
 import { getSoftresLink } from "../integrations/softres/utils";
 import { CommandHandler } from "./commandHandler";
@@ -33,12 +33,12 @@ export const getAllSoftresTokens: CommandHandler<Database> = async ({
 
   // Find the raid messages
   const raidInfoTable = new RaidInfoTable(sheetClient, INFO_SHEET);
-  const softReserveInfoTable = new SoftresRaidDataTable(
+  const softReserveInfoTable = new RaidConfigTable(
     sheetClient,
     INFO_SHEET,
   );
   const allInfos = await softReserveInfoTable.getAllValues();
-  const raidNameMap = new Map(allInfos.map((t) => [t.softresId, t.raidName]));
+  const raidNameMap = new Map(allInfos.map((t) => [t.raidId, t.raidName]));
   const allMessages = await channel.messages.fetch();
   const raidHelperMessages = allMessages.filter(
     (x) => x.author.id === RAID_HELPER_AUTHOR,

@@ -35,7 +35,7 @@ export const staffRequestHandler: CommandHandler<Database> = async ({
     `[${anonymous ? "Anonymous" : `${`@${author.username}`}`}] requests: \`\`\`
 ${message}
 \`\`\`
-to reply type \`/staff-reply ${messageId} <reply text>\`.`,
+to reply type \`/staff-reply ticket-id:${messageId} message:<reply text>\`.`,
   );
 
   await reply(

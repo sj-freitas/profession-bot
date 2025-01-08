@@ -16,6 +16,7 @@ export function parseDiscordHandles(handles: string): string[] {
 export async function deleteAllMessagesInChannel(
   discordClient: Client,
   channelId: string,
+  deletePinned = false,
 ): Promise<void> {
   const channel = await discordClient.channels.fetch(channelId);
 
@@ -28,8 +29,9 @@ export async function deleteAllMessagesInChannel(
 
   const textChannel = channel as TextChannel;
   const allMessages = await channel.messages.fetch();
+  const filteredMessages = allMessages.filter((t) => deletePinned || !t.pinned);
 
-  await textChannel.bulkDelete(allMessages);
+  await textChannel.bulkDelete(filteredMessages);
 }
 
 export async function sendMessageToChannel(

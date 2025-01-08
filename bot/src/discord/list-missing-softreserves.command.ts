@@ -4,7 +4,7 @@ import { getRosterFromRaidEvent } from "../flows/roster-helper";
 import { getSoftReserveInformation } from "../flows/soft-reserves/missing-softreserves";
 import { fetchEvent } from "../integrations/raid-helper/raid-helper-client";
 import { createSheetClient } from "../integrations/sheets/config";
-import { SoftresRaidDataTable } from "../integrations/sheets/softres-raid-data";
+import { RaidConfigTable } from "../integrations/sheets/raid-config-table";
 import { CommandHandler } from "./commandHandler";
 
 const { INFO_SHEET } = CONFIG.GUILD;
@@ -21,7 +21,7 @@ export const handleMissingSoftreserves: CommandHandler<Database> = async ({
   }
 
   const sheetClient = createSheetClient();
-  const softResInfoTable = new SoftresRaidDataTable(sheetClient, INFO_SHEET);
+  const softResInfoTable = new RaidConfigTable(sheetClient, INFO_SHEET);
   const raidEvent = await fetchEvent(eventId);
   if (!raidEvent) {
     return;
@@ -41,7 +41,7 @@ ${softReserveInfo
   .map(
     (
       curr,
-    ) => `### For ${allSoftresRaidInfo.find((t) => t.softresId === curr.instanceRoster.instanceName)?.raidName}
+    ) => `### For ${allSoftresRaidInfo.find((t) => t.raidId === curr.instanceRoster.instanceName)?.raidName}
 The following players haven't soft-reserved yet: ${curr.missingPlayers.map((t) => `<@${t.discordId}>`).join(", ")}`,
   )
   .join("\n")}`;

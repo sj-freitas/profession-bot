@@ -2,17 +2,17 @@ import { SheetClient } from "./config";
 import { SheetTableConfig, TableWrapper } from "./table-wrapper";
 import { toColumnValue, toEntityValue } from "./table-wrapper-utilts";
 
-export interface SoftresRaidData {
-  softresId: string;
+export interface RaidConfig {
+  raidId: string; // Matches with the softres instance name
   raidNameMatchingTerms: string[];
   raidName: string;
   useSoftRes: boolean;
   useWbItems: boolean;
 }
 
-const config: SheetTableConfig<SoftresRaidData> = {
+const config: SheetTableConfig<RaidConfig> = {
   tableRange: "A2:E",
-  idColumnName: "softresId",
+  idColumnName: "raidId",
   mapRawToEntity: ([
     softresId,
     raidNameMatchingTerms,
@@ -20,14 +20,14 @@ const config: SheetTableConfig<SoftresRaidData> = {
     useSoftRes,
     useWbItems,
   ]) => ({
-    softresId,
+    raidId: softresId,
     raidNameMatchingTerms: toEntityValue(raidNameMatchingTerms),
     raidName,
     useSoftRes: useSoftRes === "TRUE",
     useWbItems: useWbItems === "TRUE",
   }),
   mapEntityToRaw: ({
-    softresId,
+    raidId: softresId,
     raidNameMatchingTerms,
     raidName,
     useSoftRes,
@@ -41,7 +41,7 @@ const config: SheetTableConfig<SoftresRaidData> = {
   ],
 };
 
-export class SoftresRaidDataTable extends TableWrapper<SoftresRaidData> {
+export class RaidConfigTable extends TableWrapper<RaidConfig> {
   constructor(sheetClient: SheetClient, sheetId: string) {
     super(sheetClient, sheetId, "RaidConfig", config);
   }

@@ -4,7 +4,7 @@ import { CONFIG } from "../../config";
 import { sendMessageToChannel } from "../../discord/utils";
 import { createSheetClient } from "../../integrations/sheets/config";
 import { RaidInfo, RaidInfoTable } from "../../integrations/sheets/raid-info";
-import { SoftresRaidDataTable } from "../../integrations/sheets/softres-raid-data";
+import { RaidConfigTable } from "../../integrations/sheets/raid-config-table";
 import { getRaid, raidCreate } from "../../integrations/softres/softres-client";
 import { getSoftresLink } from "../../integrations/softres/utils";
 import { RaidInstance } from "../../integrations/softres/types";
@@ -39,7 +39,7 @@ async function getRaidIdsFromDescription(
 ): Promise<string[]> {
   const description = unsanitizedDescription.toLowerCase();
   const sheetClient = createSheetClient();
-  const softresRaidDataTable = new SoftresRaidDataTable(
+  const softresRaidDataTable = new RaidConfigTable(
     sheetClient,
     CONFIG.GUILD.INFO_SHEET,
   );
@@ -50,7 +50,7 @@ async function getRaidIdsFromDescription(
     .map((t) =>
       t.raidNameMatchingTerms.map((x) => ({
         tag: x.toLowerCase(),
-        instance: t.softresId,
+        instance: t.raidId,
       })),
     )
     .flatMap((t) => t);
@@ -138,7 +138,7 @@ export async function createAndAdvertiseSoftres(
 ) {
   const sheetClient = createSheetClient();
   const raidInfo = new RaidInfoTable(sheetClient, CONFIG.GUILD.INFO_SHEET);
-  const softresRaidData = await new SoftresRaidDataTable(
+  const softresRaidData = await new RaidConfigTable(
     sheetClient,
     CONFIG.GUILD.INFO_SHEET,
   ).getAllValues();
@@ -147,7 +147,7 @@ export async function createAndAdvertiseSoftres(
     return;
   }
 
-  const raids = new Map(softresRaidData.map((t) => [t.softresId, t.raidName]));
+  const raids = new Map(softresRaidData.map((t) => [t.raidId, t.raidName]));
   const matchingRaids = await getRaidIdsFromDescription(unsanitizedDescription);
   if (matchingRaids.length === 0) {
     return;
