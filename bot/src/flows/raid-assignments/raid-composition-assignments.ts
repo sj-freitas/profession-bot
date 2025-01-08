@@ -78,6 +78,7 @@ ${officerAssignment}`;
 
   if (announcementAssignment) {
     const raidSignUpMessage = `# ${messageTitle}
+${roster.characters.map((t) => `<@${t.player.discordId}>`).join(" ")}
 ${announcementAssignment}`;
 
     await createOrEditDiscordMessage(
