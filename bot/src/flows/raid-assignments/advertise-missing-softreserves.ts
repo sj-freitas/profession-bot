@@ -53,8 +53,17 @@ The following players haven't soft-reserved yet: ${curr.missingPlayers.map((t) =
     "## Missing Soft Reserves",
   );
 
-  if (message && softReserveInfo.every((t) => t.missingPlayers.length === 0)) {
+  const thereAreNoSoftReserves =
+    softReserveInfo.length === 0 ||
+    softReserveInfo.every((t) => t.missingPlayers.length === 0);
+  if (!message && thereAreNoSoftReserves) {
+    // Do nothing
+    return;
+  }
+  if (message && thereAreNoSoftReserves) {
+    // Delete the existing message
     await message.delete();
+    return;
   }
 
   if (message !== null) {
