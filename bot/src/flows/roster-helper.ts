@@ -139,7 +139,7 @@ export function calibrateRoster(roster: Roster, database: Database): Roster {
   if (amountOfMissingHealers > 0) {
     // Get more tanks!
     const healerSwitchers = switchersByRoleMap.get("Healer") ?? [];
-    const playersToSwitch = healerSwitchers.slice(0, amountOfMissingTanks);
+    const playersToSwitch = healerSwitchers.slice(0, amountOfMissingHealers);
 
     healers.push(...playersToSwitch);
   }

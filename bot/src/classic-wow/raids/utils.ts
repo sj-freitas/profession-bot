@@ -79,12 +79,27 @@ export function exportRaidGroupsToTable(
     groups.length / numberOfGroupsPerLine,
   );
 
+  const markedGroups = groups.map(
+    (t) =>
+      ({
+        slots: t.slots
+          .map((s) => ({
+            ...s,
+            name: s?.role === "Tank" ? `${s.name} [T]` : s?.name,
+          }))
+          .map((s) => ({
+            ...s,
+            name: s?.role === "Healer" ? `${s.name} [H]` : s?.name,
+          })),
+      }) as Group,
+  );
+
   const maxWidthOverride = Math.max(
-    ...groups.flatMap((t) => t.slots).map((t) => t?.name.length ?? 0),
+    ...markedGroups.flatMap((t) => t.slots).map((t) => t?.name.length ?? 0),
   );
   const tables: Table[] = [];
   for (let i = 0; i < maxNumberOfTablesPerLine; i += 1) {
-    const currLine = groups.slice(
+    const currLine = markedGroups.slice(
       i * numberOfGroupsPerLine,
       i * numberOfGroupsPerLine + numberOfGroupsPerLine,
     );
