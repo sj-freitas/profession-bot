@@ -11,7 +11,7 @@ export interface SoftresRaidData {
 }
 
 const config: SheetTableConfig<SoftresRaidData> = {
-  tableRange: "E2:H",
+  tableRange: "A2:E",
   idColumnName: "softresId",
   mapRawToEntity: ([
     softresId,
@@ -43,6 +43,6 @@ const config: SheetTableConfig<SoftresRaidData> = {
 
 export class SoftresRaidDataTable extends TableWrapper<SoftresRaidData> {
   constructor(sheetClient: SheetClient, sheetId: string) {
-    super(sheetClient, sheetId, "DiscordMapping", config);
+    super(sheetClient, sheetId, "RaidConfig", config);
   }
 }

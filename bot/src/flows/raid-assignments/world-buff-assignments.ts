@@ -14,26 +14,12 @@ import {
   findMessageOfBotInHistory,
 } from "../../discord/utils";
 import { isRaidEventInAmountOfTime } from "../time-utils";
-import { formatGroupsForSheets } from "../../exports/world-buffs/format-groups-for-sheets";
 import { CONFIG } from "../../config";
 import { getInstanceInfosFromRaidEventId } from "../raid-info-utils";
 import { createSheetClient } from "../../integrations/sheets/config";
 
 const THREE_DAYS_BEFORE_RAID = 3 * 24 * 60 * 60 * 1000;
-const { STAFF_RAID_CHANNEL_ID, INFO_SHEET } = CONFIG.GUILD;
-
-function formatDate(date: Date): string {
-  const options: Intl.DateTimeFormatOptions = {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    timeZone: "CET",
-    hour12: false,
-  };
-
-  const formatter = new Intl.DateTimeFormat("de-DE", options);
-  return formatter.format(date).replace(/,/g, "");
-}
+const { INFO_SHEET } = CONFIG.GUILD;
 
 export function getAssignmentConfigAndHistory(database: Database) {
   const rawHistory = database.getWorldBuffHistory();
@@ -85,9 +71,6 @@ export async function tryPostWorldBuffAssignments(
     INFO_SHEET,
     raidEvent.id,
   );
-  // Staff Channel
-  const eventDateFormatted = formatDate(new Date(raidEvent.startTime * 1000));
-  const officerChatMessageTag = `ASSIGNMENTS ${eventDateFormatted}`;
 
   if (
     instanceInfos.length === 0 ||
@@ -104,17 +87,6 @@ export async function tryPostWorldBuffAssignments(
     if (message) {
       await message.delete();
     }
-
-    const officerChatMessage = await findMessageOfBotInHistory(
-      discordClient,
-      STAFF_RAID_CHANNEL_ID,
-      officerChatMessageTag,
-    );
-
-    if (officerChatMessage) {
-      await officerChatMessage.delete();
-    }
-
     return;
   }
 
@@ -145,18 +117,5 @@ export async function tryPostWorldBuffAssignments(
     raidEvent.channelId,
     MESSAGE_TAG,
     formatted,
-  );
-
-  // Staff Chat
-  const formattedForSheets = formatGroupsForSheets(
-    assignment,
-    rawAssignmentConfig,
-    eventDateFormatted,
-  );
-  await createOrEditDiscordMessage(
-    discordClient,
-    STAFF_RAID_CHANNEL_ID,
-    officerChatMessageTag,
-    formattedForSheets,
   );
 }

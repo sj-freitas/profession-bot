@@ -28,10 +28,38 @@ RAID_HELPER_API_KEY="{RAIDER_HELPER_API_KEY_CAN_BE_OBTAINED_WITH_COMMAND_ON_DISC
 # Missing features
 
 ## Profession Features
+
 - More accurate word matching (tolerant to typos) [HARD]
 - Support item IDs directly [MEDIUM]
 
 # Raid Assignment Features
+
 - Flows:
-    - Clean up Raid Channels [NOTDONE]
-        - 4 hours after the raid, delete current raid and create a new one with default description also sets the final buff groups as history
+  - Make 2 flows:
+    - A: At 15 mins after raid start time we store the World Buff History. We check if the current history is already stored and if it is, we don't store anymore.
+    - B: /nuke (?) delete everything or run it automatically at 22 ST
+
+Keeping this snippet here so I don't forget
+```ts
+// World Buff History Maker
+function formatDate(date: Date): string {
+  const options: Intl.DateTimeFormatOptions = {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    timeZone: "CET",
+    hour12: false,
+  };
+
+  const formatter = new Intl.DateTimeFormat("de-DE", options);
+  return formatter.format(date).replace(/,/g, "");
+}
+
+const eventDateFormatted = formatDate(new Date(raidEvent.startTime * 1000));
+const officerChatMessageTag = `ASSIGNMENTS ${eventDateFormatted}`; // A,B
+const formattedForSheets = formatGroupsForSheets(
+  assignment,
+  rawAssignmentConfig,
+  eventDateFormatted,
+);
+```
