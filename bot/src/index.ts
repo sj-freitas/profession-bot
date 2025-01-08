@@ -2,13 +2,11 @@
 import { ENCOUNTER_HANDLERS } from "./discord/raidassign.command";
 import { Database } from "./exports/mem-database";
 import { refreshDatabase } from "./exports/utils";
-import { updateWorldBuffHistory } from "./flows/update-wb-history/recurring-job";
+import { getRosterFromRaidEvent } from "./flows/roster-helper";
 import { fetchEvent } from "./integrations/raid-helper/raid-helper-client";
-import { createSheetClient } from "./integrations/sheets/config";
 
 async function main() {
   const encounter = "raid";
-  const sheetClient = createSheetClient();
   const database = new Database();
   await refreshDatabase(database);
 
@@ -17,7 +15,7 @@ async function main() {
     return;
   }
 
-  const eventId = "1325581857605287986";
+  const eventId = "1324107615948636256";
   if (eventId === null) {
     return;
   }
@@ -27,7 +25,9 @@ async function main() {
     return;
   }
 
-  await updateWorldBuffHistory(sheetClient, database, event);
+  const roster = await getRosterFromRaidEvent(event, database);
+
+  console.log(roster);
 }
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises

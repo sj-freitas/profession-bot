@@ -35,7 +35,9 @@ export const getAllSoftresTokens: CommandHandler<Database> = async ({
   const raidInfoTable = new RaidInfoTable(sheetClient, INFO_SHEET);
   const raidConfigTable = new RaidConfigTable(sheetClient, INFO_SHEET);
   const allRaidConfigs = await raidConfigTable.getAllValues();
-  const raidNameMap = new Map(allRaidConfigs.map((t) => [t.raidId, t.raidName]));
+  const raidNameMap = new Map(
+    allRaidConfigs.map((t) => [t.raidId, t.raidName]),
+  );
   const allMessages = await channel.messages.fetch();
   const raidHelperMessages = allMessages.filter(
     (x) => x.author.id === RAID_HELPER_AUTHOR,

@@ -302,7 +302,7 @@ export function makeAssignments(roster: Character[]): Raid {
   // If we have more than 8 groups we need to split the smaller groups ?
 
   const merged = tryMergeGroups(
-    [...groups, ...hunterGroups].map((t) => ({ slots: t } as Group)),
+    [...groups, ...hunterGroups].map((t) => ({ slots: t }) as Group),
   );
   const adjustedGroups = merged.map(
     (currGroup) =>

@@ -1,6 +1,10 @@
 /* eslint-disable no-console */
 import { createHash } from "crypto";
-import { Character, MAX_GROUP_SIZE } from "../classic-wow/raid-assignment";
+import {
+  Character,
+  MAX_GROUP_SIZE,
+  MAX_RAID_GROUP_AMOUNT,
+} from "../classic-wow/raid-assignment";
 import { ClassName, RaidEvent } from "../integrations/raid-helper/types";
 import {
   inferWowClassFromSpec,
@@ -19,18 +23,18 @@ const tankNumberBasedOnRosterSize = [0, 1, 2, 2, 2, 3, 3, 3, 3];
 const healerNumberBasedOnRosterSize = [0, 1, 2, 2, 3, 3, 3, 4, 4];
 
 function getMinNumberOfTanksBasedOnRosterSize(rosterCount: number): number {
-  const groupCount = Math.max(
+  const groupCount = Math.min(
     Math.ceil(rosterCount / MAX_GROUP_SIZE),
-    MAX_GROUP_SIZE,
+    MAX_RAID_GROUP_AMOUNT,
   );
 
   return tankNumberBasedOnRosterSize[groupCount];
 }
 
 function getMinNumberOfHealersBasedOnRosterSize(rosterCount: number): number {
-  const groupCount = Math.max(
+  const groupCount = Math.min(
     Math.ceil(rosterCount / MAX_GROUP_SIZE),
-    MAX_GROUP_SIZE,
+    MAX_RAID_GROUP_AMOUNT,
   );
 
   return healerNumberBasedOnRosterSize[groupCount];
