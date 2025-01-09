@@ -62,7 +62,7 @@ const commands = [
       option
         .setName("encounter")
         .setDescription(
-          `The name of the encounter, accepted values are ${SUPPORTED_ENCOUNTERS.join(" | ")}`,
+          `The name of the encounter, like aq-cthun, raid, etc.`,
         ),
     )
     .addStringOption((option) =>
@@ -126,21 +126,21 @@ const commands = [
       option
         .setName("description")
         .setDescription(
-          "The description will be used also to automatically create the soft-reserves, name the instances that you'll be doing here.",
+          "Insert the instances name, it will be used also to create soft-reserves.",
         ),
     )
     .addStringOption((option) =>
       option
         .setName("time")
         .setDescription(
-          "Time must be in the `HH:mm` or `hh:mm a` format in server time, something like `20:00`",
+          "Format: `HH:mm` or `hh:mm a` in server time, something like `20:00`",
         ),
     )
     .addStringOption((option) =>
       option
         .setName("date")
         .setDescription(
-          "Date mus be in `dd-MM-yyyy` format, for example `09-01-2025` = first of January.",
+          "Format: `dd-MM-yyyy` format, for example `09-01-2025` = first of January.",
         ),
     ),
   new SlashCommandBuilder()
