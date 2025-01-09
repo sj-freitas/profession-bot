@@ -65,7 +65,7 @@ export async function createEvent(
   channelId: string,
   event: EventCreateParams,
 ): Promise<RaidEvent | null> {
-  console.log(JSON.stringify(event, null, 2));
+  console.log(`${CONFIG.RAID_HELPER_API.HOST_NAME}/servers/${serverId}/channels/${channelId}/event`);
 
   const response = await fetch(
     `${CONFIG.RAID_HELPER_API.HOST_NAME}/servers/${serverId}/channels/${channelId}/event`,

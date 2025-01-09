@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { CONFIG } from "../config";
 import { Database } from "../exports/mem-database";
 import {
@@ -16,8 +15,6 @@ export const handleCreateAdHocRaid: CommandHandler<Database> = async ({
   interaction,
 }): Promise<void> => {
   const leaderId = interaction.user.id;
-  console.log(`leaderId = ${leaderId}`)
-
   const time = options.getString("time");
   if (time === null) {
     await reply("Hours should be formatted as HH:mm or hh:mm a");
