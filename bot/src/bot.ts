@@ -5,10 +5,7 @@ import { Database } from "./exports/mem-database";
 import { loop, refreshDatabase } from "./exports/utils";
 import { handleCrafter } from "./discord/professions.command";
 import { worldBuffsHandler } from "./discord/worldbuffs.command";
-import {
-  raidAssignHandler,
-  SUPPORTED_ENCOUNTERS,
-} from "./discord/raidassign.command";
+import { raidAssignHandler } from "./discord/raidassign.command";
 import {
   staffRequestHandler,
   staffReplyHandler,
@@ -61,9 +58,7 @@ const commands = [
     .addStringOption((option) =>
       option
         .setName("encounter")
-        .setDescription(
-          `The name of the encounter, like aq-cthun, raid, etc.`,
-        ),
+        .setDescription(`The name of the encounter, like aq-cthun, raid, etc.`),
     )
     .addStringOption((option) =>
       option
