@@ -10,6 +10,7 @@ const ApplicationConfigurationZod = z.object({
     STAFF_RAID_CHANNEL_ID: z.string().nonempty(),
     DISCORD_SERVER_ID: z.string().nonempty(),
     RAID_SIGN_UP_CHANNELS: z.array(z.string()),
+    RAID_AD_HOC_SIGN_UP_CHANNEL: z.string(),
     RAIDER_ROLES: z.array(z.string()),
   }),
   WOW_HEAD: z.object({
@@ -55,6 +56,8 @@ export const rawConfig: ApplicationConfiguration = {
     RAID_SIGN_UP_CHANNELS: JSON.parse(
       process.env.GUILD_DISCORD_RAID_SIGN_UP_CHANNELS as string,
     ),
+    RAID_AD_HOC_SIGN_UP_CHANNEL: process.env
+      .GUILD_DISCORD_RAID_SIGN_UP_AD_HOC_CHANNEL as string,
   },
   WOW_HEAD: {
     HOST_NAME: "https://www.wowhead.com",

@@ -27,6 +27,10 @@ import { createSheetClient } from "./integrations/sheets/config";
 import { getAllSoftresTokens } from "./discord/get-softres-token.command";
 import { tryUpdateSwitcherPost } from "./flows/switcher-config/recurring-job";
 import { pollChannelsForWorldBuffHistory } from "./flows/update-wb-history/recurring-job";
+import {
+  handleCreateAdHocRaid,
+  handleDeleteAdHocRaid,
+} from "./discord/ad-hoc-raid-creator.command";
 
 const { RAID_SIGN_UP_CHANNELS } = CONFIG.GUILD;
 const FIVE_MINUTES = 5 * 60 * 1000;
@@ -110,6 +114,38 @@ const commands = [
   new SlashCommandBuilder()
     .setName("get-sr-tokens")
     .setDescription("Gets all softres tokens for this channel"),
+  new SlashCommandBuilder()
+    .setName("ad-hoc-create")
+    .setDescription("Creates an ad-hoc raid in your name")
+    .addStringOption((option) =>
+      option
+        .setName("title")
+        .setDescription("The title of the raid, keep it simple and short"),
+    )
+    .addStringOption((option) =>
+      option
+        .setName("description")
+        .setDescription(
+          "The description will be used also to automatically create the soft-reserves, name the instances that you'll be doing here.",
+        ),
+    )
+    .addStringOption((option) =>
+      option
+        .setName("time")
+        .setDescription(
+          "Time must be in the `HH:mm` or `hh:mm a` format in server time, something like `20:00`",
+        ),
+    )
+    .addStringOption((option) =>
+      option
+        .setName("date")
+        .setDescription(
+          "Date mus be in `dd-MM-yyyy` format, for example `09-01-2025` = first of January.",
+        ),
+    ),
+  new SlashCommandBuilder()
+    .setName("ad-hoc-delete")
+    .setDescription("Deletes all ad-hoc raids in your name"),
 ];
 
 async function setupClient(database: Database): Promise<Client> {
@@ -145,6 +181,14 @@ async function setupClient(database: Database): Promise<Client> {
     {
       id: "get-sr-tokens",
       handler: getAllSoftresTokens,
+    },
+    {
+      id: "ad-hoc-create",
+      handler: handleCreateAdHocRaid,
+    },
+    {
+      id: "ad-hoc-delete",
+      handler: handleDeleteAdHocRaid,
     },
   ]);
 
