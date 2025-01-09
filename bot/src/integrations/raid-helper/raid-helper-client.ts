@@ -45,8 +45,6 @@ export async function fetchServerEvents(
   }
 }
 
-
-
 export interface EventCreateParams {
   leaderId: string;
   templateId: 37;
@@ -70,6 +68,7 @@ export async function createEvent(
   const response = await fetch(
     `${CONFIG.RAID_HELPER_API.HOST_NAME}/servers/${serverId}/channels/${channelId}/event`,
     {
+      method: "POST",
       headers: {
         Authorization: CONFIG.RAID_HELPER_API.API_KEY,
       },
