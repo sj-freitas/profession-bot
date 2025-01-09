@@ -6,13 +6,15 @@ const AUTHORS_TO_PRESERVE: string[] = [
   "1318858960274591754", // Own Bot
 ];
 
+/**
+ * Will not delete bot messages or messages that are pinned.
+ */
 export function shouldBeDeleted(message: Message): boolean {
   const { author } = message;
   if (AUTHORS_TO_PRESERVE.some((botAuthorId) => botAuthorId === author.id)) {
     return false;
   }
-
-  return true;
+  return !message.pinned;
 }
 
 /**
