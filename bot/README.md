@@ -32,4 +32,4 @@ RAID_HELPER_API_KEY="{RAIDER_HELPER_API_KEY_CAN_BE_OBTAINED_WITH_COMMAND_ON_DISC
 
 
 ## Backlog
-- Add /rw messages for world buffs [EASY]
+- All backlog has been completed!

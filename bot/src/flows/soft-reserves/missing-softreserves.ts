@@ -27,6 +27,7 @@ export interface SelectedCharacterOfPlayer {
 
 export interface InstanceRoster {
   instanceName: string;
+  softresId: string;
   characters: SelectedCharacterOfPlayer[];
 }
 
@@ -37,6 +38,7 @@ export interface SoftReserveInformation {
 
 function getRosterForDungeon(
   instanceName: string,
+  softresId: string,
   presentPlayers: CharacterWithMetadata[],
   charactersThatReserved: string[],
 ): InstanceRoster {
@@ -54,6 +56,7 @@ function getRosterForDungeon(
 
   return {
     instanceName,
+    softresId,
     characters,
   };
 }
@@ -110,6 +113,7 @@ export async function getSoftReserveInformation(
         );
         const instanceRoster = getRosterForDungeon(
           softReserveRaidInstance.instances[0],
+          softReserveRaidInstance.raidId,
           presentPlayers,
           charactersThatReserved,
         );
