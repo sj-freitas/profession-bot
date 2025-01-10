@@ -87,7 +87,11 @@ export const handleCharacterAdd: CommandHandler<Database> = async ({
     return;
   }
 
-  if ([playerInfo.mainName, ...playerInfo.altNames].find((t) => t === sanitizedName)) {
+  if (
+    [playerInfo.mainName, ...playerInfo.altNames].find(
+      (t) => t === sanitizedName,
+    )
+  ) {
     await reply(`You already have ${sanitizedName} registered as a character.`);
     return;
   }

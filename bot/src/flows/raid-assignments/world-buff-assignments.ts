@@ -5,7 +5,10 @@ import {
   mapRawHistory,
 } from "../../buff-management/utils";
 import { Database } from "../../exports/mem-database";
-import { formatGroupAssignmentsToMarkdown } from "../../exports/world-buffs/format-group-assigments-md";
+import {
+  formatGroupAssignmentsToMarkdown,
+  formatGroupAssignmentsToStaffRaidWarning,
+} from "../../exports/world-buffs/format-group-assigments-md";
 import { NUMBER_OF_GROUPS } from "../../integrations/sheets/get-buffers";
 import { Roster } from "../roster-helper";
 import { RaidEvent } from "../../integrations/raid-helper/types";
@@ -19,7 +22,7 @@ import { getInstanceInfosFromRaidEventId } from "../raid-info-utils";
 import { createSheetClient } from "../../integrations/sheets/config";
 
 const THREE_DAYS_BEFORE_RAID = 3 * 24 * 60 * 60 * 1000;
-const { INFO_SHEET } = CONFIG.GUILD;
+const { INFO_SHEET, STAFF_RAID_CHANNEL_ID } = CONFIG.GUILD;
 
 export function getAssignmentConfigAndHistory(database: Database) {
   const rawHistory = database.getWorldBuffHistory();
@@ -104,11 +107,12 @@ export async function tryPostWorldBuffAssignments(
   });
 
   // Format
+  const assignmentsMap = new Map(
+    rawAssignmentConfig.map(({ buffInfo }) => [buffInfo.shortName, buffInfo]),
+  );
   const formatted = formatGroupAssignmentsToMarkdown(
     assignment,
-    new Map(
-      rawAssignmentConfig.map(({ buffInfo }) => [buffInfo.shortName, buffInfo]),
-    ),
+    assignmentsMap,
   );
 
   // Raid Channel
@@ -117,5 +121,18 @@ export async function tryPostWorldBuffAssignments(
     raidEvent.channelId,
     MESSAGE_TAG,
     formatted,
+  );
+
+  // Officer Channel
+  const [messageTag, message] = formatGroupAssignmentsToStaffRaidWarning(
+    assignment,
+    assignmentsMap,
+    raidEvent,
+  );
+  await createOrEditDiscordMessage(
+    discordClient,
+    STAFF_RAID_CHANNEL_ID,
+    messageTag,
+    message,
   );
 }

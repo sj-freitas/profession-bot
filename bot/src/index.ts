@@ -1,14 +1,25 @@
 /* eslint-disable no-console */
 import { createClient } from "./discord/create-client";
-import { automaticFlushOfDiscordRoles } from "./flows/auto-flush-roles/recurring-job";
-import { createSheetClient } from "./integrations/sheets/config";
+import { Database } from "./exports/mem-database";
+import { refreshDatabase } from "./exports/utils";
+import { tryPostWorldBuffAssignments } from "./flows/raid-assignments/world-buff-assignments";
+import { getRosterFromRaidEvent } from "./flows/roster-helper";
+import { fetchEvent } from "./integrations/raid-helper/raid-helper-client";
 
 async function main() {
-  const client = await createClient();
-  await automaticFlushOfDiscordRoles(client, createSheetClient());
+  const discordClient = await createClient();
+  const database = new Database();
+  await refreshDatabase(database);
 
-  console.log("Updated all users!");
-  await client.destroy();
+  const raidEvent = await fetchEvent("1325581857605287986");
+  if (!raidEvent) {
+    return;
+  }
+  const roster = await getRosterFromRaidEvent(raidEvent, database);
+
+  await tryPostWorldBuffAssignments(discordClient, database, raidEvent, roster);
+
+  await discordClient.destroy();
 }
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
