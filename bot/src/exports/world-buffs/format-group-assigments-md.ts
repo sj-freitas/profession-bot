@@ -12,7 +12,7 @@ function incrementLetter(letter: string, incrementValue: number = 1): string {
 function capitalizeFirstLetter(word: string): string {
   const [firstLetter, ...remainingChars] = word;
 
-  return `${firstLetter.toLocaleUpperCase()}${remainingChars.join("")}`;
+  return `${firstLetter.toUpperCase()}${remainingChars.join("")}`;
 }
 
 function getArrayFromSingleOrArray<T>(entry: T | T[]): T[] {

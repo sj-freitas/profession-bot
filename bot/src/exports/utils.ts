@@ -5,8 +5,8 @@ import {
   getAllBuffHistory,
   getWorldBuffInfo,
 } from "../integrations/sheets/get-buffers";
-import { getPlayers } from "../integrations/sheets/get-players";
 import { readProfessionData } from "../integrations/sheets/parse-prof";
+import { PlayerInfoTable } from "../integrations/sheets/player-info-table";
 import { SwitcherRoleDataTable } from "../integrations/sheets/switcher-role-data";
 import { Database, toFlattenData } from "./mem-database";
 import { getGuildInfo } from "./wowHeadIntegration";
@@ -15,13 +15,17 @@ export async function refreshDatabase(database: Database): Promise<void> {
   console.log("Database refresh started.");
 
   const sheetClient = createSheetClient();
+  const playerInfoTable = new PlayerInfoTable(
+    sheetClient,
+    CONFIG.GUILD.INFO_SHEET,
+  );
   const switcherDataTable = new SwitcherRoleDataTable(
     sheetClient,
     CONFIG.GUILD.INFO_SHEET,
   );
   const data = await readProfessionData(sheetClient, CONFIG.GUILD.INFO_SHEET);
   const parsed = await getGuildInfo(data.professionData);
-  const roster = await getPlayers(sheetClient, CONFIG.GUILD.INFO_SHEET);
+  const roster = await playerInfoTable.getAllValues();
   const worldBuffAssignments = await getWorldBuffInfo(
     sheetClient,
     CONFIG.GUILD.INFO_SHEET,

@@ -4,6 +4,7 @@ import {
   WorldBuffHistory,
 } from "../integrations/sheets/get-buffers";
 import { Player } from "../integrations/sheets/get-players";
+import { PlayerInfo } from "../integrations/sheets/player-info-table";
 import { Switcher } from "../integrations/sheets/switcher-role-data";
 import { AvailableProfession, GuildProfessionData } from "./types";
 
@@ -30,7 +31,7 @@ export class Database {
 
   private worldBuffHistory: WorldBuffHistory[] = [];
 
-  private playerRoster: Player[] = [];
+  private playerInfos: PlayerInfo[] = [];
 
   private characterRoster: Character[] = [];
 
@@ -64,12 +65,21 @@ export class Database {
     this.worldBuffAssignments = worldBuffAssignments;
   }
 
-  getPlayersRoster(): Player[] {
-    return this.playerRoster;
+  getPlayerInfos(): PlayerInfo[] {
+    return this.playerInfos;
   }
 
-  setPlayersRoster(players: Player[]) {
-    this.playerRoster = players;
+  getPlayersRoster(): Player[] {
+    return this.playerInfos.map((t) => ({
+      discordHandle: t.discordHandle,
+      discordId: t.discordId,
+      serverHandle: t.discordServerHandle,
+      characters: [t.mainName, ...t.altNames],
+    }));
+  }
+
+  setPlayersRoster(players: PlayerInfo[]) {
+    this.playerInfos = players;
   }
 
   getCharacterRoster(): Character[] {

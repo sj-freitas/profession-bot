@@ -28,17 +28,27 @@ import {
   handleCreateAdHocRaid,
   handleDeleteAdHocRaid,
 } from "./discord/ad-hoc-raid-creator.command";
+import { automaticFlushOfDiscordRoles } from "./flows/auto-flush-roles/recurring-job";
+import {
+  handleCharacterAdd,
+  handleCharacterList,
+  handleCharacterRemove,
+} from "./discord/characterHandlers.command";
 
 const { RAID_SIGN_UP_CHANNELS } = CONFIG.GUILD;
 const FIVE_MINUTES = 5 * 60 * 1000;
 const FORTY_FIVE_MINUTES = 45 * 60 * 1000;
+const TWO_HOURS = 2 * 60 * 60 * 1000;
 
 const commands = [
   new SlashCommandBuilder()
     .setName("crafter")
     .setDescription('"Finds the crafter for the recipe')
     .addStringOption((option) =>
-      option.setName("recipe").setDescription("The recipe to search for"),
+      option
+        .setName("recipe")
+        .setDescription("The recipe to search for")
+        .setRequired(true),
     ),
   new SlashCommandBuilder()
     .setName("world-buffs")
@@ -48,7 +58,8 @@ const commands = [
     .addStringOption((option) =>
       option
         .setName("event-id")
-        .setDescription("The event id on the discord server"),
+        .setDescription("The event id on the discord server")
+        .setRequired(true),
     ),
   new SlashCommandBuilder()
     .setName("raid-assign")
@@ -58,12 +69,14 @@ const commands = [
     .addStringOption((option) =>
       option
         .setName("encounter")
-        .setDescription(`The name of the encounter, like aq-cthun, raid, etc.`),
+        .setDescription(`The name of the encounter, like aq-cthun, raid, etc.`)
+        .setRequired(true),
     )
     .addStringOption((option) =>
       option
         .setName("event-id")
-        .setDescription("The event id on the discord server"),
+        .setDescription("The event id on the discord server")
+        .setRequired(true),
     ),
   new SlashCommandBuilder()
     .setName("staff-request")
@@ -73,7 +86,8 @@ const commands = [
     .addStringOption((option) =>
       option
         .setName("message")
-        .setDescription("The text message to send to the officers."),
+        .setDescription("The text message to send to the officers.")
+        .setRequired(true),
     )
     .addBooleanOption((option) =>
       option
@@ -85,12 +99,16 @@ const commands = [
     .setName("staff-reply")
     .setDescription("Allows a staff member to reply to a message")
     .addStringOption((option) =>
-      option.setName("ticket-id").setDescription("The ticket ID to reply to"),
+      option
+        .setName("ticket-id")
+        .setDescription("The ticket ID to reply to")
+        .setRequired(true),
     )
     .addStringOption((option) =>
       option
         .setName("message")
-        .setDescription("The text message for the officers to send."),
+        .setDescription("The text message for the officers to send.")
+        .setRequired(true),
     ),
   new SlashCommandBuilder()
     .setName("nuke")
@@ -115,32 +133,69 @@ const commands = [
     .addStringOption((option) =>
       option
         .setName("title")
-        .setDescription("The title of the raid, keep it simple and short"),
+        .setDescription("The title of the raid, keep it simple and short")
+        .setRequired(true),
     )
     .addStringOption((option) =>
       option
         .setName("description")
         .setDescription(
           "Insert the instances name, it will be used also to create soft-reserves.",
-        ),
+        )
+        .setRequired(true),
     )
     .addStringOption((option) =>
       option
         .setName("time")
         .setDescription(
           "Format: `HH:mm` or `hh:mm a` in server time, something like `20:00`",
-        ),
+        )
+        .setRequired(true),
     )
     .addStringOption((option) =>
       option
         .setName("date")
         .setDescription(
           "Format: `dd-MM-yyyy` format, for example `09-01-2025` = first of January.",
-        ),
+        )
+        .setRequired(true),
     ),
   new SlashCommandBuilder()
     .setName("ad-hoc-delete")
     .setDescription("Deletes all ad-hoc raids in your name"),
+  new SlashCommandBuilder()
+    .setName("char-list")
+    .setDescription("Lists all the characters you own")
+    .addStringOption((option) =>
+      option
+        .setName("user-id")
+        .setDescription(
+          "[Optional] The discord user id of the user to fetch characters from",
+        )
+        .setRequired(false),
+    ),
+  new SlashCommandBuilder()
+    .setName("char-add")
+    .setDescription(
+      "If this is your first time adds your main, future calls add your alts.",
+    )
+    .addStringOption((option) =>
+      option
+        .setName("name")
+        .setDescription("Character name to add")
+        .setRequired(true),
+    ),
+  new SlashCommandBuilder()
+    .setName("char-delete")
+    .setDescription(
+      "Removes an alt from our database, you can't remove a main.",
+    )
+    .addStringOption((option) =>
+      option
+        .setName("name")
+        .setDescription("Character name to remove")
+        .setRequired(true),
+    ),
 ];
 
 async function setupClient(database: Database): Promise<Client> {
@@ -185,6 +240,18 @@ async function setupClient(database: Database): Promise<Client> {
       id: "ad-hoc-delete",
       handler: handleDeleteAdHocRaid,
     },
+    {
+      id: "char-add",
+      handler: handleCharacterAdd,
+    },
+    {
+      id: "char-list",
+      handler: handleCharacterList,
+    },
+    {
+      id: "char-delete",
+      handler: handleCharacterRemove,
+    },
   ]);
 
   return await createClient((client) => {
@@ -204,6 +271,7 @@ async function bootstrapServer(): Promise<void> {
   const rest = new REST({ version: "10" }).setToken(CONFIG.DISCORD.BOT_TOKEN);
   const discordClient = await setupClient(database);
 
+  // Recurring Jobs
   void loop(
     async () =>
       cleanUpRaidChannels(discordClient, CONFIG.GUILD.RAID_SIGN_UP_CHANNELS),
@@ -240,6 +308,10 @@ async function bootstrapServer(): Promise<void> {
   void loop(
     async () => tryUpdateSwitcherPost(discordClient, sheetClient),
     FORTY_FIVE_MINUTES,
+  );
+  void loop(
+    async () => automaticFlushOfDiscordRoles(discordClient, sheetClient),
+    TWO_HOURS,
   );
 
   try {

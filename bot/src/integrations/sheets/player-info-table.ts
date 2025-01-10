@@ -81,7 +81,7 @@ const config: SheetTableConfig<PlayerInfo> = {
   ],
 };
 
-export class RaidConfigTable extends TableWrapper<PlayerInfo> {
+export class PlayerInfoTable extends TableWrapper<PlayerInfo> {
   constructor(sheetClient: SheetClient, sheetId: string) {
     super(sheetClient, sheetId, "DiscordMapping", config);
   }

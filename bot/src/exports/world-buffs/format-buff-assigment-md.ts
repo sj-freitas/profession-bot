@@ -3,7 +3,7 @@ import { WorldBuffAssignments } from "../../integrations/sheets/get-buffers";
 function capitalizeFirstLetter(word: string): string {
   const [firstLetter, ...remainingChars] = word;
 
-  return `${firstLetter.toLocaleUpperCase()}${remainingChars.join("")}`;
+  return `${firstLetter.toUpperCase()}${remainingChars.join("")}`;
 }
 
 export function formatBuffAssignmentMarkdown(
