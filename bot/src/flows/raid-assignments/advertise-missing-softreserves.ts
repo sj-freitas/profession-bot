@@ -44,7 +44,7 @@ ${softReserveInfo
       curr,
     ) => `### For ${allSoftresRaidInfo.find((t) => t.raidId === curr.instanceRoster.instanceName)?.raidName}
 The following players haven't soft-reserved yet: ${curr.missingPlayers.map((t) => `<@${t.discordId}>`).join(", ")}
-Click [here](${getSoftresLink(curr.instanceRoster.softresId)}) to fill in your soft-reserves.`,
+**[Click here to fill your softres](${getSoftresLink(curr.instanceRoster.softresId)})**`,
   )
   .join("\n")}`;
 
