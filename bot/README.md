@@ -29,3 +29,15 @@ RAID_HELPER_API_KEY="{RAIDER_HELPER_API_KEY_CAN_BE_OBTAINED_WITH_COMMAND_ON_DISC
 ## Profession Features
 - More accurate word matching (tolerant to typos) [HARD]
 - Support item IDs directly [MEDIUM]
+
+
+## Backlog
+- Bug with Cthun positions including warlocks with melee
+- Add /rw messages for world buffs [EASY]
+- Add ways for players to manage their alts
+    - /main-add [name]          -> Adds a main to a user (needs to be done first.)
+    - /list-chars               -> List all chars of user
+    - /alt-add [name]           -> Adds an alt to a user
+    - /alt-remove [name]        -> Removes an alt from a user
+- Add automatic role update (1hr job) [PROGRESS]
+- Add amount and duplicates config to SRs [DONE]

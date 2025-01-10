@@ -1,6 +1,6 @@
 import { SheetClient } from "./config";
 import { SheetTableConfig, TableWrapper } from "./table-wrapper";
-import { toColumnValue, toEntityValue } from "./table-wrapper-utilts";
+import { toColumnValue, toEntityValue } from "./table-wrapper-utils";
 
 export interface RaidInfo {
   eventId: string;

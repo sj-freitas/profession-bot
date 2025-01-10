@@ -1,6 +1,7 @@
 import { SheetClient } from "./config";
 import { readGoogleSheet } from "./utils";
 
+// TODO: To eventually be deprecated by ./player-info-table.ts
 export interface Player {
   discordHandle: string;
   discordId: string;

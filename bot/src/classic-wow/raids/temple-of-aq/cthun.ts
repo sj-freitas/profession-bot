@@ -157,7 +157,9 @@ ${exportRaidGroupsToTable({
     (t, groupIndex) =>
       ({
         slots: t.slots.map((s, index) =>
-          (s?.role === "Melee" || s?.role === "Tank") && index === 0
+          (s?.role === "Melee" ||
+            (s?.role === "Tank" && s.class !== "Warlock")) &&
+          index === 0
             ? {
                 ...s,
                 name: `${s.name} [${raidTargets[groupIndex].name}]`,
@@ -174,7 +176,10 @@ function getLeaderOfEachGroup(composition: Raid): string[] {
   return composition.groups.map((t) =>
     t.slots
       .filter((s): s is Character => Boolean(s))
-      .filter((s) => s.role === "Melee" || s.role === "Tank")
+      .filter(
+        (s) =>
+          s.role === "Melee" || (s.role === "Tank" && s.class !== "Warlock"),
+      )
       .map((s) => s.name)
       .join("\n"),
   );

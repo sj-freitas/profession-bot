@@ -1,6 +1,12 @@
 import { SheetClient } from "./config";
 import { SheetTableConfig, TableWrapper } from "./table-wrapper";
-import { toColumnValue, toEntityValue } from "./table-wrapper-utilts";
+import {
+  parseIntOrDefault,
+  toColumnValue,
+  toEntityValue,
+} from "./table-wrapper-utils";
+
+const DEFAULT_SOFTRES_AMOUNT = 2;
 
 export interface RaidConfig {
   raidId: string; // Matches with the softres instance name
@@ -8,10 +14,12 @@ export interface RaidConfig {
   raidName: string;
   useSoftRes: boolean;
   useWbItems: boolean;
+  softresAmount: number;
+  allowDuplicates: boolean;
 }
 
 const config: SheetTableConfig<RaidConfig> = {
-  tableRange: "A2:E",
+  tableRange: "A2:G",
   idColumnName: "raidId",
   mapRawToEntity: ([
     softresId,
@@ -19,12 +27,16 @@ const config: SheetTableConfig<RaidConfig> = {
     raidName,
     useSoftRes,
     useWbItems,
+    softresAmount,
+    allowDuplicates,
   ]) => ({
     raidId: softresId,
     raidNameMatchingTerms: toEntityValue(raidNameMatchingTerms),
     raidName,
     useSoftRes: useSoftRes === "TRUE",
     useWbItems: useWbItems === "TRUE",
+    softresAmount: parseIntOrDefault(softresAmount, DEFAULT_SOFTRES_AMOUNT),
+    allowDuplicates: allowDuplicates === "TRUE",
   }),
   mapEntityToRaw: ({
     raidId: softresId,
@@ -32,12 +44,16 @@ const config: SheetTableConfig<RaidConfig> = {
     raidName,
     useSoftRes,
     useWbItems,
+    softresAmount,
+    allowDuplicates,
   }) => [
     softresId,
     toColumnValue(raidNameMatchingTerms),
     raidName,
     useSoftRes ? "TRUE" : "FALSE",
     useWbItems ? "TRUE" : "FALSE",
+    `${softresAmount}`,
+    allowDuplicates ? "TRUE" : "FALSE",
   ],
 };
 

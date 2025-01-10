@@ -15,3 +15,9 @@ export function toColumnValue<TValue>(
 ): string {
   return arrayValue.map((t) => toString(t).trim()).join(";");
 }
+
+export function parseIntOrDefault(text: string, fallback: number): number {
+  const parsed = Number.parseInt(text, 10);
+
+  return Number.isInteger(parsed) ? parsed : fallback;
+}

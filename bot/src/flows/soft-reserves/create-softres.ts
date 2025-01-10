@@ -4,13 +4,15 @@ import { CONFIG } from "../../config";
 import { sendMessageToChannel } from "../../discord/utils";
 import { createSheetClient } from "../../integrations/sheets/config";
 import { RaidInfo, RaidInfoTable } from "../../integrations/sheets/raid-info";
-import { RaidConfigTable } from "../../integrations/sheets/raid-config-table";
+import {
+  RaidConfig,
+  RaidConfigTable,
+} from "../../integrations/sheets/raid-config-table";
 import { getRaid, raidCreate } from "../../integrations/softres/softres-client";
 import { getSoftresLink } from "../../integrations/softres/utils";
 import { RaidInstance } from "../../integrations/softres/types";
 
 const SOFT_RESERVE_MESSAGE_TITLE = "## Soft-Reserves for this raid are up!";
-const DEFAULT_SOFT_RESERVE_AMOUNT = 2;
 
 export interface SoftresInfo {
   instances: string[];
@@ -30,27 +32,27 @@ export function createSoftReserveMessage(
 ): string {
   return `${SOFT_RESERVE_MESSAGE_TITLE}
 Please make sure that your name is spelled exactly the same in-game.
-${associatedSoftReserves.map((t) => ` - **[${raidNames.get(t.instances[0])}](${getSoftresLink(t.raidId)})** SR x2`).join("\n")}
+${associatedSoftReserves.map((t) => ` - **[${raidNames.get(t.instances[0])}](${getSoftresLink(t.raidId)})** SR x${t.amount}`).join("\n")}
 ${associatedSoftReserves.find((t) => t.instances[0].indexOf("aq40") >= 0 && t.allowDuplicate && t.amount >= 2) ? "Any double SR'd AQ tokens will be rolled at the end with the top rollers winning a token per winning roll." : ""}`;
 }
 
 async function getRaidIdsFromDescription(
   unsanitizedDescription: string,
-): Promise<string[]> {
+): Promise<RaidConfig[]> {
   const description = unsanitizedDescription.toLowerCase();
   const sheetClient = createSheetClient();
   const softresRaidDataTable = new RaidConfigTable(
     sheetClient,
     CONFIG.GUILD.INFO_SHEET,
   );
-  const softresRaidData = (await softresRaidDataTable.getAllValues()).filter(
+  const raidConfigs = (await softresRaidDataTable.getAllValues()).filter(
     (t) => t.useSoftRes,
   );
-  const matchingTerms = softresRaidData
+  const matchingTerms = raidConfigs
     .map((t) =>
       t.raidNameMatchingTerms.map((x) => ({
         tag: x.toLowerCase(),
-        instance: t.raidId,
+        instance: t,
       })),
     )
     .flatMap((t) => t);
@@ -81,20 +83,22 @@ export async function createAnyMissingSoftresRaids(
     )
   )
     .filter((t): t is RaidInstance => t !== null)
-    .filter((t) => matchingRaids.find((x) => x === t.instances[0]));
+    .filter((t) =>
+      matchingRaids.find((currConfig) => currConfig.raidId === t.instances[0]),
+    );
 
   const raidsToCreate = matchingRaids.filter(
-    (t) => !currentlyExistingRaids.find((x) => x.instances[0] === t),
+    (t) => !currentlyExistingRaids.find((x) => x.instances[0] === t.raidId),
   );
   const createdMissingSoftresRaids: SoftresInfo[] = (
     await Promise.all(
       [...raidsToCreate].map(
         async (t) =>
           await raidCreate({
-            allowDuplicate: true,
-            amount: DEFAULT_SOFT_RESERVE_AMOUNT,
+            allowDuplicate: t.allowDuplicates,
+            amount: t.softresAmount,
             faction: "Alliance",
-            instances: [t],
+            instances: [t.raidId],
           }),
       ),
     )
@@ -156,12 +160,12 @@ export async function createAndAdvertiseSoftres(
   const associatedSoftReserves = (
     await Promise.all(
       [...matchingRaids].map(
-        async (t) =>
+        async (raidInstanceConfig) =>
           await raidCreate({
-            allowDuplicate: true,
-            amount: 2,
+            allowDuplicate: raidInstanceConfig.allowDuplicates,
+            amount: raidInstanceConfig.softresAmount,
             faction: "Alliance",
-            instances: [t],
+            instances: [raidInstanceConfig.raidId],
           }),
       ),
     )
