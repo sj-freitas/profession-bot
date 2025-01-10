@@ -32,11 +32,4 @@ RAID_HELPER_API_KEY="{RAIDER_HELPER_API_KEY_CAN_BE_OBTAINED_WITH_COMMAND_ON_DISC
 
 
 ## Backlog
-- Bug with Cthun positions including warlocks with melee [DONE]
 - Add /rw messages for world buffs [EASY]
-- Add ways for players to manage their alts [DONE]
-    - /char-list                 -> List all chars of user
-    - /char-add [name]           -> Adds an alt or main to a user
-    - /char-delete [name]        -> Removes an alt from a user
-- Add automatic role update (1hr job) [DONE]
-- Add amount and duplicates config to SRs [DONE]

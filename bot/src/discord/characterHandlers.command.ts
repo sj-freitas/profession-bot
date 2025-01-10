@@ -19,12 +19,15 @@ function extractFirstWord(text: string): string | null {
 
 export const handleCharacterList: CommandHandler<Database> = async ({
   interaction,
-  payload: database,
   reply,
 }): Promise<void> => {
+  const playerInfoTable = new PlayerInfoTable(
+    createSheetClient(),
+    CONFIG.GUILD.INFO_SHEET,
+  );
   const authorId =
     interaction.options.getString("user-id") ?? interaction.user.id;
-  const playerInfos = database.getPlayerInfos();
+  const playerInfos = await playerInfoTable.getAllValues();
   const playerInfo = playerInfos.find((t) => t.discordId === authorId);
   if (!playerInfo) {
     await reply(
@@ -41,7 +44,6 @@ export const handleCharacterList: CommandHandler<Database> = async ({
 
 export const handleCharacterAdd: CommandHandler<Database> = async ({
   interaction,
-  payload: database,
   reply,
 }): Promise<void> => {
   const playerInfoTable = new PlayerInfoTable(
@@ -66,7 +68,7 @@ export const handleCharacterAdd: CommandHandler<Database> = async ({
   }
 
   const authorId = interaction.user.id;
-  const playerInfos = database.getPlayerInfos();
+  const playerInfos = await playerInfoTable.getAllValues();
   const playerInfo = playerInfos.find((t) => t.discordId === authorId);
   if (!playerInfo) {
     await playerInfoTable.insertValue({
@@ -85,6 +87,11 @@ export const handleCharacterAdd: CommandHandler<Database> = async ({
     return;
   }
 
+  if (playerInfo.altNames.find((t) => t === sanitizedName)) {
+    await reply(`You already have ${sanitizedName} registered as an alt.`);
+    return;
+  }
+
   // This is an alt
   const altNames = [...playerInfo.altNames, sanitizedName];
   await playerInfoTable.updateValue({
@@ -99,7 +106,6 @@ export const handleCharacterAdd: CommandHandler<Database> = async ({
 
 export const handleCharacterRemove: CommandHandler<Database> = async ({
   interaction,
-  payload: database,
   reply,
 }): Promise<void> => {
   const playerInfoTable = new PlayerInfoTable(
@@ -124,7 +130,7 @@ export const handleCharacterRemove: CommandHandler<Database> = async ({
   }
 
   const authorId = interaction.user.id;
-  const playerInfos = database.getPlayerInfos();
+  const playerInfos = await playerInfoTable.getAllValues();
   const playerInfo = playerInfos.find((t) => t.discordId === authorId);
   if (!playerInfo) {
     await reply(`You don't have any characters assigned to you, can't delete.`);
