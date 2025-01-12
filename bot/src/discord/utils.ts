@@ -122,7 +122,7 @@ export async function createOrEditDiscordMessage(
   );
 
   if (message === null) {
-    await sendMessageToChannel(discordClient, channelId, messageContent);
+    await sendMessageToChannel(discordClient, channelId, messageContent, files);
     return;
   }
 

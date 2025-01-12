@@ -59,7 +59,7 @@ export async function tryPostFightAssignments(
 
         const allOfficerChannelMessages: RaidAssignmentSegments[] =
           allAssignments.map((t) => ({
-            title: `[${t.officerTitle}](https://discord.com/channels/${DISCORD_SERVER_ID}/${raidEvent.channelId}/${raidEvent.id})`,
+            title: `${t.officerTitle} for [this raid](https://discord.com/channels/${DISCORD_SERVER_ID}/${raidEvent.channelId}/${raidEvent.id})`,
             text: t.officerAssignment,
             attachments: t.files,
           }));
