@@ -31,10 +31,10 @@ export async function runJob(discordClient: Client) {
   const rowCount = data.cachedRowCount;
   const parsed = await getGuildInfo(data.professionData);
 
-  // if (rowCount === data.professionData.length) {
-  //   // Nothing to update
-  //   return;
-  // }
+  if (rowCount === data.professionData.length) {
+    // Nothing to update
+    return;
+  }
 
   // Update the sheet with the current row count
   await replaceValueInGoogleSheet(
