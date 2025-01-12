@@ -92,7 +92,8 @@ export async function tryPostFightAssignments(
           discordClient,
           STAFF_RAID_CHANNEL_ID,
           tag,
-          currSegment,
+          `${tag}
+${currSegment}`,
         );
         i += 1;
       }
@@ -100,13 +101,14 @@ export async function tryPostFightAssignments(
 
     if (raidSignUpChannelMessage.segments.length > 0) {
       let i = 1;
-      for (const currSegment of officerChannelMessage.segments) {
-        const tag = `${officerChannelMessage.tag} ${i}/${officerChannelMessage.segments.length}`;
+      for (const currSegment of raidSignUpChannelMessage.segments) {
+        const tag = `${raidSignUpChannelMessage.tag} ${i}/${raidSignUpChannelMessage.segments.length}`;
         await createOrEditDiscordMessage(
           discordClient,
           raidEvent.channelId,
           tag,
-          currSegment,
+          `${tag}
+${currSegment}`,
         );
         i += 1;
       }
