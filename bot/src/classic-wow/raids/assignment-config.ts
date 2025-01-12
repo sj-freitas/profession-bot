@@ -7,7 +7,9 @@ export interface AttachmentFile {
 
 export interface RaidAssignmentResult {
   dmAssignment: string[];
+  announcementTitle?: string;
   announcementAssignment?: string;
+  officerTitle?: string;
   officerAssignment?: string;
   files?: AttachmentFile[];
 }

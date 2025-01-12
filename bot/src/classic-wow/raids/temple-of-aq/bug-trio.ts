@@ -60,8 +60,7 @@ export function exportToDiscord(
   const printAssignment = (currAssignment: AssignmentDetails) =>
     `${currAssignment.description} ${currAssignment.characters.map((t) => `<@${characterDiscordHandleMap.get(t.name)}>`).join(", ")}`;
 
-  return `### Bug Trio Emps Tank Assignment
-${bugTrioAssignment.map((t) => `- ${t.raidTarget.icon.discordEmoji} [${t.raidTarget.icon.name}] (${t.raidTarget.name}): ${t.assignments.map(printAssignment).join(" ")} `).join("\n")}`;
+  return `${bugTrioAssignment.map((t) => `- ${t.raidTarget.icon.discordEmoji} [${t.raidTarget.icon.name}] (${t.raidTarget.name}): ${t.assignments.map(printAssignment).join(" ")} `).join("\n")}`;
 }
 
 interface AssignmentInfo {
@@ -108,12 +107,11 @@ export function getBugTrioAssignment({
   const dmAssignment = [
     `
 # Copy the following assignments to their specific use cases
-
 ## Discord Assignment for the specific raid channel:
+### Bug Trio Tank Assignment
 \`\`\`
 ${exportToDiscord(assignments, players)}
 \`\`\`
-
 ## To be used as a raiding warning, copy these and use them in-game before the encounter:
 \`\`\`
 ${exportToRaidWarning(assignments)}
@@ -122,14 +120,15 @@ ${exportToRaidWarning(assignments)}
   ];
 
   const announcementAssignment = exportToDiscord(assignments, players);
-  const officerAssignment = `### Bug Trio assignments to post as a \`/rw\` in-game
-\`\`\`
+  const officerAssignment = `\`\`\`
 ${exportToRaidWarning(assignments)}
 \`\`\``;
 
   return Promise.resolve({
     dmAssignment,
+    announcementTitle: `### Bug Trio Tank Assignment`,
     announcementAssignment,
+    officerTitle: `### Bug Trio assignments to post as a \`/rw\` in-game`,
     officerAssignment,
   });
 }

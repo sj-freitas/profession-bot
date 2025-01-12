@@ -13,7 +13,7 @@ const SIX_HOURS = 6 * 60 * 60 * 1000;
 const { INFO_SHEET, STAFF_RAID_CHANNEL_ID, DISCORD_SERVER_ID } = CONFIG.GUILD;
 
 interface RaidAssignmentSegments {
-  tag: string;
+  title: string;
   text?: string;
   attachments?: AttachmentFile[];
 }
@@ -58,14 +58,14 @@ export async function tryPostFightAssignments(
         );
 
         const allOfficerChannelMessages: RaidAssignmentSegments[] =
-          allAssignments.map((t, idx) => ({
-            tag: `## Assignments for [${currRaid.raidName}](https://discord.com/channels/${DISCORD_SERVER_ID}/${raidEvent.channelId}/${raidEvent.id}) ${idx + 1}/${allAssignments.length}`,
+          allAssignments.map((t) => ({
+            title: `[${t.officerTitle}](https://discord.com/channels/${DISCORD_SERVER_ID}/${raidEvent.channelId}/${raidEvent.id})`,
             text: t.officerAssignment,
             attachments: t.files,
           }));
         const allRaidSignUpChannelMessages: RaidAssignmentSegments[] =
-          allAssignments.map((t, idx) => ({
-            tag: `## Assignments for ${currRaid.raidName} ${idx + 1}/${allAssignments.length}`,
+          allAssignments.map((t) => ({
+            title: `${t.announcementTitle}`,
             text: t.announcementAssignment,
             attachments: t.files,
           }));
@@ -87,12 +87,12 @@ export async function tryPostFightAssignments(
     } = curr;
     if (officerChannelMessage.length > 0) {
       for (const currSegment of officerChannelMessage) {
-        const { tag, text, attachments } = currSegment;
+        const { title, text, attachments } = currSegment;
         await createOrEditDiscordMessage(
           discordClient,
           STAFF_RAID_CHANNEL_ID,
-          tag,
-          `${tag}
+          title,
+          `${title}
 ${text}`,
           attachments?.map(
             (t) => new AttachmentBuilder(t.attachment, { name: t.name }),
@@ -103,12 +103,12 @@ ${text}`,
 
     if (raidSignUpChannelMessage.length > 0) {
       for (const currSegment of raidSignUpChannelMessage) {
-        const { tag, text, attachments } = currSegment;
+        const { title, text, attachments } = currSegment;
         await createOrEditDiscordMessage(
           discordClient,
           raidEvent.channelId,
-          tag,
-          `${tag}
+          title,
+          `${title}
 ${text}`,
           attachments?.map(
             (t) => new AttachmentBuilder(t.attachment, { name: t.name }),

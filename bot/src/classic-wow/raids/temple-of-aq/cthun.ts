@@ -147,8 +147,7 @@ export function makeAssignments(roster: Character[]): Raid {
 export function exportToDiscord(composition: Raid): string {
   const raidTargets = Object.values(ALL_RAID_TARGETS).reverse();
 
-  return `### C'thun composition
-Check your positioning on the map below, the map is dynamically generated and it **might change to optimize with the current setup.**
+  return `Check your positioning on the map below, the map is dynamically generated and it **might change to optimize with the current setup.**
 Each melee has a "group leader" stack on top of your group's leader.
 
 \`\`\`
@@ -194,35 +193,32 @@ export async function getCthunAssignment(
   );
   const dmAssignment = [
     `# Copy the following assignments to their specific use cases
-
 ## Discord Assignment for the specific raid channel:
-
+### C'thun composition
 ${exportToDiscord(assignments)}`,
     `## WoW Raidsort Addon, do \`/raidsort import\` and copy the following value:
 \`\`\`
 ${exportToLuaTable(assignments)}
 \`\`\`
-
 ### The following image contains assignments for all groups:
 `,
   ];
 
   const announcementAssignment = `${exportToDiscord(assignments)}
-
 **The following image contains assignments for all groups:**
 `;
-  const officerAssignment = `### C'thun composition for Raidsort AddOn
-Do \`/raidsort import\` in-game to open the AddOn and copy the following value:
+  const officerAssignment = `Do \`/raidsort import\` in-game to open the AddOn and copy the following value:
 \`\`\`
 ${exportToLuaTable(assignments)}
 \`\`\`
-
 Once the setup is loaded you can \`/raidsort load\` to sort groups or \`/raidsort invite\` to invite members into the raid.
 `;
 
   return {
     dmAssignment,
+    announcementTitle: `### C'thun composition`,
     announcementAssignment,
+    officerTitle: `### C'thun composition for Raidsort AddOn`,
     officerAssignment,
     files: [{ attachment: cthunImageBuffer, name: "cthun-positions.png" }],
   };

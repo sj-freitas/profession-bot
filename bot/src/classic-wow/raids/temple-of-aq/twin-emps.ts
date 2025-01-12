@@ -87,8 +87,7 @@ export function exportToDiscord(
   const printAssignment = (currAssignment: AssignmentDetails) =>
     `${currAssignment.description} ${currAssignment.characters.map((t) => `<@${characterDiscordHandleMap.get(t.name)}>`).join(", ")}`;
 
-  return `### Twin Emps Tank Assignment
-${twinsAssignment.map((t) => `- ${t.raidTarget.icon.discordEmoji} [${t.raidTarget.icon.name}] (${t.raidTarget.name}): ${t.assignments.map(printAssignment).join(" ")} `).join("\n")}`;
+  return `${twinsAssignment.map((t) => `- ${t.raidTarget.icon.discordEmoji} [${t.raidTarget.icon.name}] (${t.raidTarget.name}): ${t.assignments.map(printAssignment).join(" ")} `).join("\n")}`;
 }
 
 interface AssignmentInfo {
@@ -135,12 +134,11 @@ export function getTwinsAssignment({
   const dmAssignment = [
     `
 # Copy the following assignments to their specific use cases
-
 ## Discord Assignment for the specific raid channel:
+### Twin Emperors Tank Assignment
 \`\`\`
 ${exportToDiscord(assignments, players)}
 \`\`\`
-
 ## To be used as a raiding warning, copy these and use them in-game before the encounter:
 \`\`\`
 ${exportToRaidWarning(assignments)}
@@ -149,14 +147,15 @@ ${exportToRaidWarning(assignments)}
   ];
 
   const announcementAssignment = exportToDiscord(assignments, players);
-  const officerAssignment = `### Twins assignments to post as a \`/rw\` in-game
-\`\`\`
+  const officerAssignment = `\`\`\`
 ${exportToRaidWarning(assignments)}
 \`\`\``;
 
   return Promise.resolve({
     dmAssignment,
+    announcementTitle: `### Twin Emperors Tank Assignment`,
     announcementAssignment,
+    officerTitle: `### Twins assignments to post as a \`/rw\` in-game`,
     officerAssignment,
   });
 }
