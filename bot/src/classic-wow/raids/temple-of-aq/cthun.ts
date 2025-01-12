@@ -148,6 +148,9 @@ export function exportToDiscord(composition: Raid): string {
   const raidTargets = Object.values(ALL_RAID_TARGETS).reverse();
 
   return `### C'thun composition
+Check your positioning on the map below, the map is dynamically generated and it **might change to optimize with the current setup.**
+Each melee has a "group leader" stack on top of your group's leader.
+
 \`\`\`
 ${exportRaidGroupsToTable({
   groups: composition.groups.map(
@@ -190,12 +193,16 @@ export async function getCthunAssignment(
     getLeaderOfEachGroup(assignments),
   );
   const dmAssignment = `# Copy the following assignments to their specific use cases
+
 ## Discord Assignment for the specific raid channel:
+
 ${exportToDiscord(assignments)}
+
 ## WoW Raidsort Addon, do \`/raidsort import\` and copy the following value:
 \`\`\`
 ${exportToLuaTable(assignments)}
 \`\`\`
+
 ### The following image contains assignments for all groups:
 `;
 
