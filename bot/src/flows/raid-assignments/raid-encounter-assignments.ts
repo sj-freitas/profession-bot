@@ -11,10 +11,14 @@ import { createOrEditDiscordMessage } from "../../discord/utils";
 const SIX_HOURS = 6 * 60 * 60 * 1000;
 const { INFO_SHEET, STAFF_RAID_CHANNEL_ID } = CONFIG.GUILD;
 
+interface RaidAssignmentSegments {
+  tag: string;
+  segments: string[];
+}
+
 interface AssignmentMessage {
-  messageTag: string;
-  officerChannelMessage?: string;
-  raidSignUpChannelMessage?: string;
+  officerChannelMessage: RaidAssignmentSegments;
+  raidSignUpChannelMessage: RaidAssignmentSegments;
 }
 
 export async function tryPostFightAssignments(
@@ -58,19 +62,17 @@ export async function tryPostFightAssignments(
           .map((t) => t.announcementAssignment)
           .filter((t): t is string => Boolean(t));
 
-        const officerChannelMessage =
-          allOfficerChannelMessages.length >= 0
-            ? `## Assignments for ${currRaid.raidName}
-${allOfficerChannelMessages.join("\n")}`
-            : undefined;
-        const raidSignUpChannelMessage =
-          allRaidSignUpChannelMessages.length >= 0
-            ? `## Assignments for ${currRaid.raidName}
-${allRaidSignUpChannelMessages.join("\n")}`
-            : undefined;
+        // Split this damn
+        const officerChannelMessage = {
+          tag: `## Assignments for ${currRaid.raidName}`,
+          segments: allOfficerChannelMessages,
+        };
+        const raidSignUpChannelMessage = {
+          tag: `## Assignments for ${currRaid.raidName}`,
+          segments: allRaidSignUpChannelMessages,
+        };
 
         const assignmentMessageOfRaid: AssignmentMessage = {
-          messageTag: `## Assignments for ${currRaid.raidName}`,
           officerChannelMessage,
           raidSignUpChannelMessage,
         };
@@ -81,24 +83,33 @@ ${allRaidSignUpChannelMessages.join("\n")}`
   ).filter((currRaid): currRaid is AssignmentMessage => currRaid !== null);
 
   for (const curr of assignmentData) {
-    const { officerChannelMessage, raidSignUpChannelMessage, messageTag } =
-      curr;
-    if (officerChannelMessage) {
-      await createOrEditDiscordMessage(
-        discordClient,
-        STAFF_RAID_CHANNEL_ID,
-        messageTag,
-        officerChannelMessage,
-      );
+    const { officerChannelMessage, raidSignUpChannelMessage } = curr;
+    if (officerChannelMessage.segments.length > 0) {
+      let i = 1;
+      for (const currSegment of officerChannelMessage.segments) {
+        const tag = `${officerChannelMessage.tag} ${i}/${officerChannelMessage.segments.length}`;
+        await createOrEditDiscordMessage(
+          discordClient,
+          STAFF_RAID_CHANNEL_ID,
+          tag,
+          currSegment,
+        );
+        i += 1;
+      }
     }
 
-    if (raidSignUpChannelMessage) {
-      await createOrEditDiscordMessage(
-        discordClient,
-        raidEvent.channelId,
-        messageTag,
-        raidSignUpChannelMessage,
-      );
+    if (raidSignUpChannelMessage.segments.length > 0) {
+      let i = 1;
+      for (const currSegment of officerChannelMessage.segments) {
+        const tag = `${officerChannelMessage.tag} ${i}/${officerChannelMessage.segments.length}`;
+        await createOrEditDiscordMessage(
+          discordClient,
+          raidEvent.channelId,
+          tag,
+          currSegment,
+        );
+        i += 1;
+      }
     }
   }
 }
