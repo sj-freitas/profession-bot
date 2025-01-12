@@ -192,19 +192,20 @@ export async function getCthunAssignment(
   const cthunImageBuffer = await drawImageAssignments(
     getLeaderOfEachGroup(assignments),
   );
-  const dmAssignment = `# Copy the following assignments to their specific use cases
+  const dmAssignment = [
+    `# Copy the following assignments to their specific use cases
 
 ## Discord Assignment for the specific raid channel:
 
-${exportToDiscord(assignments)}
-
-## WoW Raidsort Addon, do \`/raidsort import\` and copy the following value:
+${exportToDiscord(assignments)}`,
+    `## WoW Raidsort Addon, do \`/raidsort import\` and copy the following value:
 \`\`\`
 ${exportToLuaTable(assignments)}
 \`\`\`
 
 ### The following image contains assignments for all groups:
-`;
+`,
+  ];
 
   const announcementAssignment = `${exportToDiscord(assignments)}
 

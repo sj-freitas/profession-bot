@@ -327,7 +327,7 @@ export function getGenericRaidAssignment(
 ): Promise<RaidAssignmentResult> {
   const raid = makeAssignments(roster.characters);
 
-  const dmAssignment = getRaidsortLuaAssignment(raid);
+  const dmAssignment = [getRaidsortLuaAssignment(raid)];
   const announcementAssignment = `## Raid Groups
 \`\`\`
 ${exportRaidGroupsToTable(raid)}

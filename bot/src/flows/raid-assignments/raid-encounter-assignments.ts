@@ -10,7 +10,7 @@ import { createOrEditDiscordMessage } from "../../discord/utils";
 import { AttachmentFile } from "../../classic-wow/raids/assignment-config";
 
 const SIX_HOURS = 6 * 60 * 60 * 1000;
-const { INFO_SHEET, STAFF_RAID_CHANNEL_ID } = CONFIG.GUILD;
+const { INFO_SHEET, STAFF_RAID_CHANNEL_ID, DISCORD_SERVER_ID } = CONFIG.GUILD;
 
 interface RaidAssignmentSegments {
   tag: string;
@@ -59,7 +59,7 @@ export async function tryPostFightAssignments(
 
         const allOfficerChannelMessages: RaidAssignmentSegments[] =
           allAssignments.map((t, idx) => ({
-            tag: `## Assignments for ${currRaid.raidName} ${idx + 1}/${allAssignments.length}`,
+            tag: `## Assignments for [${currRaid.raidName}](https://discord.com/channels/${DISCORD_SERVER_ID}/${raidEvent.channelId}/${raidEvent.id}) ${idx + 1}/${allAssignments.length}`,
             text: t.officerAssignment,
             attachments: t.files,
           }));

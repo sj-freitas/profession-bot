@@ -63,8 +63,14 @@ export const raidAssignHandler: CommandHandler<Database> = async ({
   const raidAssignmentRoster = toRaidAssignmentRoster(roster);
   const assignments = await getAssignmentForEncounter(raidAssignmentRoster);
 
+  for (const curr of assignments.dmAssignment) {
+    await interaction.reply({
+      content: curr,
+      ephemeral: true,
+    });
+  }
   await interaction.reply({
-    content: assignments.dmAssignment,
+    content: "Attachments:",
     files: assignments.files,
     ephemeral: true,
   });

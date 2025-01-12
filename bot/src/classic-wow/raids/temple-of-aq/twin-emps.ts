@@ -132,7 +132,8 @@ export function getTwinsAssignment({
 }: RaidAssignmentRoster): Promise<RaidAssignmentResult> {
   const assignments = makeAssignments(characters);
 
-  const dmAssignment = `
+  const dmAssignment = [
+    `
 # Copy the following assignments to their specific use cases
 
 ## Discord Assignment for the specific raid channel:
@@ -144,7 +145,8 @@ ${exportToDiscord(assignments, players)}
 \`\`\`
 ${exportToRaidWarning(assignments)}
 \`\`\`
-  `;
+  `,
+  ];
 
   const announcementAssignment = exportToDiscord(assignments, players);
   const officerAssignment = `### Twins assignments to post as a \`/rw\` in-game
