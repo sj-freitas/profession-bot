@@ -62,16 +62,17 @@ export const raidAssignHandler: CommandHandler<Database> = async ({
   const roster = await getRosterFromRaidEvent(event, database);
   const raidAssignmentRoster = toRaidAssignmentRoster(roster);
   const assignments = await getAssignmentForEncounter(raidAssignmentRoster);
+  const { user } = interaction;
 
-  for (const curr of assignments.dmAssignment) {
-    await interaction.reply({
-      content: curr,
-      ephemeral: true,
-    });
-  }
-  await interaction.reply({
+  const allMessages = await Promise.all(
+    assignments.dmAssignment.map(async (t) => await user.send(t)),
+  );
+  await user.send({
     content: "Attachments:",
     files: assignments.files,
-    ephemeral: true,
   });
+
+  await reply(
+    `Click [here](${allMessages[0].url}) to see the generated assignments`,
+  );
 };
