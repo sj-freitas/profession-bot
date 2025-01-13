@@ -196,7 +196,7 @@ export async function getCthunAssignment(
 ## Discord Assignment for the specific raid channel:
 ### C'thun composition
 ${exportToDiscord(assignments)}`,
-    `## WoW Raidsort Addon, do \`/raidsort import\` and copy the following value:
+    `## WoW Raidsort Addon, do \`/raidsort import cthun\` and copy the following value:
 \`\`\`
 ${exportToLuaTable(assignments)}
 \`\`\`
@@ -207,11 +207,11 @@ ${exportToLuaTable(assignments)}
   const announcementAssignment = `${exportToDiscord(assignments)}
 **The following image contains assignments for all groups:**
 `;
-  const officerAssignment = `Do \`/raidsort import\` in-game to open the AddOn and copy the following value:
+  const officerAssignment = `Do \`/raidsort import cthun\` in-game to open the AddOn and copy the following value:
 \`\`\`
 ${exportToLuaTable(assignments)}
 \`\`\`
-Once the setup is loaded you can \`/raidsort load\` to sort groups or \`/raidsort invite\` to invite members into the raid.
+Once the setup is loaded you can \`/raidsort load cthun\` to sort groups or \`/raidsort invite cthun\` to invite members into the raid.
 `;
 
   return {

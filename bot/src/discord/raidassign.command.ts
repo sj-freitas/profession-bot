@@ -59,20 +59,30 @@ export const raidAssignHandler: CommandHandler<Database> = async ({
     await reply(`${eventId} refers to an invalid event.`);
     return;
   }
+
+  const { user } = interaction;
+
+  // Send a first message to trigger the DM, then edit it and send the rest.
+  const firstMessage = await user.send({ content: "Loading..." });
+  await reply(
+    `Click [here](${firstMessage.url}) to see the generated assignments`,
+  );
+
   const roster = await getRosterFromRaidEvent(event, database);
   const raidAssignmentRoster = toRaidAssignmentRoster(roster);
   const assignments = await getAssignmentForEncounter(raidAssignmentRoster);
-  const { user } = interaction;
 
-  const allMessages = await Promise.all(
-    assignments.dmAssignment.map(async (t) => await user.send(t)),
+  await Promise.all(
+    assignments.dmAssignment.map(async (t, idx) => {
+      if (idx === 0) {
+        await firstMessage.edit(t);
+      } else {
+        await user.send(t);
+      }
+    }),
   );
   await user.send({
     content: "Attachments:",
     files: assignments.files,
   });
-
-  await reply(
-    `Click [here](${allMessages[0].url}) to see the generated assignments`,
-  );
 };
