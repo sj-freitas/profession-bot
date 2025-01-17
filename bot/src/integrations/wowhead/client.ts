@@ -6,7 +6,7 @@ export async function queryWowHead(
   searchTerm: string,
 ): Promise<WowHeadQueryResults> {
   const BASE_URL = `${CONFIG.WOW_HEAD.HOST_NAME}/classic/search/suggestions-template`;
-  const queryString = `?q=${encodeURIComponent(searchTerm)}`;
+  const queryString = `?q=${encodeURIComponent(searchTerm.toLowerCase())}`;
 
   const results = await fetch(`${BASE_URL}${queryString}`);
 
