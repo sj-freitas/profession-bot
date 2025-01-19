@@ -34,6 +34,7 @@ import {
   handleCharacterList,
   handleCharacterRemove,
 } from "./discord/characterHandlers.command";
+import { addWhatListener } from "./flows/whaaaat/what-listener";
 
 const { RAID_SIGN_UP_CHANNELS } = CONFIG.GUILD;
 const FIVE_MINUTES = 5 * 60 * 1000;
@@ -256,6 +257,7 @@ async function setupClient(database: Database): Promise<Client> {
 
   return await createClient((client) => {
     addChannelListener(client, RAID_SIGN_UP_CHANNELS);
+    addWhatListener(client);
     client.on(Events.ClientReady, (readyClient) => {
       console.log(`Logged in as ${readyClient.user.tag}!`);
     });
