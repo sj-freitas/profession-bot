@@ -87,7 +87,7 @@ export function exportToDiscord(
   const printAssignment = (currAssignment: AssignmentDetails) =>
     `${currAssignment.description} ${currAssignment.characters.map((t) => `<@${characterDiscordHandleMap.get(t.name)}>`).join(", ")}`;
 
-  return `${twinsAssignment.map((t) => `- ${t.raidTarget.icon.discordEmoji} [${t.raidTarget.icon.name}] (${t.raidTarget.name}): ${t.assignments.map(printAssignment).join(" ")} `).join("\n")}`;
+  return `${twinsAssignment.map((t) => `- ${t.raidTarget.icon.discordEmoji} [${t.raidTarget.icon.name}] ${t.raidTarget.name}: ${t.assignments.map(printAssignment).join(" ")} `).join("\n")}`;
 }
 
 interface AssignmentInfo {
