@@ -7,7 +7,7 @@ export async function handlePokeLutaryon(
   channel: SendableChannels,
 ): Promise<void> {
   await channel.send(
-    `@<${LUTARYON_DISCORD_ID}> we love you! :heart: Don't ever change!`,
+    `<@${LUTARYON_DISCORD_ID}> we love you! :heart: Don't ever change!`,
   );
 }
 
