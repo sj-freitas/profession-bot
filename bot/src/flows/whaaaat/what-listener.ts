@@ -1,6 +1,6 @@
 import { Client, SendableChannels } from "discord.js";
 
-const WHAAAT = ["whaaat", "whaaaat", "whaaaaat"];
+const WHAAAT = ["whaat", "whaaat", "whaaaat", "whaaaaat"];
 const LUTARYON_DISCORD_ID = "261165680445882369";
 
 export async function handlePokeLutaryon(
