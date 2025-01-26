@@ -21,10 +21,10 @@ export function makeAssignments(roster: Character[]): Raid {
   const allHealers = roster.filter((t) => t.role === "Healer");
   const allMeleeBuffers = roster
     .filter(isMeleeCharacter)
-    .filter((t) => CLASS_ROLE_MAP[t.class][t.role].canBuff);
+    .filter((t) => t.class === "Warrior");
   const remainingMelee = roster
     .filter(isMeleeCharacter)
-    .filter((t) => !CLASS_ROLE_MAP[t.class][t.role].canBuff);
+    .filter((t) => t.class !== "Warrior");
   const allRangedBuffers = roster
     .filter((t) => t.role === "Ranged")
     .filter((t) => CLASS_ROLE_MAP[t.class][t.role].canBuff);
