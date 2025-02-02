@@ -33,6 +33,8 @@ interface FormattedAssignmentBuffData {
   };
 }
 
+const MISSING_DEFAULT = "missing!";
+
 export function formatGroupAssignmentsToStaffRaidWarning(
   groupConfig: GroupPreConfig[],
   buffInfo: Map<string, WorldBuffInfo>,
@@ -48,36 +50,36 @@ These are the assignments converted as raid warnings to be easily posted instead
 \`/rw ${Object.entries(groupConfig[0])
       .map(
         ([buff, players]) =>
-          `${buffInfo.get(buff)?.shortName}=${((Array.isArray(players) ? players[0] : players) as Player).characters[0]}`,
+          `${buffInfo.get(buff)?.shortName}=${((Array.isArray(players) ? players[0] : players) as Player)?.characters[0] ?? MISSING_DEFAULT}`,
       )
       .join(" | ")}\`
 ** Group A2 **
 \`/rw ${Object.entries(groupConfig[0])
       .filter(
-        ([buff, characters]) =>
-          buffInfo.get(buff)?.duration === 1 && characters.length > 1,
+        ([buff, players]) =>
+          buffInfo.get(buff)?.duration === 1 && players?.length > 1,
       )
       .map(
-        ([buff, characters]) =>
-          `${buffInfo.get(buff)?.shortName}=${(characters[1] as Player).characters[0]}`,
+        ([buff, players]) =>
+          `${buffInfo.get(buff)?.shortName}=${(players?.[1] as Player)?.characters[0] ?? MISSING_DEFAULT}`,
       )
       .join(" | ")}\`
 ** Group B **
 \`/rw ${Object.entries(groupConfig[1])
       .map(
         ([buff, players]) =>
-          `${buffInfo.get(buff)?.shortName}=${((Array.isArray(players) ? players[0] : players) as Player).characters[0]}`,
+          `${buffInfo.get(buff)?.shortName}=${((Array.isArray(players) ? players[0] : players) as Player)?.characters[0] ?? MISSING_DEFAULT}`,
       )
       .join(" | ")}\`
 ** Group B2 **
 \`/rw ${Object.entries(groupConfig[1])
       .filter(
         ([buff, players]) =>
-          buffInfo.get(buff)?.duration === 1 && players.length > 1,
+          buffInfo.get(buff)?.duration === 1 && players?.length > 1,
       )
       .map(
         ([buff, players]) =>
-          `${buffInfo.get(buff)?.shortName}=${(players[1] as Player).characters[0]}`,
+          `${buffInfo.get(buff)?.shortName}=${(players[1] as Player)?.characters[0] ?? MISSING_DEFAULT}`,
       )
       .join(" | ")}\`
   `,
