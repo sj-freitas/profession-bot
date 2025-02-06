@@ -35,6 +35,8 @@ import {
   handleCharacterRemove,
 } from "./discord/characterHandlers.command";
 import { addWhatListener } from "./flows/whaaaat/what-listener";
+import { updateListOfAtieshCandidates } from "./flows/atiesh-flow/update-list-of-candidates";
+import { updateAtieshSelectedMembers } from "./flows/atiesh-flow/update-selected-members";
 
 const { RAID_SIGN_UP_CHANNELS } = CONFIG.GUILD;
 const FIVE_MINUTES = 5 * 60 * 1000;
@@ -289,6 +291,8 @@ async function bootstrapServer(): Promise<void> {
   );
   void loop(async () => refreshDatabase(database), FIVE_MINUTES);
   void loop(async () => runJob(discordClient), FIVE_MINUTES);
+  void loop(async () => updateListOfAtieshCandidates(discordClient), TWO_HOURS);
+  void loop(async () => updateAtieshSelectedMembers(discordClient), FIVE_MINUTES);
   void loop(
     async () =>
       pollChannelsForSoftReserves(discordClient, RAID_SIGN_UP_CHANNELS),
