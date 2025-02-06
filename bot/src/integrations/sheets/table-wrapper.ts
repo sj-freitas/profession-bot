@@ -189,6 +189,10 @@ export class TableWrapper<T> {
 
     const nonExisting = values.filter((t) => !existingIds.has(t[idColumn]));
 
+    if (nonExisting.length === 0) {
+      return;
+    }
+
     await appendRowsToGoogleSheet(
       this.sheetClient,
       this.sheetId,
