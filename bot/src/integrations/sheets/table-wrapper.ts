@@ -2,7 +2,7 @@
 /* eslint-disable no-useless-constructor */
 import { SheetClient } from "./config";
 import {
-  appendRowToGoogleSheet,
+  appendRowsToGoogleSheet,
   readGoogleSheet,
   replaceValueInGoogleSheet,
 } from "./utils";
@@ -147,7 +147,7 @@ export class TableWrapper<T> {
       return;
     }
 
-    await appendRowToGoogleSheet(
+    await appendRowsToGoogleSheet(
       this.sheetClient,
       this.sheetId,
       this.tabId,
@@ -155,7 +155,7 @@ export class TableWrapper<T> {
         x: initialColumn,
         y: initialRow,
       },
-      this.tableConfig.mapEntityToRaw(value),
+      [this.tableConfig.mapEntityToRaw(value)],
     );
   }
 
@@ -169,7 +169,7 @@ export class TableWrapper<T> {
       return;
     }
 
-    await appendRowToGoogleSheet(
+    await appendRowsToGoogleSheet(
       this.sheetClient,
       this.sheetId,
       this.tabId,
@@ -177,7 +177,27 @@ export class TableWrapper<T> {
         x: getInitialLetterFromRange(this.tableConfig.tableRange),
         y: getNumberOfFirstColumnFromRange(this.tableConfig.tableRange),
       },
-      this.tableConfig.mapEntityToRaw(value),
+      [this.tableConfig.mapEntityToRaw(value)],
+    );
+  }
+
+  async insertMany(values: T[]): Promise<void> {
+    const idColumn = this.tableConfig.idColumnName as keyof T;
+    // const idValue = value[idColumn] as string;
+    const allValues = await this.getAllValues();
+    const existingIds = new Set(allValues.map((t) => t[idColumn]));
+
+    const nonExisting = values.filter((t) => !existingIds.has(t[idColumn]));
+
+    await appendRowsToGoogleSheet(
+      this.sheetClient,
+      this.sheetId,
+      this.tabId,
+      {
+        x: getInitialLetterFromRange(this.tableConfig.tableRange),
+        y: getNumberOfFirstColumnFromRange(this.tableConfig.tableRange),
+      },
+      nonExisting.map((t) => this.tableConfig.mapEntityToRaw(t)),
     );
   }
 }

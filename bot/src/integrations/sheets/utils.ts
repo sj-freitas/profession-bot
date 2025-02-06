@@ -34,6 +34,32 @@ export function calculateRange(
   return `${start}:${end}`;
 }
 
+export async function appendRowsToGoogleSheet(
+  googleSheetClient: SheetClient,
+  spreadsheetId: string,
+  tabName: string,
+  startCell: { x: string; y: number },
+  values: string[][],
+) {
+  await googleSheetClient.spreadsheets.values.append({
+    spreadsheetId,
+    range: `${tabName}!${calculateRange(startCell, values[0].length)}`, // : "A3:C3"
+    valueInputOption: "RAW",
+    requestBody: {
+      majorDimension: "ROWS",
+      values,
+    },
+  });
+}
+
+/**
+ * DEPRECATED
+ * @param googleSheetClient 
+ * @param spreadsheetId 
+ * @param tabName 
+ * @param startCell 
+ * @param values 
+ */
 export async function appendRowToGoogleSheet(
   googleSheetClient: SheetClient,
   spreadsheetId: string,

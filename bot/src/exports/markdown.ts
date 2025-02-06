@@ -19,6 +19,7 @@ ${[...data.entries()]
   .map(
     ([profession, { recipes }]) => `## ${profession}
 ${recipes
+  .sort((left, right) => left.name.localeCompare(right.name))
   .map(
     (currRecipe) =>
       `- [${currRecipe.name}](${currRecipe.url}): Crafters: [${getCrafters(currRecipe.crafters)}]`,
