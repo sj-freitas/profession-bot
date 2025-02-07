@@ -8,7 +8,7 @@ import { PlayerInfoTable } from "../../integrations/sheets/player-info-table";
 export async function updateAtieshSelectedMembers(
   discordClient: Client,
 ): Promise<void> {
-  if (new Date().getTime() <= new Date("07.02.2025 17:00 GMT").getTime()) {
+  if (new Date().getTime() <= new Date("07 February 2025 17:00 GMT").getTime()) {
     return;
   }
 

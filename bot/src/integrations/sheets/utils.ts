@@ -41,6 +41,11 @@ export async function appendRowsToGoogleSheet(
   startCell: { x: string; y: number },
   values: string[][],
 ) {
+  if (values.length === 0) {
+    // Not enough items to append
+    return;
+  }
+
   await googleSheetClient.spreadsheets.values.append({
     spreadsheetId,
     range: `${tabName}!${calculateRange(startCell, values[0].length)}`, // : "A3:C3"
