@@ -39,7 +39,7 @@ export function makeAssignments(roster: Character[]): TargetAssignment[] {
       (t.role === "Ranged" || t.role === "Healer") &&
       !assignedHealers.find((x) => x.name === t.name),
   );
-  const priests = roster.filter((t) => t.class === "Priest");
+  const priests = roster.filter((t) => t.class === "Priest" && t.role === "Healer");
   const defensiveCooldownOrder = [...druids, ...priests];
   // Split these per tank
   const healersInOrder = assignedHealers.map((t) =>

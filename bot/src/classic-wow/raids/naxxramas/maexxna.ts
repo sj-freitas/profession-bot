@@ -14,7 +14,7 @@ export function makeAssignments(roster: Character[]): TargetAssignment[] {
   const druids = roster.filter(
     (t) => t.class === "Druid" && (t.role === "Ranged" || t.role === "Healer"),
   );
-  const priests = roster.filter((t) => t.class === "Priest");
+  const priests = roster.filter((t) => t.class === "Priest" && t.role === "Healer");
 
   const coolDownsOrder = [...druids, ...priests];
 
