@@ -114,9 +114,9 @@ interface AssignmentInfo {
 }
 
 export function exportToRaidWarning(
-  sarturaAssignment: TargetAssignment[],
+  kelThuzadAssignments: TargetAssignment[],
 ): string {
-  const groupedByAssignmentTypeId = sarturaAssignment.reduce<AssignmentInfo>(
+  const groupedByAssignmentTypeId = kelThuzadAssignments.reduce<AssignmentInfo>(
     (res, curr) => {
       curr.assignments.forEach((t) => {
         res[t.id] = [
