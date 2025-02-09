@@ -23,7 +23,7 @@ export function makeAssignments(roster: Character[]): TargetAssignment[] {
   return [
     {
       raidTarget: {
-        icon: ALL_RAID_TARGETS.Triangle,
+        icon: ALL_RAID_TARGETS.Skull,
         name: `Healing CD order on MT`,
       },
       assignments: [
