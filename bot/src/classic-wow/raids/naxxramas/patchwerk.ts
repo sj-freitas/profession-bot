@@ -60,7 +60,7 @@ export function makeAssignments(roster: Character[]): TargetAssignment[] {
       assignments: [
         {
           id: `Hateful Strike Tank ${index + 1}`,
-          description: "The player who will be on top of the threat",
+          description: "A tank who will be on taking the most damage and should always be topped-off",
           characters: [currTank],
         },
         {
