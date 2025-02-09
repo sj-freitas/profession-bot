@@ -32,6 +32,30 @@ export function makeAssignments(roster: Character[]): TargetAssignment[] {
   const [mainTankHealer] = restOfHealers;
   const BASE_INDEX = 1;
 
+  const assignedHealers = [mainTankHealer, ...singleTargetHealers];
+  const druids = roster.filter(
+    (t) =>
+      t.class === "Druid" &&
+      (t.role === "Ranged" || t.role === "Healer") &&
+      !assignedHealers.find((x) => x.name === t.name),
+  );
+  const priests = roster.filter((t) => t.class === "Priest");
+  const defensiveCooldownOrder = [...druids, ...priests];
+  // Split these per tank
+  const healersInOrder = assignedHealers.map((t) =>
+    t.class === "Priest" || t.class === "Druid" ? t : null,
+  );
+  const defensiveCooldownGroups: Character[][] = [
+    actualMainTank,
+    ...hatefulStrikeTanks,
+  ].map((_, index) =>
+    [healersInOrder[index] ?? null].filter((t) => t !== null),
+  );
+  defensiveCooldownOrder.forEach((currCharacter, index) => {
+    const tankIndex = index % defensiveCooldownGroups.length;
+    defensiveCooldownGroups[tankIndex].push(currCharacter);
+  });
+
   const raidTargets = Object.values(ALL_RAID_TARGETS).reverse();
   return [
     {
@@ -60,13 +84,19 @@ export function makeAssignments(roster: Character[]): TargetAssignment[] {
       assignments: [
         {
           id: `Hateful Strike Tank ${index + 1}`,
-          description: "A tank who will be on taking the most damage and should always be topped-off",
+          description:
+            "A tank who will be on taking the most damage and should always be topped-off",
           characters: [currTank],
         },
         {
           id: `Healer on ${currTank.name}`,
           description: `Healer that spam heals ${currTank.name}`,
           characters: [singleTargetHealers[index]],
+        },
+        {
+          id: `Defensive cooldown rotation on ${currTank.name} during enrage (last 30%)`,
+          description: `Pain Suppression / Barkskin usage on enrage for ${currTank.name}`,
+          characters: defensiveCooldownGroups[index],
         },
       ],
     })),
