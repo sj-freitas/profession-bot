@@ -35,6 +35,21 @@ export function pickOneAtRandomAndRemoveFromArray<T>(
   return array.splice(indexOfElementToRemove, 1)[0];
 }
 
+export function removeFirstOnPredicate<T>(
+  array: T[],
+  predicate: (t: T) => boolean,
+): T | null {
+  for (let i = 0; i < array.length; i += 1) {
+    if (predicate(array[i])) {
+      const element = array.splice(i, 1)[0];
+
+      return element;
+    }
+  }
+
+  return null;
+}
+
 export function exportToLuaTable(composition: Raid): string {
   return `{\n${composition.groups
     .map(

@@ -1,106 +1,40 @@
 /* eslint-disable no-console */
+import { AttachmentBuilder, MessageFlags } from "discord.js";
 import { CONFIG } from "./config";
 import { createClient } from "./discord/create-client";
-import { createSheetClient } from "./integrations/sheets/config";
-import { PlayerInfoTable } from "./integrations/sheets/player-info-table";
+import { drawImageAssignments } from "./classic-wow/raids/naxxramas/kel-thuzad-images";
+import { getRosterFromRaidEvent, toRaidAssignmentRoster } from "./flows/roster-helper";
+import { refreshDatabase } from "./exports/utils";
+import { Database } from "./exports/mem-database";
+import { fetchEvent } from "./integrations/raid-helper/raid-helper-client";
+import { makeAssignments } from "./classic-wow/raids/naxxramas/kel-thuzad";
+
 
 async function main() {
   const discordClient = await createClient();
 
-  const channelId = `1182982442664067093`;
-  const messageId = `1336680688828813373`;
-
-  const sheetClient = createSheetClient();
-  const playerInfoTable = new PlayerInfoTable(
-    sheetClient,
-    CONFIG.GUILD.INFO_SHEET,
-  );
-  const allPlayers = await playerInfoTable.getAllValues();
-  const channel = await discordClient.channels.fetch(channelId);
-  if (!channel || !channel.isTextBased() || !channel.isSendable()) {
-    return;
-  }
-  const surveyMessage = await channel.messages.fetch(messageId);
-  if (!surveyMessage) {
+  const guild = await discordClient.guilds.fetch(CONFIG.GUILD.DISCORD_SERVER_ID);
+  const myProfile = await guild.members.fetch("373190463080890378");
+  
+  // Naxxramas raid
+  const database = new Database();
+  await refreshDatabase(database);
+  const raidEvent = await fetchEvent("1335889878726213675");
+  if (!raidEvent) {
     return;
   }
 
-  const reactions = surveyMessage.reactions.cache;
-
-  // COMPLETED THREE SET
-  const threeSetReactions = reactions.find((t) => t.emoji.name === "1️⃣");
-  if (!threeSetReactions) {
-    return;
-  }
-
-  const allRaiders = allPlayers.filter((t) =>
-    t.discordRoles.find((x) => x === "Raider" || x === "Staff"),
-  );
-  const usersWithThreeSet = await threeSetReactions.users.fetch();
-  const usersWithThreeSetIds = usersWithThreeSet.map((t) => t.id);
-
-  const playersWithThreeSet = usersWithThreeSetIds.map((t) =>
-    allPlayers.find((x) => x.discordId === t),
-  );
-  const missingThreeSet = allRaiders.filter(
-    (t) => !playersWithThreeSet.find((x) => x?.discordId === t.discordId),
-  );
-
-  const mainsMissingThreeSet = missingThreeSet.map((t) => t.mainName);
-  console.log(mainsMissingThreeSet);
-
-  // COMPLETED REMNANTS
-  const remnantsCompletedReaction = reactions.find(
-    (t) => t.emoji.name === "3️⃣",
-  );
-  if (!remnantsCompletedReaction) {
-    return;
-  }
-
-  const usersWithRemnantsCompleted =
-    await remnantsCompletedReaction.users.fetch();
-  const usersWithRemnantsCompletedIds = usersWithRemnantsCompleted.map(
-    (t) => t.id,
-  );
-  const playersWithRemnantsCompleted = usersWithRemnantsCompletedIds.map((t) =>
-    allPlayers.find((x) => x.discordId === t),
-  );
-  const missingRemnantsCompleted = allRaiders.filter(
-    (t) =>
-      !playersWithRemnantsCompleted.find((x) => x?.discordId === t.discordId),
-  );
-
-  const mainsMissingRemnants = missingRemnantsCompleted.map((t) => t.mainName);
-  console.log(mainsMissingRemnants);
-
-  // COMPLETED PRE-BIS MINIMUM GRIND
-  const preBisCompletedReaction = reactions.find((t) => t.emoji.name === "2️⃣");
-  if (!preBisCompletedReaction) {
-    return;
-  }
-
-  const usersWithPreBisCompleted = await preBisCompletedReaction.users.fetch();
-  const usersWithPreBisCompletedIds = usersWithPreBisCompleted.map((t) => t.id);
-  const playersWitPreBisCompleted = usersWithPreBisCompletedIds.map((t) =>
-    allPlayers.find((x) => x.discordId === t),
-  );
-  const missingPreBisCompleted = allRaiders.filter(
-    (t) => !playersWitPreBisCompleted.find((x) => x?.discordId === t.discordId),
-  );
-
-  const mainsMissingPreBis = missingPreBisCompleted.map((t) => t.mainName);
-  console.log(missingPreBisCompleted);
-
-  console.log(`# Players Missing Naxxramas Preparation
-## Players missing 3/3 set
-${mainsMissingThreeSet.map((t) => ` - ${t}`).join("\n")}
-
-## Players missing 150 Remnants
-${mainsMissingRemnants.map((t) => ` - ${t}`).join("\n")}
-
-## Players missing pre-raid sanctified
-${mainsMissingPreBis.map((t) => ` - ${t}`).join("\n")}
-`);
+  const roster = await getRosterFromRaidEvent(raidEvent, database);
+  const raidAssignmentRoster = toRaidAssignmentRoster(roster);
+  const assignments = makeAssignments(raidAssignmentRoster.characters);
+  const groups = assignments.map((t) => t.assignments[0].characters.map((x) => x.name));
+  const file = await drawImageAssignments(groups);
+  
+  await myProfile.send({
+    content: `Kel'Thuzad`,
+    files: [new AttachmentBuilder(file, { name: "kel-thuzad-assignments.png" })],
+    flags: MessageFlags.SuppressEmbeds,
+  });
 
   await discordClient.destroy();
 }
