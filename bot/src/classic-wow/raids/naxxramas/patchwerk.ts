@@ -74,6 +74,11 @@ export function makeAssignments(roster: Character[]): TargetAssignment[] {
           description: "Healer that focuses on the main-tank",
           characters: [mainTankHealer],
         },
+        {
+          id: `Defensive cooldown rotation on the MT during enrage (last 30%)`,
+          description: `Pain Suppression / Barkskin usage on enrage for ${actualMainTank.name}`,
+          characters: defensiveCooldownGroups[0],
+        },
       ],
     },
     ...allHatefulStrikeTanks.map((currTank, index) => ({
@@ -96,7 +101,7 @@ export function makeAssignments(roster: Character[]): TargetAssignment[] {
         {
           id: `Defensive cooldown rotation on ${currTank.name} during enrage (last 30%)`,
           description: `Pain Suppression / Barkskin usage on enrage for ${currTank.name}`,
-          characters: defensiveCooldownGroups[index],
+          characters: defensiveCooldownGroups[BASE_INDEX + index],
         },
       ],
     })),
