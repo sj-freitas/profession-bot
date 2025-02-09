@@ -13,6 +13,7 @@ import { RaidAssignmentRoster } from "../classic-wow/raids/raid-assignment-roste
 import { RaidAssignmentResult } from "../classic-wow/raids/assignment-config";
 import { getTwinsAssignment } from "../classic-wow/raids/temple-of-aq/twin-emps";
 import { getBugTrioAssignment } from "../classic-wow/raids/temple-of-aq/bug-trio";
+import { getKelThuzadAssignment } from "../classic-wow/raids/naxxramas/kel-thuzad";
 
 type RaidAssignment = (
   roster: RaidAssignmentRoster,
@@ -24,6 +25,7 @@ export const ENCOUNTER_HANDLERS: { [key: string]: RaidAssignment } = {
   "aq-twins": getTwinsAssignment,
   "aq-cthun": getCthunAssignment,
   "aq-bug-trio": getBugTrioAssignment,
+  "naxx-kelthuzad": getKelThuzadAssignment,
 };
 
 export const SUPPORTED_ENCOUNTERS = Object.keys(ENCOUNTER_HANDLERS);
