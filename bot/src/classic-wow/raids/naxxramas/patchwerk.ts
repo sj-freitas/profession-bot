@@ -1,4 +1,5 @@
 import { Player } from "../../../integrations/sheets/get-players";
+import { filterTwo } from "../../../lib/array-utilts";
 import {
   ALL_RAID_TARGETS,
   AssignmentDetails,
@@ -8,39 +9,72 @@ import {
 } from "../../raid-assignment";
 import { RaidAssignmentResult } from "../assignment-config";
 import { RaidAssignmentRoster } from "../raid-assignment-roster";
+import { pickOneAtRandomAndRemoveFromArray } from "../utils";
 
 export function makeAssignments(roster: Character[]): TargetAssignment[] {
   // Melee Group assignment
-  const druids = roster.filter(
-    (t) => t.class === "Druid" && (t.role === "Ranged" || t.role === "Healer"),
-  );
-  const priests = roster.filter(
-    (t) => t.class === "Priest" && (t.role === "Ranged" || t.role === "Healer"),
+  const tanks = roster.filter((t) => t.role === "Tank");
+  const [mainTanks, hatefulStrikeTanks] = filterTwo(
+    tanks,
+    (t) => t.class !== "Druid" && t.class !== "Warlock",
   );
 
-  const coolDownsOrder = [...druids, ...priests];
+  const [mainTank, ...rest] = mainTanks;
+  const allHatefulStrikeTanks = [...rest, ...hatefulStrikeTanks];
+  const actualMainTank =
+    mainTank ?? pickOneAtRandomAndRemoveFromArray(allHatefulStrikeTanks);
 
+  const healers = roster.filter((t) => t.role === "Healer");
+  const [singleTargetHealers, restOfHealers] = filterTwo(
+    healers,
+    (t) => t.class === "Priest" || t.class === "Paladin",
+  );
+  const [mainTankHealer] = restOfHealers;
+  const BASE_INDEX = 1;
+
+  const raidTargets = Object.values(ALL_RAID_TARGETS).reverse();
   return [
     {
       raidTarget: {
-        icon: ALL_RAID_TARGETS.Triangle,
-        name: `Healing CD order on MT`,
+        icon: raidTargets[0],
+        name: `Healing on MT`,
       },
       assignments: [
         {
-          id: "Healer Cooldown",
-          description:
-            "Order of healer cooldowns, Pain Suppression and Barkskin.",
-          characters: coolDownsOrder,
+          id: "The Main Tank",
+          description: "The player who will be on top of the threat",
+          characters: [actualMainTank],
+        },
+        {
+          id: "MT Healer",
+          description: "Healer that focuses on the main-tank",
+          characters: [mainTankHealer],
         },
       ],
     },
+    ...allHatefulStrikeTanks.map((currTank, index) => ({
+      raidTarget: {
+        icon: raidTargets[BASE_INDEX + index],
+        name: `Hateful Strike Tank ${index + 1}`,
+      },
+      assignments: [
+        {
+          id: `Hateful Strike Tank ${index + 1}`,
+          description: "The player who will be on top of the threat",
+          characters: [currTank],
+        },
+        {
+          id: `Healer on ${currTank.name}`,
+          description: `Healer that spam heals ${currTank.name}`,
+          characters: [singleTargetHealers[index]],
+        },
+      ],
+    })),
   ];
 }
 
-
 export function exportToDiscord(
-  maexxnaAssignment: TargetAssignment[],
+  patchwerkAssignment: TargetAssignment[],
   player: Player[],
 ): string {
   const characterDiscordHandleMap = new Map<string, string>();
@@ -54,7 +88,8 @@ export function exportToDiscord(
   const printAssignment = (currAssignment: AssignmentDetails) =>
     `${currAssignment.description} ${currAssignment.characters.map((t) => `<@${characterDiscordHandleMap.get(t.name)}>`).join(", ")}`;
 
-  return `${maexxnaAssignment.map((t) => `- ${t.raidTarget.icon.discordEmoji} [${t.raidTarget.icon.name}] (${t.raidTarget.name}): ${t.assignments.map(printAssignment).join(" ")} `).join("\n")}`;
+  return `${patchwerkAssignment.map((t) => `- ${t.raidTarget.icon.discordEmoji} [${t.raidTarget.icon.name}] (${t.raidTarget.name}): ${t.assignments.map(printAssignment).join(" ")} `).join("\n")}
+Unassigned Healers just heal whatever they can.`;
 }
 
 interface AssignmentInfo {
@@ -65,9 +100,9 @@ interface AssignmentInfo {
 }
 
 export function exportToRaidWarning(
-  maexxnaAssignments: TargetAssignment[],
+  patchwerkAssignments: TargetAssignment[],
 ): string {
-  const groupedByAssignmentTypeId = maexxnaAssignments.reduce<AssignmentInfo>(
+  const groupedByAssignmentTypeId = patchwerkAssignments.reduce<AssignmentInfo>(
     (res, curr) => {
       curr.assignments.forEach((t) => {
         res[t.id] = [
@@ -92,7 +127,7 @@ export function exportToRaidWarning(
     .join("\n");
 }
 
-export async function getMaexxnaAssignment({
+export async function getPatchwerkAssignment({
   characters,
   players,
 }: RaidAssignmentRoster): Promise<RaidAssignmentResult> {
@@ -100,7 +135,7 @@ export async function getMaexxnaAssignment({
   const dmAssignment = [
     `# Copy the following assignments to their specific use cases
 ## Discord Assignment for the specific raid channel:
-### Maexxna Assignments
+### Patchwerk Assignments
 \`\`\`
 ${exportToDiscord(assignments, players)}
 \`\`\`
@@ -118,9 +153,9 @@ ${exportToRaidWarning(assignments)}
 
   return Promise.resolve({
     dmAssignment,
-    announcementTitle: "### Maexxna Healing Cooldown Assignment",
+    announcementTitle: "### Patchwork Assignments",
     announcementAssignment,
-    officerTitle: `### Maexxna Healing Cooldown assignments to post as a \`/rw\` in-game`,
+    officerTitle: `### Patchwork assignments to post as a \`/rw\` in-game`,
     officerAssignment,
   });
 }
