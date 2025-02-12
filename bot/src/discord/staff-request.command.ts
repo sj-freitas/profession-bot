@@ -32,7 +32,7 @@ export const staffRequestHandler: CommandHandler<Database> = async ({
 
   await sendMessageToChannel(
     channelId,
-    `[${anonymous ? "Anonymous" : `${`@${author.username}`}`}] requests: \`\`\`
+    `[${anonymous ? "Anonymous" : `${`<@${author.id}>`}`}] requests: \`\`\`
 ${message}
 \`\`\`
 to reply type \`/staff-reply ticket-id:${messageId} message:<reply text>\`.`,
@@ -92,7 +92,7 @@ export const staffReplyHandler: CommandHandler<Database> = async ({
 
   await sendDirectMessageToUser(
     userId,
-    `Your request was answered by @${author.username}: \`\`\`
+    `Your request was answered by <@${author.id}>: \`\`\`
 ${message}
 \`\`\`
 to reply DM the officer in question or submit another issue.`,
