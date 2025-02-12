@@ -4,7 +4,6 @@ import {
   ALL_RAID_TARGETS,
   AssignmentDetails,
   Character,
-  RaidTarget,
   TargetAssignment,
 } from "../../raid-assignment";
 import { RaidAssignmentResult } from "../assignment-config";
@@ -39,21 +38,28 @@ export function makeAssignments(roster: Character[]): TargetAssignment[] {
       (t.role === "Ranged" || t.role === "Healer") &&
       !assignedHealers.find((x) => x.name === t.name),
   );
-  const priests = roster.filter((t) => t.class === "Priest" && t.role === "Healer");
+  const priests = roster.filter(
+    (t) => t.class === "Priest" && t.role === "Healer",
+  );
   const defensiveCooldownOrder = [...druids, ...priests];
   // Split these per tank
   const healersInOrder = assignedHealers.map((t) =>
     t.class === "Priest" || t.class === "Druid" ? t : null,
   );
-  const defensiveCooldownGroups: Character[][] = [
-    actualMainTank,
-    ...hatefulStrikeTanks,
-  ].map((_, index) =>
+  const allTanks = [actualMainTank, ...allHatefulStrikeTanks];
+  const defensiveCooldownGroups: Character[][] = allTanks.map((_, index) =>
     [healersInOrder[index] ?? null].filter((t) => t !== null),
   );
   defensiveCooldownOrder.forEach((currCharacter, index) => {
-    const tankIndex = index % defensiveCooldownGroups.length;
-    defensiveCooldownGroups[tankIndex].push(currCharacter);
+    const tankIndex = index % allTanks.length;
+
+    if (
+      !defensiveCooldownGroups[tankIndex].find(
+        (t) => currCharacter.name === t.name,
+      )
+    ) {
+      defensiveCooldownGroups[tankIndex].push(currCharacter);
+    }
   });
 
   const raidTargets = Object.values(ALL_RAID_TARGETS).reverse();
@@ -61,23 +67,23 @@ export function makeAssignments(roster: Character[]): TargetAssignment[] {
     {
       raidTarget: {
         icon: raidTargets[0],
-        name: `Healing on MT`,
+        name: `Main Tank`,
       },
       assignments: [
         {
-          id: "The Main Tank",
-          description: "The player who will be on top of the threat",
+          id: `MT`,
+          description: "Main Tank",
           characters: [actualMainTank],
         },
         {
-          id: "MT Healer",
-          description: "Healer that focuses on the main-tank",
+          id: `Healed by`,
+          description: "healed by",
           characters: [mainTankHealer],
         },
         {
-          id: `Defensive cooldown rotation on the MT during enrage (last 30%)`,
-          description: `Pain Suppression / Barkskin usage on enrage for ${actualMainTank.name}`,
-          characters: defensiveCooldownGroups[0],
+          id: `Defensive cooldown rotation (last 30%) Suppression / Barkskin for ${actualMainTank.name} by`,
+          description: `defensive cooldowns by`,
+          characters: defensiveCooldownGroups[0] ?? [],
         },
       ],
     },
@@ -89,19 +95,18 @@ export function makeAssignments(roster: Character[]): TargetAssignment[] {
       assignments: [
         {
           id: `Hateful Strike Tank ${index + 1}`,
-          description:
-            "A tank who will be on taking the most damage and should always be topped-off",
+          description: "Hateful Strike Tank",
           characters: [currTank],
         },
         {
-          id: `Healer on ${currTank.name}`,
-          description: `Healer that spam heals ${currTank.name}`,
+          id: `Healed by`,
+          description: `healed by`,
           characters: [singleTargetHealers[index]],
         },
         {
-          id: `Defensive cooldown rotation on ${currTank.name} during enrage (last 30%)`,
-          description: `Pain Suppression / Barkskin usage on enrage for ${currTank.name}`,
-          characters: defensiveCooldownGroups[BASE_INDEX + index],
+          id: `Defensive cooldown rotation (last 30%) Suppression / Barkskin for ${actualMainTank.name} by`,
+          description: `defensive cooldowns by`,
+          characters: defensiveCooldownGroups[BASE_INDEX + index] ?? [],
         },
       ],
     })),
@@ -123,42 +128,27 @@ export function exportToDiscord(
   const printAssignment = (currAssignment: AssignmentDetails) =>
     `${currAssignment.description} ${currAssignment.characters.map((t) => `<@${characterDiscordHandleMap.get(t.name)}>`).join(", ")}`;
 
-  return `${patchwerkAssignment.map((t) => `- ${t.raidTarget.icon.discordEmoji} [${t.raidTarget.icon.name}] (${t.raidTarget.name}): ${t.assignments.map(printAssignment).join(" ")} `).join("\n")}
+  return `${patchwerkAssignment
+    .map(
+      (t) =>
+        `- ${t.raidTarget.icon.discordEmoji} [${t.raidTarget.icon.name}] (${t.raidTarget.name}): ${t.assignments.map(printAssignment).join(" ")} `,
+    )
+    .join("\n")}
 Unassigned Healers just heal whatever they can.`;
-}
-
-interface AssignmentInfo {
-  [id: string]: {
-    targetInfo: RaidTarget;
-    assignees: Character[];
-  }[];
 }
 
 export function exportToRaidWarning(
   patchwerkAssignments: TargetAssignment[],
 ): string {
-  const groupedByAssignmentTypeId = patchwerkAssignments.reduce<AssignmentInfo>(
-    (res, curr) => {
-      curr.assignments.forEach((t) => {
-        res[t.id] = [
-          ...(res[t.id] ?? []),
-          {
-            targetInfo: curr.raidTarget,
-            assignees: t.characters,
-          },
-        ];
-      });
+  return patchwerkAssignments
+    .map((currAssignment) => {
+      const [tanks, healers, cooldowns] = currAssignment.assignments;
+      const tankedBy = `${tanks.characters.map((x) => x.name).join(" || ")}`;
+      const healedBy = `${healers.description} ${healers.characters.map((x) => x.name).join(" || ")}`;
+      const defensiveCooldowns = `${cooldowns.description} ${cooldowns.characters.map((x) => x.name).join(" > ")}`;
 
-      return res;
-    },
-    {},
-  );
-
-  return Object.entries(groupedByAssignmentTypeId)
-    .map(
-      ([assignmentId, details]) =>
-        `/rw ${assignmentId}: ${details.map((t) => `${t.targetInfo.icon.symbol} ${t.targetInfo.name} = ${t.assignees.map((char) => char.name).join(", ")}`).join(" || ")}`,
-    )
+      return `/rw ${currAssignment.raidTarget.name}: ${tankedBy} ${healedBy} ${defensiveCooldowns}`;
+    })
     .join("\n");
 }
 
