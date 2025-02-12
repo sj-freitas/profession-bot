@@ -8,38 +8,45 @@ import {
 } from "../../raid-assignment";
 import { RaidAssignmentResult } from "../assignment-config";
 import { RaidAssignmentRoster } from "../raid-assignment-roster";
+import { shuffleArray } from "../utils";
+
+const BOSS = {
+  raidTarget: {
+    icon: ALL_RAID_TARGETS.Cross,
+    name: `Faerlina`,
+  },
+};
+const LEFT_ADDS = {
+  raidTarget: {
+    icon: ALL_RAID_TARGETS.Skull,
+    name: `Left Adds`,
+  },
+};
+const RIGHT_ADDS = {
+  raidTarget: {
+    icon: ALL_RAID_TARGETS.Square,
+    name: `Right Adds`,
+  },
+};
 
 export function makeAssignments(roster: Character[]): TargetAssignment[] {
-  // Melee Group assignment
-  const druids = roster.filter(
-    (t) => t.class === "Druid" && (t.role === "Ranged" || t.role === "Healer"),
-  );
-  const priests = roster.filter(
-    (t) => t.class === "Priest" && t.role === "Healer",
-  );
+  const tanks = roster.filter((t) => t.role === "Tank");
+  const shuffledTanks = shuffleArray(tanks);
 
-  const coolDownsOrder = [...druids, ...priests];
-
-  return [
-    {
-      raidTarget: {
-        icon: ALL_RAID_TARGETS.Skull,
-        name: `Healing CD order on MT`,
+  return [BOSS, LEFT_ADDS, RIGHT_ADDS].map((currTarget, idx) => ({
+    ...currTarget,
+    assignments: [
+      {
+        id: "Tanks",
+        description: "tanked by",
+        characters: [shuffledTanks[idx]],
       },
-      assignments: [
-        {
-          id: "Healer Cooldown",
-          description:
-            "Order of healer cooldowns, Pain Suppression and Barkskin.",
-          characters: coolDownsOrder,
-        },
-      ],
-    },
-  ];
+    ],
+  }));
 }
 
 export function exportToDiscord(
-  maexxnaAssignment: TargetAssignment[],
+  faerlinaAssignment: TargetAssignment[],
   player: Player[],
 ): string {
   const characterDiscordHandleMap = new Map<string, string>();
@@ -53,7 +60,7 @@ export function exportToDiscord(
   const printAssignment = (currAssignment: AssignmentDetails) =>
     `${currAssignment.description} ${currAssignment.characters.map((t) => `<@${characterDiscordHandleMap.get(t.name)}>`).join(", ")}`;
 
-  return `${maexxnaAssignment.map((t) => `- ${t.raidTarget.icon.discordEmoji} [${t.raidTarget.icon.name}] (${t.raidTarget.name}): ${t.assignments.map(printAssignment).join(" ")} `).join("\n")}`;
+  return `${faerlinaAssignment.map((t) => `- ${t.raidTarget.icon.discordEmoji} [${t.raidTarget.icon.name}] (${t.raidTarget.name}): ${t.assignments.map(printAssignment).join(" ")} `).join("\n")}`;
 }
 
 interface AssignmentInfo {
@@ -64,9 +71,9 @@ interface AssignmentInfo {
 }
 
 export function exportToRaidWarning(
-  maexxnaAssignments: TargetAssignment[],
+  faerlinaAssignment: TargetAssignment[],
 ): string {
-  const groupedByAssignmentTypeId = maexxnaAssignments.reduce<AssignmentInfo>(
+  const groupedByAssignmentTypeId = faerlinaAssignment.reduce<AssignmentInfo>(
     (res, curr) => {
       curr.assignments.forEach((t) => {
         res[t.id] = [
@@ -91,15 +98,17 @@ export function exportToRaidWarning(
     .join("\n");
 }
 
-export async function getMaexxnaAssignment({
+export function getFaerlinaAssignment({
   characters,
   players,
 }: RaidAssignmentRoster): Promise<RaidAssignmentResult> {
   const assignments = makeAssignments(characters);
+
   const dmAssignment = [
-    `# Copy the following assignments to their specific use cases
+    `
+# Copy the following assignments to their specific use cases
 ## Discord Assignment for the specific raid channel:
-### Maexxna Assignments
+### Grand Widow Faerlina Tank Assignment
 \`\`\`
 ${exportToDiscord(assignments, players)}
 \`\`\`
@@ -117,9 +126,9 @@ ${exportToRaidWarning(assignments)}
 
   return Promise.resolve({
     dmAssignment,
-    announcementTitle: "### Maexxna Healing Cooldown Assignment",
+    announcementTitle: `### Grand Widow Faerlina Tank Assignment`,
     announcementAssignment,
-    officerTitle: `### Maexxna Healing Cooldown assignments to post as a \`/rw\` in-game`,
+    officerTitle: `### Grand Widow Faerlina assignments to post as a \`/rw\` in-game`,
     officerAssignment,
   });
 }

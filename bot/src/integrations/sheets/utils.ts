@@ -59,11 +59,11 @@ export async function appendRowsToGoogleSheet(
 
 /**
  * DEPRECATED
- * @param googleSheetClient 
- * @param spreadsheetId 
- * @param tabName 
- * @param startCell 
- * @param values 
+ * @param googleSheetClient
+ * @param spreadsheetId
+ * @param tabName
+ * @param startCell
+ * @param values
  */
 export async function appendRowToGoogleSheet(
   googleSheetClient: SheetClient,

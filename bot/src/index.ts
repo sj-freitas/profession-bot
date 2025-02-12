@@ -1,11 +1,13 @@
 /* eslint-disable no-console */
 // import { createClient } from "./discord/create-client";
 import { fetchEvent } from "./integrations/raid-helper/raid-helper-client";
-import { getRosterFromRaidEvent, toRaidAssignmentRoster } from "./flows/roster-helper";
+import {
+  getRosterFromRaidEvent,
+  toRaidAssignmentRoster,
+} from "./flows/roster-helper";
 import { refreshDatabase } from "./exports/utils";
 import { Database } from "./exports/mem-database";
 import { getPatchwerkAssignment } from "./classic-wow/raids/naxxramas/patchwerk";
-
 
 async function main() {
   // const discordClient = await createClient();
@@ -21,7 +23,7 @@ async function main() {
   const raidAssignmentRoster = toRaidAssignmentRoster(roster);
 
   const kek = await getPatchwerkAssignment(raidAssignmentRoster);
-  
+
   console.log(kek.officerAssignment);
 
   // await discordClient.destroy();

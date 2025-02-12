@@ -176,7 +176,7 @@ ${exportToRaidWarning(assignments)}
 
   return Promise.resolve({
     dmAssignment,
-    announcementTitle: '### Sartura Stun and Tank Assignment',
+    announcementTitle: "### Sartura Stun and Tank Assignment",
     announcementAssignment,
     officerTitle: `### Sartura assignments to post as a \`/rw\` in-game`,
     officerAssignment,

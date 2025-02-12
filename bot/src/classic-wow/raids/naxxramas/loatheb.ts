@@ -8,6 +8,7 @@ import {
 } from "../../raid-assignment";
 import { RaidAssignmentResult } from "../assignment-config";
 import { RaidAssignmentRoster } from "../raid-assignment-roster";
+import { shuffleArray } from "../utils";
 
 export function makeAssignments(roster: Character[]): TargetAssignment[] {
   // Melee Group assignment
@@ -17,20 +18,23 @@ export function makeAssignments(roster: Character[]): TargetAssignment[] {
   const priests = roster.filter(
     (t) => t.class === "Priest" && t.role === "Healer",
   );
+  const warriors = roster.filter(
+    (t) => t.class === "Warrior" && t.role === "Melee",
+  );
 
-  const coolDownsOrder = [...druids, ...priests];
+  const coolDownsOrder = shuffleArray([...druids, ...priests, ...warriors]);
 
   return [
     {
       raidTarget: {
         icon: ALL_RAID_TARGETS.Skull,
-        name: `Healing CD order on MT`,
+        name: `Healing/Defensive CD order on MT`,
       },
       assignments: [
         {
           id: "Healer Cooldown",
           description:
-            "Order of healer cooldowns, Pain Suppression and Barkskin.",
+            "Order of healer cooldowns, Pain Suppression, Barkskin and Rallying Cry.",
           characters: coolDownsOrder,
         },
       ],
@@ -39,7 +43,7 @@ export function makeAssignments(roster: Character[]): TargetAssignment[] {
 }
 
 export function exportToDiscord(
-  maexxnaAssignment: TargetAssignment[],
+  loathebAssignment: TargetAssignment[],
   player: Player[],
 ): string {
   const characterDiscordHandleMap = new Map<string, string>();
@@ -53,7 +57,7 @@ export function exportToDiscord(
   const printAssignment = (currAssignment: AssignmentDetails) =>
     `${currAssignment.description} ${currAssignment.characters.map((t) => `<@${characterDiscordHandleMap.get(t.name)}>`).join(", ")}`;
 
-  return `${maexxnaAssignment.map((t) => `- ${t.raidTarget.icon.discordEmoji} [${t.raidTarget.icon.name}] (${t.raidTarget.name}): ${t.assignments.map(printAssignment).join(" ")} `).join("\n")}`;
+  return `${loathebAssignment.map((t) => `- ${t.raidTarget.icon.discordEmoji} [${t.raidTarget.icon.name}] (${t.raidTarget.name}): ${t.assignments.map(printAssignment).join(" ")} `).join("\n")}`;
 }
 
 interface AssignmentInfo {
@@ -64,9 +68,9 @@ interface AssignmentInfo {
 }
 
 export function exportToRaidWarning(
-  maexxnaAssignments: TargetAssignment[],
+  loathebAssignments: TargetAssignment[],
 ): string {
-  const groupedByAssignmentTypeId = maexxnaAssignments.reduce<AssignmentInfo>(
+  const groupedByAssignmentTypeId = loathebAssignments.reduce<AssignmentInfo>(
     (res, curr) => {
       curr.assignments.forEach((t) => {
         res[t.id] = [
@@ -91,7 +95,7 @@ export function exportToRaidWarning(
     .join("\n");
 }
 
-export async function getMaexxnaAssignment({
+export async function getLoathebAssignment({
   characters,
   players,
 }: RaidAssignmentRoster): Promise<RaidAssignmentResult> {
@@ -99,7 +103,7 @@ export async function getMaexxnaAssignment({
   const dmAssignment = [
     `# Copy the following assignments to their specific use cases
 ## Discord Assignment for the specific raid channel:
-### Maexxna Assignments
+### Loatheb Assignments
 \`\`\`
 ${exportToDiscord(assignments, players)}
 \`\`\`
@@ -117,9 +121,9 @@ ${exportToRaidWarning(assignments)}
 
   return Promise.resolve({
     dmAssignment,
-    announcementTitle: "### Maexxna Healing Cooldown Assignment",
+    announcementTitle: "### Loatheb Healing Cooldown Assignment",
     announcementAssignment,
-    officerTitle: `### Maexxna Healing Cooldown assignments to post as a \`/rw\` in-game`,
+    officerTitle: `### Loatheb Healing Cooldown assignments to post as a \`/rw\` in-game`,
     officerAssignment,
   });
 }
