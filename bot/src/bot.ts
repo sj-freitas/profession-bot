@@ -292,7 +292,10 @@ async function bootstrapServer(): Promise<void> {
   void loop(async () => refreshDatabase(database), FIVE_MINUTES);
   void loop(async () => runJob(discordClient), FIVE_MINUTES);
   void loop(async () => updateListOfAtieshCandidates(discordClient), TWO_HOURS);
-  void loop(async () => updateAtieshSelectedMembers(discordClient), FIVE_MINUTES);
+  void loop(
+    async () => updateAtieshSelectedMembers(discordClient),
+    FIVE_MINUTES,
+  );
   void loop(
     async () =>
       pollChannelsForSoftReserves(discordClient, RAID_SIGN_UP_CHANNELS),

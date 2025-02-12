@@ -73,8 +73,8 @@ interface AssignmentInfo {
 export function exportToRaidWarning(
   faerlinaAssignment: TargetAssignment[],
 ): string {
-  const groupedByAssignmentTypeId =
-    faerlinaAssignment.reduce<AssignmentInfo>((res, curr) => {
+  const groupedByAssignmentTypeId = faerlinaAssignment.reduce<AssignmentInfo>(
+    (res, curr) => {
       curr.assignments.forEach((t) => {
         res[t.id] = [
           ...(res[t.id] ?? []),
@@ -86,7 +86,9 @@ export function exportToRaidWarning(
       });
 
       return res;
-    }, {});
+    },
+    {},
+  );
 
   return Object.entries(groupedByAssignmentTypeId)
     .map(
