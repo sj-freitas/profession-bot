@@ -104,7 +104,7 @@ export function makeAssignments(roster: Character[]): TargetAssignment[] {
           characters: [singleTargetHealers[index]],
         },
         {
-          id: `Defensive cooldown rotation (last 30%) Suppression / Barkskin for ${actualMainTank.name} by`,
+          id: `Defensive cooldown rotation (last 30%) Suppression / Barkskin for ${currTank.name} by`,
           description: `defensive cooldowns by`,
           characters: defensiveCooldownGroups[BASE_INDEX + index] ?? [],
         },
