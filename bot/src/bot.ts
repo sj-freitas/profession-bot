@@ -37,6 +37,7 @@ import {
 import { addWhatListener } from "./flows/whaaaat/what-listener";
 import { updateListOfAtieshCandidates } from "./flows/atiesh-flow/update-list-of-candidates";
 import { updateAtieshSelectedMembers } from "./flows/atiesh-flow/update-selected-members";
+import { getMissingRaiderFromEmojiReaction } from "./discord/missing-reaction.command";
 
 const { RAID_SIGN_UP_CHANNELS } = CONFIG.GUILD;
 const FIVE_MINUTES = 5 * 60 * 1000;
@@ -199,6 +200,23 @@ const commands = [
         .setDescription("Character name to remove")
         .setRequired(true),
     ),
+  new SlashCommandBuilder()
+    .setName("missing-reaction")
+    .setDescription(
+      "Finds who are the missing Raider roll members without a reaction on a specific message.",
+    )
+    .addStringOption((option) =>
+      option
+        .setName("message-id")
+        .setDescription("Message id to get the information from.")
+        .setRequired(true),
+    )
+    .addStringOption((option) =>
+      option
+        .setName("emoji")
+        .setDescription("The emoji reaction to assess.")
+        .setRequired(true),
+    ),
 ];
 
 async function setupClient(database: Database): Promise<Client> {
@@ -255,6 +273,10 @@ async function setupClient(database: Database): Promise<Client> {
       id: "char-delete",
       handler: handleCharacterRemove,
     },
+    {
+      id: "missing-reaction",
+      handler: getMissingRaiderFromEmojiReaction,
+    }
   ]);
 
   return await createClient((client) => {
