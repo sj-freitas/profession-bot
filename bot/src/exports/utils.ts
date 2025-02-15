@@ -8,7 +8,7 @@ import {
 import { readProfessionData } from "../integrations/sheets/parse-prof";
 import { PlayerInfoTable } from "../integrations/sheets/player-info-table";
 import { SwitcherRoleDataTable } from "../integrations/sheets/switcher-role-data";
-import { Database, toFlattenData } from "./mem-database";
+import { Database, removeDuplicates, toFlattenData } from "./mem-database";
 import { getGuildInfo } from "./wowHeadIntegration";
 
 export async function refreshDatabase(database: Database): Promise<void> {
@@ -37,7 +37,7 @@ export async function refreshDatabase(database: Database): Promise<void> {
   );
   const switchers = await switcherDataTable.getAllValues();
 
-  database.setAllRecipes(toFlattenData(parsed));
+  database.setAllRecipes(removeDuplicates(toFlattenData(parsed)));
   database.setPlayersRoster(roster);
   database.setWorldBuffAssignments(worldBuffAssignments);
   database.setWorldBuffHistory(worldBuffHistory);

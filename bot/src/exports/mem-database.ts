@@ -117,3 +117,11 @@ export function toFlattenData(
 
   return professionPivot.flatMap((t) => t).flatMap((t) => t);
 }
+
+export function removeDuplicates(recipeInfo: RecipeInfo[]): RecipeInfo[] {
+  return [
+    ...new Map(
+      recipeInfo.map((t) => [`${t.crafter}-${t.wowHeadId}`, t]),
+    ).values(),
+  ];
+}
