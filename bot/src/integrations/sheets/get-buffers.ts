@@ -67,11 +67,29 @@ export interface WorldBuffHistory {
   }[];
 }
 
+function numberToColumn(numberValue: number) {
+  let column = "";
+  let value = numberValue;
+
+  while (value >= 0) {
+    column = String.fromCharCode((value % 26) + 65) + column;
+    value = Math.floor(value / 26) - 1;
+  }
+  return column;
+}
+
+function columnToNumber(column: string): number {
+  let num = 0;
+  for (let i = 0; i < column.length; i += 1) {
+    num = num * 26 + (column.charCodeAt(i) - 65 + 1);
+  }
+  return num - 1;
+}
+
 function incrementLetter(letter: string, incrementValue: number = 1): string {
-  return (
-    letter.substring(0, letter.length - 1) +
-    String.fromCharCode(letter.charCodeAt(letter.length - 1) + incrementValue)
-  );
+  const letterValue = columnToNumber(letter);
+
+  return numberToColumn(letterValue + incrementValue);
 }
 
 function getColumnRanges(
