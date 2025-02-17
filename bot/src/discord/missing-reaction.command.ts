@@ -20,7 +20,7 @@ export const getMissingRaiderFromEmojiReaction: CommandHandler<Database> = async
     return;
   }
   const emoji = interaction.options.getString("emoji");
-  if (!messageId) {
+  if (!emoji) {
     await reply("Please provide an emoji.");
     return;
   }
