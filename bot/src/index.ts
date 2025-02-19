@@ -1,22 +1,29 @@
 /* eslint-disable no-console */
 // import { createClient } from "./discord/create-client";
 import { fetchEvent } from "./integrations/raid-helper/raid-helper-client";
-import { refreshDatabase } from "./exports/utils";
 import { Database } from "./exports/mem-database";
-import { updateWorldBuffHistory } from "./flows/update-wb-history/recurring-job";
-import { createSheetClient } from "./integrations/sheets/config";
+import {
+  getRosterFromRaidEvent,
+  toRaidAssignmentRoster,
+} from "./flows/roster-helper";
+import { refreshRoster } from "./exports/utils";
+import { getLoathebAssignment } from "./classic-wow/raids/naxxramas/loatheb";
 
 async function main() {
-  const raidEvent = await fetchEvent("1338822038256619592");
+  const database = new Database();
+  const raidEvent = await fetchEvent("1339627114521034803");
   if (!raidEvent) {
     return;
   }
 
-  const database = new Database();
-  const sheetClient = createSheetClient();
+  await refreshRoster(database);
 
-  await refreshDatabase(database);
-  await updateWorldBuffHistory(sheetClient, database, raidEvent);
+  const roster = await getRosterFromRaidEvent(raidEvent, database);
+  const raidAssignmentRoster = toRaidAssignmentRoster(roster);
+
+  const stuff = await getLoathebAssignment(raidAssignmentRoster);
+
+  console.log(stuff.officerAssignment);
 }
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
