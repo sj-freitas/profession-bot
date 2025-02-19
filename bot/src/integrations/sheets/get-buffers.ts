@@ -211,6 +211,10 @@ export async function getAllBuffHistory(
     });
 
     index += 1;
+
+    await new Promise((resolve) => {
+      setTimeout(resolve, 5000);
+    });
   }
 
   return groupHistory;
