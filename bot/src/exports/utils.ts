@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { CONFIG } from "../config";
-import { createSheetClient } from "../integrations/sheets/config";
+import { createSheetClient, SheetClient } from "../integrations/sheets/config";
 import {
   getAllBuffHistory,
   getWorldBuffInfo,
@@ -11,21 +11,30 @@ import { SwitcherRoleDataTable } from "../integrations/sheets/switcher-role-data
 import { Database, removeDuplicates, toFlattenData } from "./mem-database";
 import { getGuildInfo } from "./wowHeadIntegration";
 
-export async function refreshDatabase(database: Database): Promise<void> {
-  console.log("Database refresh started.");
-
-  const sheetClient = createSheetClient();
+export async function refreshRoster(
+  database: Database,
+  sheetClient: SheetClient = createSheetClient(),
+): Promise<void> {
   const playerInfoTable = new PlayerInfoTable(
     sheetClient,
     CONFIG.GUILD.INFO_SHEET,
   );
+  const roster = await playerInfoTable.getAllValues();
+
+  database.setPlayersRoster(roster);
+}
+
+export async function refreshDatabase(database: Database): Promise<void> {
+  console.log("Database refresh started.");
+
+  const sheetClient = createSheetClient();
   const switcherDataTable = new SwitcherRoleDataTable(
     sheetClient,
     CONFIG.GUILD.INFO_SHEET,
   );
   const data = await readProfessionData(sheetClient, CONFIG.GUILD.INFO_SHEET);
   const parsed = await getGuildInfo(data.professionData);
-  const roster = await playerInfoTable.getAllValues();
+
   const worldBuffAssignments = await getWorldBuffInfo(
     sheetClient,
     CONFIG.GUILD.INFO_SHEET,
@@ -38,10 +47,11 @@ export async function refreshDatabase(database: Database): Promise<void> {
   const switchers = await switcherDataTable.getAllValues();
 
   database.setAllRecipes(removeDuplicates(toFlattenData(parsed)));
-  database.setPlayersRoster(roster);
   database.setWorldBuffAssignments(worldBuffAssignments);
   database.setWorldBuffHistory(worldBuffHistory);
   database.setSwitchers(switchers);
+
+  await refreshRoster(database, sheetClient);
 
   console.log("Database refresh complete.");
 }

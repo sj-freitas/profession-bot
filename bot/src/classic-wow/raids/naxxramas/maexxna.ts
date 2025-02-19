@@ -86,7 +86,7 @@ export function exportToRaidWarning(
   return Object.entries(groupedByAssignmentTypeId)
     .map(
       ([assignmentId, details]) =>
-        `/rw ${assignmentId}: ${details.map((t) => `${t.targetInfo.icon.symbol} ${t.targetInfo.name} = ${t.assignees.map((char) => char.name).join(", ")}`).join(" || ")}`,
+        `/rw ${assignmentId}: ${details.map((t) => `${t.targetInfo.icon.symbol} ${t.targetInfo.name} = ${t.assignees.map((char, idx) => `${idx + 1} ${char.name}`).join(" > ")}`).join(" || ")}`,
     )
     .join("\n");
 }
@@ -113,7 +113,11 @@ ${exportToRaidWarning(assignments)}
   const announcementAssignment = exportToDiscord(assignments, players);
   const officerAssignment = `\`\`\`
 ${exportToRaidWarning(assignments)}
-\`\`\``;
+\`\`\`
+
+### As a list for people to see:
+The characters are in order and should cycle through
+${assignments[0].assignments[0].characters.map((x, idx) => ` ${idx + 1}. ${x.name}`).join("\n")}`;
 
   return Promise.resolve({
     dmAssignment,
