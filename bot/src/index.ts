@@ -7,11 +7,11 @@ import {
   toRaidAssignmentRoster,
 } from "./flows/roster-helper";
 import { refreshRoster } from "./exports/utils";
-import { getLoathebAssignment } from "./classic-wow/raids/naxxramas/loatheb";
+import { getCthunAssignment } from "./classic-wow/raids/temple-of-aq/cthun";
 
 async function main() {
   const database = new Database();
-  const raidEvent = await fetchEvent("1339627114521034803");
+  const raidEvent = await fetchEvent("1341056665361059841");
   if (!raidEvent) {
     return;
   }
@@ -21,9 +21,9 @@ async function main() {
   const roster = await getRosterFromRaidEvent(raidEvent, database);
   const raidAssignmentRoster = toRaidAssignmentRoster(roster);
 
-  const stuff = await getLoathebAssignment(raidAssignmentRoster);
+  const stuff = await getCthunAssignment(raidAssignmentRoster);
 
-  console.log(stuff.officerAssignment);
+  console.log(stuff.announcementAssignment);
 }
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
