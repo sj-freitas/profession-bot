@@ -17,6 +17,14 @@ import { drawImageAssignments } from "./cthun-images";
 export const IDEAL_NUMBER_OF_MELEE_PER_GROUP = 2;
 export const ABSOLUTE_MAXIMUM_AMOUNT_OF_MELEE_IN_GROUP = 3;
 
+function swapInArray<T>(array: T[], a: number, b: number): void {
+  const temp = array[a];
+  const originalArray = array;
+
+  originalArray[a] = array[b];
+  originalArray[b] = temp;
+}
+
 export function makeAssignments(roster: Character[]): Raid {
   const allHealers = roster.filter((t) => t.role === "Healer");
   const allMeleeBuffers = roster
@@ -138,6 +146,81 @@ export function makeAssignments(roster: Character[]): Raid {
 
     return { slots } as Group;
   });
+
+  // Put all tanks in the last groups
+  // either 1,2,7,8 or in 0 based index: (0, 1, 6, 7)
+  const TOP_GROUPS = [0, 1, 6, 7].filter((t) => refinedGroups[t] !== undefined);
+  const allTankGroupIndexes = refinedGroups
+    .map((t, index) => ({
+      isTankGroup: t.slots.find((x) => x?.role === "Tank"),
+      groupIndex: index,
+    }))
+    .filter((t) => t.isTankGroup)
+    .map((t) => t.groupIndex);
+
+  const availableGroups = TOP_GROUPS.filter(
+    (t) => !allTankGroupIndexes.find((x) => t === x),
+  );
+  const tankGroupsThatNeedToBeSwapped = allTankGroupIndexes.filter(
+    (t) => !TOP_GROUPS.find((x) => t === x),
+  );
+  tankGroupsThatNeedToBeSwapped.forEach((curr, index) => {
+    const currTankGroupToMove = curr;
+    const currDestinationGroup = availableGroups[index];
+
+    swapInArray(refinedGroups, currTankGroupToMove, currDestinationGroup);
+  });
+
+  // Ensure that ferals are always in back groups
+  // either 3,5,4,6 or in 0 based index: (2, 4, 3, 5])
+  const BOTTOM_GROUPS = [2, 4, 3, 5].filter(
+    (t) => refinedGroups[t] !== undefined,
+  );
+  const feralDamageDealersThatNeedToBeMoved = refinedGroups
+    .map((t, index) => ({
+      feralDamageDealers:
+        t?.slots.filter((x) => x?.role === "Melee" && x.class === "Druid") ??
+        [],
+      groupIndex: index,
+    }))
+    .filter(
+      (t) =>
+        t.feralDamageDealers.length > 0 &&
+        !BOTTOM_GROUPS.find((x) => t.groupIndex === x),
+    );
+  const availableGroupForFerals = BOTTOM_GROUPS.filter(
+    (t) => !feralDamageDealersThatNeedToBeMoved.find((x) => t === x.groupIndex),
+  );
+  feralDamageDealersThatNeedToBeMoved
+    .map((x) =>
+      x.feralDamageDealers.map((y) => ({
+        character: y,
+        groupIndex: x.groupIndex,
+      })),
+    )
+    .flatMap((t) => t)
+    .forEach((curr, index) => {
+      const currFeralThatNeedsToBeMoved = curr;
+      const currDestinationGroup =
+        refinedGroups[availableGroupForFerals[index]];
+      const meleeToSwap = currDestinationGroup.slots.find(
+        (t) => t?.role === "Melee" && t.class !== "Druid",
+      );
+      if (!meleeToSwap) {
+        // Nothing we can do here.
+        return;
+      }
+
+      const indexOfSwap = currDestinationGroup.slots.indexOf(meleeToSwap);
+      currDestinationGroup.slots[indexOfSwap] =
+        currFeralThatNeedsToBeMoved.character;
+      const currentFeralGroup =
+        refinedGroups[currFeralThatNeedsToBeMoved.groupIndex];
+      const indexOfCurrentFeral = currentFeralGroup.slots.indexOf(
+        currFeralThatNeedsToBeMoved.character,
+      );
+      currentFeralGroup.slots[indexOfCurrentFeral] = meleeToSwap;
+    });
 
   return {
     groups: refinedGroups,
