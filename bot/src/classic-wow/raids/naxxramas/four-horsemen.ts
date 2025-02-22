@@ -69,7 +69,7 @@ export function makeAssignments(roster: Character[]): TargetAssignment[] {
       assignments: [
         {
           id: `${THANE_KORTHAZZ.raidTarget.name} tanking`,
-          description: `Initial tanking and healing`,
+          description: `Initial tanking and healing. Position is initially East`,
           characters: [frontTanks[0], ...meleeHealers],
         },
       ],
@@ -79,7 +79,7 @@ export function makeAssignments(roster: Character[]): TargetAssignment[] {
       assignments: [
         {
           id: `${HIGHLORD_MOGRAINE.raidTarget.name} tanking`,
-          description: `Initial tanking and healing`,
+          description: `Initial tanking and healing. Position is initially North`,
           characters: [frontTanks[1], rangedHealer],
         },
       ],
@@ -89,7 +89,7 @@ export function makeAssignments(roster: Character[]): TargetAssignment[] {
       assignments: [
         {
           id: `${LADY_BLAUMEUX.raidTarget.name} tanking`,
-          description: `Initial tanking and healing`,
+          description: `Initial tanking and healing. Position is always South`,
           characters: [backTanks[0], backHealer],
         },
       ],
@@ -99,7 +99,7 @@ export function makeAssignments(roster: Character[]): TargetAssignment[] {
       assignments: [
         {
           id: `${SIR_ZELIEK.raidTarget.name} tanking`,
-          description: `Initial tanking and healing`,
+          description: `Initial tanking and healing. Position is always West`,
           characters: [backTanks[1], backHealer],
         },
       ],
