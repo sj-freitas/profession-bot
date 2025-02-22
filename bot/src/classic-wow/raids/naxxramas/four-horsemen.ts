@@ -10,6 +10,7 @@ import {
 import { RaidAssignmentResult } from "../assignment-config";
 import { RaidAssignmentRoster } from "../raid-assignment-roster";
 import { shuffleArray, sortByClasses } from "../utils";
+import { drawImageAssignments } from "./four-horsemen-images";
 
 const THANE_KORTHAZZ = {
   raidTarget: {
@@ -135,8 +136,8 @@ interface AssignmentInfo {
 export function exportToRaidWarning(
   fourHorsemenAssignment: TargetAssignment[],
 ): string {
-  const groupedByAssignmentTypeId = fourHorsemenAssignment.reduce<AssignmentInfo>(
-    (res, curr) => {
+  const groupedByAssignmentTypeId =
+    fourHorsemenAssignment.reduce<AssignmentInfo>((res, curr) => {
       curr.assignments.forEach((t) => {
         res[t.id] = [
           ...(res[t.id] ?? []),
@@ -148,9 +149,7 @@ export function exportToRaidWarning(
       });
 
       return res;
-    },
-    {},
-  );
+    }, {});
 
   return Object.entries(groupedByAssignmentTypeId)
     .map(
@@ -160,7 +159,7 @@ export function exportToRaidWarning(
     .join("\n");
 }
 
-export function getFourHorsemenAssignmentAssignment({
+export async function getFourHorsemenAssignmentAssignment({
   characters,
   players,
 }: RaidAssignmentRoster): Promise<RaidAssignmentResult> {
@@ -186,11 +185,27 @@ ${exportToRaidWarning(assignments)}
 ${exportToRaidWarning(assignments)}
 \`\`\``;
 
+  const fourHorsemenImageBuffer = await drawImageAssignments(
+    assignments.map((t) => {
+      const [tank, ...healers] = t.assignments[0].characters.map((x) => x.name);
+      return {
+        tank,
+        healers,
+      };
+    }),
+  );
+
   return Promise.resolve({
     dmAssignment,
     announcementTitle: `### Four Horsemen Tank Assignment`,
     announcementAssignment,
     officerTitle: `### Four Horsemen assignments to post as a \`/rw\` in-game`,
+    files: [
+      {
+        attachment: fourHorsemenImageBuffer,
+        name: "four-horsemen-assignments.png",
+      },
+    ],
     officerAssignment,
   });
 }

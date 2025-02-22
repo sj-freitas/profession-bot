@@ -3,9 +3,9 @@ import * as path from "path";
 import { createCanvas, loadImage } from "canvas";
 
 type Orientation = "left" | "right" | "center";
-type CthunGroupCoordinates = [x: number, y: number, orientation: Orientation];
+type ImageCoordinates = [x: number, y: number, orientation: Orientation];
 
-const THREE_GROUPS: CthunGroupCoordinates[] = [
+const THREE_GROUPS: ImageCoordinates[] = [
   [320, 150, "right"],
   [750, 150, "left"],
   [540, 460, "center"],
