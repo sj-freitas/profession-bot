@@ -1,4 +1,5 @@
 import { Table, toTableMarkdown } from "../../exports/markdown";
+import { Class } from "../../integrations/raider-io/types";
 import { Character, Group, Raid } from "../raid-assignment";
 
 export function pickOnePutOnTop<T>(array: T[], preselected?: T): T[] {
@@ -123,4 +124,22 @@ export function exportRaidGroupsToTable(
   }
 
   return `${tables.map((t) => `\n${toTableMarkdown(t, maxWidthOverride)}`).join("\n")}`;
+}
+
+export function sortByClasses(
+  characters: Character[],
+  classNames: Class[],
+): Character[] {
+  return characters.sort((a, b) => {
+    for (const currClass of classNames) {
+      if (b.class === currClass) {
+        return +1;
+      }
+      if (a.class === currClass) {
+        return -1;
+      }
+    }
+
+    return 0;
+  });
 }

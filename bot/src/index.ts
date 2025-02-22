@@ -7,9 +7,11 @@ import {
   toRaidAssignmentRoster,
 } from "./flows/roster-helper";
 import { refreshRoster } from "./exports/utils";
-import { getCthunAssignment } from "./classic-wow/raids/temple-of-aq/cthun";
+import { getFourHorsemenAssignmentAssignment } from "./classic-wow/raids/naxxramas/four-horsemen";
+import { createClient } from "./discord/create-client";
 
 async function main() {
+  const discordClient = await createClient();
   const database = new Database();
   const raidEvent = await fetchEvent("1341056665361059841");
   if (!raidEvent) {
@@ -21,9 +23,20 @@ async function main() {
   const roster = await getRosterFromRaidEvent(raidEvent, database);
   const raidAssignmentRoster = toRaidAssignmentRoster(roster);
 
-  const stuff = await getCthunAssignment(raidAssignmentRoster);
+  const stuff = await getFourHorsemenAssignmentAssignment(raidAssignmentRoster);
 
-  console.log(stuff.announcementAssignment);
+  console.log(stuff.dmAssignment);
+  
+  const user = await discordClient.users.fetch("373190463080890378");
+  if (!user) {
+    return;
+  }
+  await user.send({
+    content: stuff.dmAssignment.join("\n"),
+    files: stuff.files,
+  })
+
+  await discordClient.destroy();
 }
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises

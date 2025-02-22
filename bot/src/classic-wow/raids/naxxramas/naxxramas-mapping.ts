@@ -1,5 +1,6 @@
 import { AssignmentConfig } from "../assignment-config";
 import { getFaerlinaAssignment } from "./faerlina";
+import { getFourHorsemenAssignmentAssignment } from "./four-horsemen";
 import { getKelThuzadAssignment } from "./kel-thuzad";
 import { getLoathebAssignment } from "./loatheb";
 import { getMaexxnaAssignment } from "./maexxna";
@@ -12,6 +13,7 @@ export const NAXXRAMAS: AssignmentConfig = {
     getMaexxnaAssignment,
     getLoathebAssignment,
     getPatchwerkAssignment,
+    getFourHorsemenAssignmentAssignment,
     getKelThuzadAssignment,
   ],
 };
