@@ -18,6 +18,7 @@ import { getMaexxnaAssignment } from "../classic-wow/raids/naxxramas/maexxna";
 import { getPatchwerkAssignment } from "../classic-wow/raids/naxxramas/patchwerk";
 import { getLoathebAssignment } from "../classic-wow/raids/naxxramas/loatheb";
 import { getFaerlinaAssignment } from "../classic-wow/raids/naxxramas/faerlina";
+import { getFourHorsemenAssignmentAssignment } from "../classic-wow/raids/naxxramas/four-horsemen";
 
 type RaidAssignment = (
   roster: RaidAssignmentRoster,
@@ -33,6 +34,7 @@ export const ENCOUNTER_HANDLERS: { [key: string]: RaidAssignment } = {
   "naxx-maexxna": getMaexxnaAssignment,
   "naxx-loatheb": getLoathebAssignment,
   "naxx-patchwerk": getPatchwerkAssignment,
+  "naxx-4hm": getFourHorsemenAssignmentAssignment,
   "naxx-kelthuzad": getKelThuzadAssignment,
 };
 

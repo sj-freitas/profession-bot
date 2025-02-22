@@ -7,7 +7,7 @@ import {
   toRaidAssignmentRoster,
 } from "./flows/roster-helper";
 import { refreshRoster } from "./exports/utils";
-import { getCthunAssignment } from "./classic-wow/raids/temple-of-aq/cthun";
+import { getFourHorsemenAssignmentAssignment } from "./classic-wow/raids/naxxramas/four-horsemen";
 
 async function main() {
   const database = new Database();
@@ -21,9 +21,9 @@ async function main() {
   const roster = await getRosterFromRaidEvent(raidEvent, database);
   const raidAssignmentRoster = toRaidAssignmentRoster(roster);
 
-  const stuff = await getCthunAssignment(raidAssignmentRoster);
+  const stuff = await getFourHorsemenAssignmentAssignment(raidAssignmentRoster);
 
-  console.log(stuff.announcementAssignment);
+  console.log(stuff.dmAssignment);
 }
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises

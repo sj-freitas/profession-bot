@@ -3,7 +3,7 @@ import { SheetClient } from "../../integrations/sheets/config";
 import { Player } from "../../integrations/sheets/get-players";
 import { RaidInfoTable } from "../../integrations/sheets/raid-info";
 import { getRaid } from "../../integrations/softres/softres-client";
-import { filterTwo } from "../../lib/array-utilts";
+import { filterTwo } from "../../lib/array-utils";
 import { CharacterWithMetadata, Roster } from "../roster-helper";
 
 function getCharacterThatSoftReserved(

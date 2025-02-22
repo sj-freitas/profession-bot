@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-extend-native */
 import { Class } from "../../integrations/raider-io/types";
-import { filterTwo } from "../../lib/array-utilts";
+import { filterTwo } from "../../lib/array-utils";
 import { CLASS_ROLE_MAP } from "../class-role";
 import {
   Character,

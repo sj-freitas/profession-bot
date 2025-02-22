@@ -1,5 +1,5 @@
 import { Player } from "../../../integrations/sheets/get-players";
-import { filterTwo, Predicate } from "../../../lib/array-utilts";
+import { filterTwo, Predicate } from "../../../lib/array-utils";
 import {
   ALL_RAID_TARGETS,
   AssignmentDetails,
