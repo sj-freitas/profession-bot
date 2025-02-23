@@ -1,8 +1,9 @@
-import { Client } from "discord.js";
+import { Client, GuildMember } from "discord.js";
 import { Database } from "../../exports/mem-database";
 import { CONFIG } from "../../config";
 import { getRosterFromRaidEvent } from "../roster-helper";
 import {
+  fetchMemberOrNull,
   findMessageOfBotInHistory,
   sendMessageToChannel,
 } from "../../discord/utils";
@@ -48,9 +49,12 @@ export async function tryNotifyOfficersMissingSignUps(
   const guild = await discordClient.guilds.fetch(DISCORD_SERVER_ID);
   const players = database.getPlayersRoster();
   const members = await Promise.all(
-    players.map(async (t) => guild.members.fetch(t.discordId)),
+    players.map(async (t) => fetchMemberOrNull(guild, t.discordId)),
   );
   const guildRaiders = members
+    .filter(
+      (member: GuildMember | null): member is GuildMember => member !== null,
+    )
     .filter((member) => {
       const roles = member.roles.valueOf();
 

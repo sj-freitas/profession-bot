@@ -1,9 +1,10 @@
-import { Client } from "discord.js";
+import { Client, GuildMember } from "discord.js";
 import { CONFIG } from "../../config";
 import { AtieshCandidatesTable } from "../../integrations/sheets/atiesh/atiesh-candidates-data";
 import { AtieshPostConfigTable } from "../../integrations/sheets/atiesh/atiesh-post-config";
 import { createSheetClient } from "../../integrations/sheets/config";
 import { PlayerInfoTable } from "../../integrations/sheets/player-info-table";
+import { fetchMemberOrNull } from "../../discord/utils";
 
 const ACCEPTED_ATIESH_CLASSES = new Set(["Mage", "Priest", "Warlock", "Druid"]);
 
@@ -69,9 +70,10 @@ export async function updateListOfAtieshCandidates(
   }
 
   const members = await Promise.all(
-    userIds.map(async (t) => server.members.fetch(t)),
+    userIds.map(async (t) => fetchMemberOrNull(server, t)),
   );
   const atieshCandidates = members
+    .filter((t): t is GuildMember => t !== null)
     .filter((t) =>
       t.roles.cache.find((x) => ACCEPTED_ATIESH_CLASSES.has(x.name)),
     )

@@ -1,6 +1,8 @@
 import {
   AttachmentBuilder,
   Client,
+  Guild,
+  GuildMember,
   Message,
   MessageFlags,
   TextChannel,
@@ -135,4 +137,25 @@ export async function createOrEditDiscordMessage(
     flags: MessageFlags.SuppressEmbeds,
     files,
   });
+}
+
+/**
+ * When a member isn't found discord throws an exception. Since we don't want this flow we wrap this in
+ * a function that returns null instead of throwing an exception.
+ */
+export async function fetchMemberOrNull(
+  guild: Guild,
+  memberId: string,
+): Promise<GuildMember | null> {
+  try {
+    const member = await guild.members.fetch(memberId);
+
+    return member;
+  } catch (err: unknown) {
+    if (err && (err as any).status === 404) {
+      return null;
+    }
+
+    throw err;
+  }
 }

@@ -131,7 +131,7 @@ export function findNextAssignment({
 
   // The plan is to get the one that buffed less,
   // recency bias can be a thing, we can address it later
-  const preGroupConfig = new Map<keyof AssignmentConfig, (Player | null)[]>();
+  const preGroupConfig = new Map<keyof AssignmentConfig, (Player | null | undefined)[]>();
   for (const currKey of Object.keys(assignmentConfig)) {
     const buffName = currKey as keyof AssignmentConfig;
     const assignees = findPlayersForBuff(
@@ -140,7 +140,7 @@ export function findNextAssignment({
       availableSortedPlayers,
       RAID_DURATION_IN_HOURS,
       numberOfGroups,
-    ).map((t) => (t !== null ? (rosterMap.get(t) ?? null) : null));
+    ).map((t) => (t !== null && t !== undefined ? (rosterMap.get(t) ?? null) : null));
 
     preGroupConfig.set(buffName, assignees);
   }
