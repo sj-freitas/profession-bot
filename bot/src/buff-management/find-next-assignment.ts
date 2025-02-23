@@ -15,9 +15,9 @@ export interface GroupConfig {
   dmf: Player;
   dragon: Player;
   zg: Player;
-  rend: [Player, Player?];
-  firewater: [Player, Player?];
-  songflower: [Player, Player?];
+  rend: [Player?, Player?];
+  firewater: [Player?, Player?];
+  songflower: [Player?, Player?];
 }
 
 export interface BuffAssignment {

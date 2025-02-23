@@ -19,7 +19,14 @@ export function findBuff(
   const found = entries.find((t) => t.buff.shortName === buff);
 
   if (!found) {
-    throw new Error(`Unexpected buff ${buff}`!);
+    return {
+      buff: {
+        longName: buff,
+        shortName: buff,
+        duration: 0,
+      },
+      assignees: [],
+    }
   }
 
   return found;
@@ -42,9 +49,9 @@ export function getAssignees(
   return assignees;
 }
 
-export function getFirstTwoOfArray<T>(array: T[]): [T, T?] {
+export function getFirstTwoOfArray<T>(array: T[]): [T?, T?] {
   if (array.length === 0) {
-    throw new Error(`unexpected array with 1 element!`);
+    return [];
   }
 
   return [array[0], array[1]];
