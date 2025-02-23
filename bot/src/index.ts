@@ -9,6 +9,8 @@ import {
 import { refreshRoster } from "./exports/utils";
 import { getFourHorsemenAssignmentAssignment } from "./classic-wow/raids/naxxramas/four-horsemen";
 import { createClient } from "./discord/create-client";
+import { CONFIG } from "./config";
+import { fetchMemberOrNull } from "./discord/utils";
 
 async function main() {
   const discordClient = await createClient();
@@ -26,7 +28,6 @@ async function main() {
   const stuff = await getFourHorsemenAssignmentAssignment(raidAssignmentRoster);
 
   console.log(stuff.dmAssignment);
-  
   const user = await discordClient.users.fetch("373190463080890378");
   if (!user) {
     return;
@@ -34,7 +35,7 @@ async function main() {
   await user.send({
     content: stuff.dmAssignment.join("\n"),
     files: stuff.files,
-  })
+  });
 
   await discordClient.destroy();
 }

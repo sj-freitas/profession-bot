@@ -5,6 +5,7 @@ import {
 } from "../../integrations/sheets/player-info-table";
 import { SheetClient } from "../../integrations/sheets/config";
 import { CONFIG } from "../../config";
+import { fetchMemberOrNull } from "../../discord/utils";
 
 const { INFO_SHEET, DISCORD_SERVER_ID } = CONFIG.GUILD;
 const IGNORE_ROLES = new Set(["@everyone", "New joiner"]);
@@ -29,7 +30,8 @@ export async function automaticFlushOfDiscordRoles(
   const allDiscordUsers = (
     await Promise.all(
       allPlayers.map(async (currPlayer) => {
-        const currentMember = await guildInfo.members.fetch(
+        const currentMember = await fetchMemberOrNull(
+          guildInfo,
           currPlayer.discordId,
         );
         if (!currentMember) {
