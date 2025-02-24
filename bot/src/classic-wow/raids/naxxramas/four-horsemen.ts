@@ -38,20 +38,21 @@ const LADY_BLAUMEUX = {
 };
 
 export function makeAssignments(roster: Character[]): TargetAssignment[] {
-  const backTanks = sortByClasses(
-    shuffleArray(
-      roster.filter(
-        (t) =>
-          (t.role === "Tank" && t.class === "Warlock") ||
-          (t.class === "Priest" && t.role === "Ranged"),
-      ),
-    ),
-    ["Warlock", "Priest"],
+  const allTanks = sortByClasses(
+    roster.filter((t) => t.role === "Tank"),
+    ["Warrior", "Druid", "Paladin", "Rogue", "Warlock"],
   );
-  const frontTanks = shuffleArray(
-    roster.filter((t) => t.role === "Tank" && t.class !== "Warlock"),
-  );
-
+  const [firstTank, secondTank, ...restOfTanks] = allTanks;
+  const frontTanks = shuffleArray([firstTank, secondTank]);
+  const allAvailableBackTanks = [
+    ...restOfTanks,
+    ...roster.filter((t) => t.class === "Priest" && t.role === "Ranged"),
+  ];
+  const [backTankOne, backTankTwo] = sortByClasses(allAvailableBackTanks, [
+    "Warlock",
+    "Priest",
+  ]);
+  const backTanks = shuffleArray([backTankOne, backTankTwo]);
   const healers = roster.filter((t) => t.role === "Healer");
   const [backHealers, otherHealers] = filterTwo(
     healers,

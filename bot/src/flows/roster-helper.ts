@@ -19,7 +19,7 @@ import { Database } from "../exports/mem-database";
 import { RaidAssignmentRoster } from "../classic-wow/raids/raid-assignment-roster";
 import { Switcher } from "../integrations/sheets/switcher-role-data";
 
-const tankNumberBasedOnRosterSize = [0, 1, 2, 2, 2, 3, 3, 3, 3];
+const tankNumberBasedOnRosterSize = [0, 1, 2, 2, 2, 2, 2, 2, 2];
 const healerNumberBasedOnRosterSize = [0, 1, 2, 2, 3, 3, 3, 4, 4];
 
 function getMinNumberOfTanksBasedOnRosterSize(rosterCount: number): number {
