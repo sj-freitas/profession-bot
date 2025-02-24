@@ -1,20 +1,14 @@
 /* eslint-disable no-console */
 // import { createClient } from "./discord/create-client";
-import { fetchEvent } from "./integrations/raid-helper/raid-helper-client";
 import { Database } from "./exports/mem-database";
 import { refreshDatabase } from "./exports/utils";
-import { getAssignmentConfigAndHistory } from "./flows/raid-assignments/world-buff-assignments";
+import { pollChannelsForWorldBuffHistory } from "./flows/update-wb-history/recurring-job";
 
 async function main() {
   const database = new Database();
-  const raidEvent = await fetchEvent("1341056665361059841");
-  if (!raidEvent) {
-    return;
-  }
 
   await refreshDatabase(database);
-  
-  getAssignmentConfigAndHistory(database);
+  await pollChannelsForWorldBuffHistory(database, ["1289209696263077918"]);
 }
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
