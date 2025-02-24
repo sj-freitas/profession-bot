@@ -92,7 +92,7 @@ function incrementLetter(letter: string, incrementValue: number = 1): string {
   return numberToColumn(letterValue + incrementValue);
 }
 
-function getColumnRanges(
+export function getColumnRanges(
   startColumn: string,
   numberOfGroups: number,
   index: number,
@@ -101,16 +101,6 @@ function getColumnRanges(
     incrementLetter(startColumn, index * numberOfGroups),
     incrementLetter(startColumn, index * numberOfGroups + numberOfGroups - 1),
   ];
-}
-
-function isInvalidGroup(nextGroup: any[][] | null | undefined): boolean {
-  if (nextGroup === null || nextGroup === undefined) {
-    return false;
-  }
-
-  // Possibly more checks here
-
-  return true;
 }
 
 const WORLD_BUFF_HISTORY_TAB_NAME = "WBHistory";
@@ -135,18 +125,18 @@ export async function addToHistory(
   spreadsheetId: string,
   groups: string[][],
 ): Promise<void> {
-  const [allGroupNames] =
+  const [allGroups] =
     (await readGoogleSheet(
       sheetClient,
       spreadsheetId,
       WORLD_BUFF_HISTORY_TAB_NAME,
       "A1:ZZ1",
     )) ?? [];
-  if (!allGroupNames) {
+  if (!allGroups) {
     return;
   }
 
-  const startColumn = incrementLetter("A", allGroupNames.length);
+  const startColumn = incrementLetter("A", allGroups.length);
   await sheetClient.spreadsheets.values.append({
     spreadsheetId,
     range: `${WORLD_BUFF_HISTORY_TAB_NAME}!${calculateRange({ x: startColumn, y: 1 }, 1)}`, // : "A3:C3"
@@ -156,6 +146,35 @@ export async function addToHistory(
       values: groups,
     },
   });
+}
+
+function readColumns(
+  table: string[][],
+  position: number,
+  numberOfColumns: number,
+): string[][] | null {
+  const numberOfRows = table.length;
+  const readOffset = numberOfColumns * position;
+  const result: string[][] = [];
+
+  // Validate out of bounds
+  for (let i = 0; i < numberOfColumns; i += 1) {
+    const currGroupTitle = table[0][readOffset + i];
+    if (!currGroupTitle) {
+      return null;
+    }
+  }
+
+  for (let i = 0; i < numberOfRows; i += 1) {
+    for (let j = 0; j < numberOfColumns; j += 1) {
+      const currArray = result[j] ?? [];
+
+      currArray.push(table[i][j + readOffset]);
+      result[j] = currArray;
+    }
+  }
+
+  return result;
 }
 
 export async function getAllBuffHistory(
@@ -169,37 +188,30 @@ export async function getAllBuffHistory(
 
   let index = 0;
 
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    const [left, right] = getColumnRanges(START_COLUMN, numberOfGroups, index);
-    const range = `${left}:${right}`;
-    const readCurrGroup = await readGoogleSheet(
+  const allWorldBuffHistory =
+    (await readGoogleSheet(
       sheetClient,
       sheetId,
       WORLD_BUFF_HISTORY_TAB_NAME,
-      range,
-    );
+      `${START_COLUMN}1:ZZ`,
+    )) ?? [];
 
-    const hasValidGroups = isInvalidGroup(readCurrGroup);
-    if (!hasValidGroups) {
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const pivotedTable = readColumns(
+      allWorldBuffHistory,
+      index,
+      numberOfGroups,
+    );
+    if (pivotedTable === null) {
       break;
     }
 
-    const pivotedTable = ((readCurrGroup ?? []) as string[][]).reduce<
-      string[][]
-    >((res, currLine) => {
-      currLine.forEach((currEntry, idx) => {
-        res[idx] = res[idx] ?? [];
-        res[idx].push(currEntry);
-      });
-
-      return res;
-    }, []);
     const groups = pivotedTable.map(([title, ...rows]) => ({
       name: title,
       entries: rows.map((currRow, idx) => ({
         buff: buffData[idx].buffInfo,
-        assignees: currRow
+        assignees: (currRow ?? "")
           .split(";")
           .map((t) => t.trim())
           .filter((t) => Boolean(t)),
@@ -211,10 +223,6 @@ export async function getAllBuffHistory(
     });
 
     index += 1;
-
-    await new Promise((resolve) => {
-      setTimeout(resolve, 5000);
-    });
   }
 
   return groupHistory;
