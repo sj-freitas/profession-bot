@@ -91,7 +91,12 @@ export async function getGuildInfo(
         ),
         {
           ...existingRecipe,
-          crafters: [...new Set([...existingRecipe.crafters, currData.characterName]).values()],
+          crafters: [
+            ...new Set([
+              ...existingRecipe.crafters,
+              currData.characterName,
+            ]).values(),
+          ],
         },
       ],
     };

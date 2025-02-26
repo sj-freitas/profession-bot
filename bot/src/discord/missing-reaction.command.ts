@@ -2,11 +2,9 @@
 import { Database } from "../exports/mem-database";
 import { CommandHandler } from "./commandHandler";
 
-export const getMissingRaiderFromEmojiReaction: CommandHandler<Database> = async ({
-  interaction,
-  payload,
-  reply,
-}): Promise<void> => {
+export const getMissingRaiderFromEmojiReaction: CommandHandler<
+  Database
+> = async ({ interaction, payload, reply }): Promise<void> => {
   const messageId = interaction.options.getString("message-id");
   if (!messageId) {
     await reply("Please provide a message-id.");
@@ -37,10 +35,12 @@ export const getMissingRaiderFromEmojiReaction: CommandHandler<Database> = async
     .getPlayerInfos()
     .filter((t) => t.discordRoles.find((x) => x === "Raider"))
     .map((t) => t.discordId);
-  
+
   // Find missing
-  const missing = allRaiderUserIds.filter((t) => !reactionUserIds.find((x) => x === t));
+  const missing = allRaiderUserIds.filter(
+    (t) => !reactionUserIds.find((x) => x === t),
+  );
 
   await reply(`## Following players haven't reacted with ${emoji}
-${missing.map((t) => ` - <@${t}>`).join("\n")}`)
+${missing.map((t) => ` - <@${t}>`).join("\n")}`);
 };

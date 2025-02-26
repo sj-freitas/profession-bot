@@ -276,7 +276,7 @@ async function setupClient(database: Database): Promise<Client> {
     {
       id: "missing-reaction",
       handler: getMissingRaiderFromEmojiReaction,
-    }
+    },
   ]);
 
   return await createClient((client) => {

@@ -322,6 +322,8 @@ export function makeAssignments(roster: Character[]): Raid {
   };
 }
 
+// Look into languages to have slightly nicer markdown colors
+// https://gist.github.com/matthewzring/9f7bbfd102003963f9be7dbcf7d40e51
 export function getGenericRaidAssignment(
   roster: RaidAssignmentRoster,
 ): Promise<RaidAssignmentResult> {
@@ -329,7 +331,7 @@ export function getGenericRaidAssignment(
 
   const dmAssignment = [getRaidsortLuaAssignment(raid)];
   const announcementAssignment = `## Raid Groups
-\`\`\`
+\`\`\`prolog
 ${exportRaidGroupsToTable(raid)}
 \`\`\``;
 

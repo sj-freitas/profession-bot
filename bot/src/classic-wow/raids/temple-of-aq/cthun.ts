@@ -233,7 +233,7 @@ export function exportToDiscord(composition: Raid): string {
   return `Check your positioning on the map below, the map is dynamically generated and it **might change to optimize with the current setup.**
 Each melee has a "group leader" stack on top of your group's leader.
 
-\`\`\`
+\`\`\`prolog
 ${exportRaidGroupsToTable({
   groups: composition.groups.map(
     (t, groupIndex) =>
@@ -244,7 +244,7 @@ ${exportRaidGroupsToTable({
           index === 0
             ? {
                 ...s,
-                name: `${s.name} [${raidTargets[groupIndex].name}]`,
+                name: `${s.name} [${raidTargets[groupIndex].symbol}]`,
               }
             : s,
         ),
@@ -280,7 +280,7 @@ export async function getCthunAssignment(
 ### C'thun composition
 ${exportToDiscord(assignments)}`,
     `## WoW Raidsort Addon, do \`/raidsort import cthun\` and copy the following value:
-\`\`\`
+\`\`\`json
 ${exportToLuaTable(assignments)}
 \`\`\`
 ### The following image contains assignments for all groups:
@@ -291,7 +291,7 @@ ${exportToLuaTable(assignments)}
 **The following image contains assignments for all groups:**
 `;
   const officerAssignment = `Do \`/raidsort import cthun\` in-game to open the AddOn and copy the following value:
-\`\`\`
+\`\`\`json
 ${exportToLuaTable(assignments)}
 \`\`\`
 Once the setup is loaded you can \`/raidsort load cthun\` to sort groups or \`/raidsort invite cthun\` to invite members into the raid.

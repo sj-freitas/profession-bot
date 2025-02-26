@@ -26,7 +26,7 @@ export function findBuff(
         duration: 0,
       },
       assignees: [],
-    }
+    };
   }
 
   return found;
