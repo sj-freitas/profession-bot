@@ -8,30 +8,18 @@ import {
 } from "../../raid-assignment";
 import { RaidAssignmentResult } from "../assignment-config";
 import { RaidAssignmentRoster } from "../raid-assignment-roster";
-import { pickOneAtRandomAndRemoveFromArray } from "../utils";
+import { pickOneAtRandomAndRemoveFromArray, shuffleArray } from "../utils";
 import { drawImageAssignments } from "./kel-thuzad-images";
 
 export const NUMBER_OF_SIDES = 3;
 
-// Make this configurable
-const MELEE_LEADERS = [
-  "Paynex",
-  "Tearyn",
-  "Nibsinobsi",
-  "Snace",
-  "Ashgiver",
-  "Boomstronk",
-];
-
 export function makeAssignments(roster: Character[]): TargetAssignment[] {
   // Melee Group assignment
   const tanks = roster.filter((t) => t.role === "Tank");
-  const meleeDps = roster.filter((t) => t.role === "Melee");
-  const availableMeleeLeaders = meleeDps.filter((t) =>
-    MELEE_LEADERS.find((x) => x === t.name),
-  );
 
-  // We might not have enough leaders, in this case promote 1 at random
+  // Add an RNG element to the melee positioning
+  const meleeDps = shuffleArray(roster.filter((t) => t.role === "Melee"));
+  const availableMeleeLeaders: Character[] = [];
   let takeIndex = 0;
   for (let i = availableMeleeLeaders.length; i < NUMBER_OF_SIDES; i += 1) {
     availableMeleeLeaders.push(meleeDps[takeIndex]);

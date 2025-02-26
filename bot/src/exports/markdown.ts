@@ -72,7 +72,14 @@ function printEmptyLine(row: RowMetadata) {
  * | value 3  | value 4  |
  */
 
-export function toTableMarkdown(table: Table, maxWidthOverride?: number) {
+export function toTableMarkdown(unformatted: Table, maxWidthOverride?: number) {
+  const table = {
+    columns: unformatted.columns.map((t) => ({
+      ...t,
+      header: `'${t.header}'`,
+    })),
+  };
+
   const columnMetadata = table.columns.map((currColumn) => ({
     ...currColumn,
     width:

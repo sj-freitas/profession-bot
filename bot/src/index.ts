@@ -1,10 +1,13 @@
 /* eslint-disable no-console */
 // import { createClient } from "./discord/create-client";
-import { getFourHorsemenAssignmentAssignment } from "./classic-wow/raids/naxxramas/four-horsemen";
+import { getCthunAssignment } from "./classic-wow/raids/temple-of-aq/cthun";
 import { createClient } from "./discord/create-client";
 import { Database } from "./exports/mem-database";
 import { refreshDatabase } from "./exports/utils";
-import { getRosterFromRaidEvent, toRaidAssignmentRoster } from "./flows/roster-helper";
+import {
+  getRosterFromRaidEvent,
+  toRaidAssignmentRoster,
+} from "./flows/roster-helper";
 import { fetchEvent } from "./integrations/raid-helper/raid-helper-client";
 
 async function main() {
@@ -19,7 +22,7 @@ async function main() {
   const roster = await getRosterFromRaidEvent(raidEvent, database);
   const assignmentRoster = toRaidAssignmentRoster(roster);
 
-  const fourHorsemen = await getFourHorsemenAssignmentAssignment(assignmentRoster);
+  const bossAssignment = await getCthunAssignment(assignmentRoster);
 
   const user = await discordClient.users.fetch("373190463080890378");
   if (!user) {
@@ -27,9 +30,9 @@ async function main() {
   }
 
   await user.send({
-    content: fourHorsemen.dmAssignment.join("\n"),
-    files: fourHorsemen.files,
-  })
+    content: bossAssignment.dmAssignment.join("\n"),
+    files: bossAssignment.files,
+  });
 
   await discordClient.destroy();
 }
