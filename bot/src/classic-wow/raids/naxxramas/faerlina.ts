@@ -32,17 +32,18 @@ const RIGHT_ADDS = {
 export function makeAssignments(roster: Character[]): TargetAssignment[] {
   const tanks = roster.filter((t) => t.role === "Tank");
   const shuffledTanks = shuffleArray(tanks);
-
-  return [BOSS, LEFT_ADDS, RIGHT_ADDS].map((currTarget, idx) => ({
+  const assignments = [BOSS, LEFT_ADDS, RIGHT_ADDS].map((currTarget, idx) => ({
     ...currTarget,
     assignments: [
       {
         id: "Tanks",
         description: "tanked by",
-        characters: [shuffledTanks[idx]],
+        characters: [shuffledTanks[idx % shuffledTanks.length]],
       },
     ],
   }));
+
+  return assignments;
 }
 
 export function exportToDiscord(
