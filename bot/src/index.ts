@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 // import { createClient } from "./discord/create-client";
-import { getCthunAssignment } from "./classic-wow/raids/temple-of-aq/cthun";
+import { getFaerlinaAssignment } from "./classic-wow/raids/naxxramas/faerlina";
 import { createClient } from "./discord/create-client";
 import { Database } from "./exports/mem-database";
 import { refreshDatabase } from "./exports/utils";
@@ -22,7 +22,7 @@ async function main() {
   const roster = await getRosterFromRaidEvent(raidEvent, database);
   const assignmentRoster = toRaidAssignmentRoster(roster);
 
-  const bossAssignment = await getCthunAssignment(assignmentRoster);
+  const bossAssignment = await getFaerlinaAssignment(assignmentRoster);
 
   const user = await discordClient.users.fetch("373190463080890378");
   if (!user) {
