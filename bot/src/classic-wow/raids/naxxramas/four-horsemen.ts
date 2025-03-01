@@ -9,7 +9,7 @@ import {
 } from "../../raid-assignment";
 import { RaidAssignmentResult } from "../assignment-config";
 import { RaidAssignmentRoster } from "../raid-assignment-roster";
-import { shuffleArray, sortByClasses } from "../utils";
+import { sortByClasses } from "../utils";
 import { drawImageAssignments } from "./four-horsemen-images";
 
 const THANE_KORTHAZZ = {
@@ -43,7 +43,7 @@ export function makeAssignments(roster: Character[]): TargetAssignment[] {
     ["Warrior", "Druid", "Paladin", "Rogue", "Warlock"],
   );
   const [firstTank, secondTank, ...restOfTanks] = allTanks;
-  const frontTanks = shuffleArray([firstTank, secondTank]);
+  const frontTanks = [firstTank, secondTank];
   const allAvailableBackTanks = [
     ...restOfTanks,
     ...roster.filter((t) => t.class === "Priest" && t.role === "Ranged"),
@@ -52,7 +52,7 @@ export function makeAssignments(roster: Character[]): TargetAssignment[] {
     "Warlock",
     "Priest",
   ]);
-  const backTanks = shuffleArray([backTankOne, backTankTwo]);
+  const backTanks = [backTankOne, backTankTwo];
   const healers = roster.filter((t) => t.role === "Healer");
   const [backHealers, otherHealers] = filterTwo(
     healers,

@@ -10,19 +10,17 @@ import { RaidAssignmentResult } from "../assignment-config";
 import { RaidAssignmentRoster } from "../raid-assignment-roster";
 import { shuffleArray } from "../utils";
 
+const MAX_NUMBER_OF_DRUIDS = 4;
+
 export function makeAssignments(roster: Character[]): TargetAssignment[] {
-  // Melee Group assignment
   const druids = roster.filter(
     (t) => t.class === "Druid" && (t.role === "Ranged" || t.role === "Healer"),
   );
-  const priests = roster.filter(
-    (t) => t.class === "Priest" && t.role === "Healer",
-  );
-  const warriors = roster.filter(
-    (t) => t.class === "Warrior" && t.role === "Melee",
-  );
 
-  const coolDownsOrder = shuffleArray([...druids, ...priests, ...warriors]);
+  const coolDownsOrder = shuffleArray([...druids]).slice(
+    0,
+    MAX_NUMBER_OF_DRUIDS,
+  );
 
   return [
     {
@@ -33,8 +31,7 @@ export function makeAssignments(roster: Character[]): TargetAssignment[] {
       assignments: [
         {
           id: "Healer Cooldown",
-          description:
-            "Order of healer cooldowns, Pain Suppression, Barkskin and Rallying Cry.",
+          description: `Order of druid Barkskin rotation${coolDownsOrder.length < MAX_NUMBER_OF_DRUIDS ? " - to be complemented with tank cooldowns." : "."}`,
           characters: coolDownsOrder,
         },
       ],

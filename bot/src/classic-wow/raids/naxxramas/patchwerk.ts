@@ -9,7 +9,7 @@ import {
 import { RaidAssignmentResult } from "../assignment-config";
 import { RaidAssignmentRoster } from "../raid-assignment-roster";
 
-const FIGHT_DURATION_ESTIMATION = 160;
+const FIGHT_DURATION_ESTIMATION = 80;
 const NUMBER_OF_HATEFUL_STRIKE_TANKS = 1;
 
 function calculateWhenToApplyCooldowns(
