@@ -27,7 +27,7 @@ export const CLASS_ROLE_MAP: ClassRoleFeatures = {
     Ranged: { canStun: false, canBuff: false, canInterrupt: false },
   },
   Mage: {
-    Melee: { canStun: false, canBuff: false, canInterrupt: true },
+    Healer: { canStun: false, canBuff: false, canInterrupt: true },
     Ranged: { canStun: false, canBuff: false, canInterrupt: true },
   },
   Paladin: {

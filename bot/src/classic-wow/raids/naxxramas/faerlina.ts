@@ -8,7 +8,6 @@ import {
 } from "../../raid-assignment";
 import { RaidAssignmentResult } from "../assignment-config";
 import { RaidAssignmentRoster } from "../raid-assignment-roster";
-import { shuffleArray } from "../utils";
 
 const BOSS = {
   raidTarget: {
@@ -31,14 +30,13 @@ const RIGHT_ADDS = {
 
 export function makeAssignments(roster: Character[]): TargetAssignment[] {
   const tanks = roster.filter((t) => t.role === "Tank");
-  const shuffledTanks = shuffleArray(tanks);
   const assignments = [BOSS, LEFT_ADDS, RIGHT_ADDS].map((currTarget, idx) => ({
     ...currTarget,
     assignments: [
       {
         id: "Tanks",
         description: "tanked by",
-        characters: [shuffledTanks[idx % shuffledTanks.length]],
+        characters: [tanks[idx % tanks.length]],
       },
     ],
   }));

@@ -1,83 +1,159 @@
 import { Player } from "../../../integrations/sheets/get-players";
+import { CLASS_ROLE_MAP } from "../../class-role";
 import {
   ALL_RAID_TARGETS,
   AssignmentDetails,
   Character,
-  RaidTarget,
   TargetAssignment,
 } from "../../raid-assignment";
 import { RaidAssignmentResult } from "../assignment-config";
 import { RaidAssignmentRoster } from "../raid-assignment-roster";
-import { pickOneAtRandomAndRemoveFromArray, shuffleArray } from "../utils";
-import { drawImageAssignments } from "./kel-thuzad-images";
+import { sortByClasses } from "../utils";
+import { drawImageAssignments } from "./kel-thuzad-hm4-image";
 
-export const NUMBER_OF_SIDES = 3;
+export const NUMBER_OF_MELEE_SPOTS = 3;
+export const NUMBER_OF_RANGED_SPOTS = 4;
+export const NUMBER_OF_HEALING_SPOTS = 4;
+export const NUMBER_OF_INTERRUPTERS = 5;
 
-export function makeAssignments(roster: Character[]): TargetAssignment[] {
+function sortBySmallerSize<T>(array: T[][]): T[][] {
+  return [...array].sort((t, v) => t.length - v.length);
+}
+
+function roundRobinAllocate<T>(groups: T[][], valuesToAllocate: T[]) {
+  valuesToAllocate.forEach((curr: T, index: number) => {
+    const currDestinationGroup = groups[index % groups.length];
+
+    currDestinationGroup.push(curr);
+  });
+}
+
+function createEmptyArrayOfArrays<T>(size: number): T[][] {
+  return new Array(size).fill(null).map(() => []);
+}
+
+export function makeAssignments(roster: Character[]): {
+  mainTankAssignment: TargetAssignment;
+  rangedAssignments: TargetAssignment[];
+  meleeAssignments: TargetAssignment[];
+  healerAssignments: Character[][];
+  interrupts: Character[];
+} {
   // Melee Group assignment
-  const tanks = roster.filter((t) => t.role === "Tank");
+  const [mainTank, ...otherTanks] = sortByClasses(
+    roster.filter((t) => t.role === "Tank"),
+    ["Warrior", "Paladin", "Rogue", "Warlock", "Druid"],
+  );
+  const allTanks = [...otherTanks, mainTank];
+
+  const meleeDps = sortByClasses(
+    roster.filter((t) => t.role === "Melee"),
+    ["Warrior", "Paladin", "Rogue", "Hunter"],
+  );
+  const rangedDps = sortByClasses(
+    roster.filter((t) => t.role === "Ranged"),
+    ["Priest", "Druid", "Mage", "Warlock"],
+  );
+  const healers = roster.filter((t) => t.role === "Healer");
 
   // Add an RNG element to the melee positioning
-  const meleeDps = shuffleArray(roster.filter((t) => t.role === "Melee"));
-  const availableMeleeLeaders: Character[] = [];
-  let takeIndex = 0;
-  for (let i = availableMeleeLeaders.length; i < NUMBER_OF_SIDES; i += 1) {
-    availableMeleeLeaders.push(meleeDps[takeIndex]);
-    takeIndex += 1;
-  }
-
-  const pickedLeaders = new Array(NUMBER_OF_SIDES)
-    .fill(null)
-    .map(() => pickOneAtRandomAndRemoveFromArray(availableMeleeLeaders))
-    .filter((t): t is Character => t !== null);
-  const groups: Character[][] = pickedLeaders.map((t) => [t]);
-
-  // Remove Leaders from melee DPS
-  const pickedMeleeDps: Character[] = meleeDps.filter(
-    (t) => !pickedLeaders.find((x) => x.name === t.name),
+  const meleeGroups = createEmptyArrayOfArrays<Character>(
+    NUMBER_OF_MELEE_SPOTS,
+  );
+  const rangedGroups = createEmptyArrayOfArrays<Character>(
+    NUMBER_OF_RANGED_SPOTS,
+  );
+  const healerGroups = createEmptyArrayOfArrays<Character>(
+    NUMBER_OF_HEALING_SPOTS,
   );
 
-  // Round robin set the a tank to each group
-  const NUMBER_OF_TANKS = tanks.length;
-  for (let i = 0; i < NUMBER_OF_TANKS; i += 1) {
-    const currentTank = pickOneAtRandomAndRemoveFromArray(tanks);
-    if (currentTank !== null) {
-      groups[i % groups.length].push(currentTank);
-    }
-  }
+  roundRobinAllocate(meleeGroups, meleeDps);
+  roundRobinAllocate(rangedGroups, rangedDps);
+  roundRobinAllocate(healerGroups, healers);
 
-  const NUMBER_OF_MELEE_DPS = pickedMeleeDps.length;
-  for (let i = 0; i < NUMBER_OF_MELEE_DPS; i += 1) {
-    const currentMeleeDps = pickOneAtRandomAndRemoveFromArray(pickedMeleeDps);
-    if (currentMeleeDps !== null) {
-      groups[i % groups.length].push(currentMeleeDps);
-    }
-  }
+  // Swap Group 2 with 3 on casters to make sure there's a spriest on Left and Right side.
+  const [first, second, third, forth] = rangedGroups;
+  const reOrderedRangedGroups = [first, third, second, forth];
 
-  const icons = [
+  const sortedMeleeGroupsBySmallest = sortBySmallerSize(meleeGroups);
+  roundRobinAllocate(sortedMeleeGroupsBySmallest, allTanks);
+
+  const rangedIcons = [
     ALL_RAID_TARGETS.Star,
-    ALL_RAID_TARGETS.Moon,
+    ALL_RAID_TARGETS.Circle,
     ALL_RAID_TARGETS.Diamond,
+    ALL_RAID_TARGETS.Triangle,
+  ];
+  const meleeIcons = [
+    ALL_RAID_TARGETS.Moon,
+    ALL_RAID_TARGETS.Square,
+    ALL_RAID_TARGETS.Cross,
   ];
 
-  return icons.map((currIcon, groupIndex) => ({
+  const rangedAssignments = rangedIcons.map((currIcon, groupIndex) => ({
     raidTarget: {
       icon: currIcon,
-      name: `${groups[groupIndex][0].name}'s Group`,
+      name: `${reOrderedRangedGroups[groupIndex][0].name}'s Group`,
+    },
+    assignments: [
+      {
+        id: "Stack",
+        description:
+          "Ranged group stack - spread until the circle is tight then you stack",
+        characters: reOrderedRangedGroups[groupIndex],
+      },
+    ],
+  }));
+  const meleeAssignments = meleeIcons.map((currIcon, groupIndex) => ({
+    raidTarget: {
+      icon: currIcon,
+      name: `${meleeGroups[groupIndex][0].name}'s Group`,
     },
     assignments: [
       {
         id: "Stack",
         description:
           "Melee group stack - includes where tanks should position when NOT tanking",
-        characters: groups[groupIndex],
+        characters: meleeGroups[groupIndex],
       },
     ],
   }));
+  const mainTankAssignment = {
+    raidTarget: {
+      icon: ALL_RAID_TARGETS.Skull,
+      name: `Main Tank`,
+    },
+    assignments: [
+      {
+        id: "Main Tank",
+        description: "Main tank on the boss",
+        characters: [mainTank],
+      },
+    ],
+  };
+
+  const interrupts = roster
+    .filter(
+      (t) =>
+        CLASS_ROLE_MAP[t.class][t.role].canInterrupt &&
+        t.role !== "Tank" &&
+        t.role !== "Healer" &&
+        t.class !== "Paladin",
+    )
+    .slice(0, NUMBER_OF_INTERRUPTERS);
+
+  return {
+    mainTankAssignment,
+    rangedAssignments,
+    meleeAssignments,
+    healerAssignments: healerGroups,
+    interrupts,
+  };
 }
 
 export function exportToDiscord(
   kelThuzadAssignment: TargetAssignment[],
+  interrupters: Character[],
   player: Player[],
 ): string {
   const characterDiscordHandleMap = new Map<string, string>();
@@ -91,42 +167,16 @@ export function exportToDiscord(
   const printAssignment = (currAssignment: AssignmentDetails) =>
     `${currAssignment.description} ${currAssignment.characters.map((t) => `<@${characterDiscordHandleMap.get(t.name)}>`).join(", ")}`;
 
-  return `${kelThuzadAssignment.map((t) => `- ${t.raidTarget.icon.discordEmoji} [${t.raidTarget.icon.name}] (${t.raidTarget.name}): ${t.assignments.map(printAssignment).join(" ")} `).join("\n")}`;
-}
+  return `${kelThuzadAssignment.map((t) => `- ${t.raidTarget.icon.discordEmoji} [${t.raidTarget.icon.name}] (${t.raidTarget.name}): ${t.assignments.map(printAssignment).join(" ")} `).join("\n")}
 
-interface AssignmentInfo {
-  [id: string]: {
-    targetInfo: RaidTarget;
-    assignees: Character[];
-  }[];
+### Interrupts on Kel'Thuzad
+${interrupters.map((t, index) => `${index + 1}. <@${characterDiscordHandleMap.get(t.name)}>`).join("\n")}`;
 }
 
 export function exportToRaidWarning(
-  kelThuzadAssignments: TargetAssignment[],
+  interrupts: Character[],
 ): string {
-  const groupedByAssignmentTypeId = kelThuzadAssignments.reduce<AssignmentInfo>(
-    (res, curr) => {
-      curr.assignments.forEach((t) => {
-        res[t.id] = [
-          ...(res[t.id] ?? []),
-          {
-            targetInfo: curr.raidTarget,
-            assignees: t.characters,
-          },
-        ];
-      });
-
-      return res;
-    },
-    {},
-  );
-
-  return Object.entries(groupedByAssignmentTypeId)
-    .map(
-      ([assignmentId, details]) =>
-        `/rw ${assignmentId}: ${details.map((t) => `${t.targetInfo.icon.symbol} ${t.targetInfo.name} = ${t.assignees.map((char) => char.name).join(", ")}`).join(" || ")}`,
-    )
-    .join("\n");
+  return `/rw Interrupts on Kel'Thuzad: ${interrupts.map((x) => x.name).join(" > ")}`;
 }
 
 export async function getKelThuzadAssignment({
@@ -134,40 +184,65 @@ export async function getKelThuzadAssignment({
   players,
 }: RaidAssignmentRoster): Promise<RaidAssignmentResult> {
   const assignments = makeAssignments(characters);
-  const meleeGroups = assignments.map((t) =>
+  const allDpsAssignments = [
+    ...assignments.meleeAssignments,
+    ...assignments.rangedAssignments,
+  ];
+
+  const mainTankAssignment =
+    assignments.mainTankAssignment.assignments[0].characters.map((x) => x.name);
+  const meleeGroups = assignments.meleeAssignments.map((t) =>
+    t.assignments[0].characters.map((x) =>
+      x.name === mainTankAssignment[0] ? `${x.name}*` : x.name,
+    ),
+  );
+  const rangedGroups = assignments.rangedAssignments.map((t) =>
     t.assignments[0].characters.map((x) => x.name),
   );
-  const kelThuzadImageBuffer = await drawImageAssignments(meleeGroups);
+  const healerGroups = assignments.healerAssignments.map((t) =>
+    t.map((x) => x.name),
+  );
+  const kelThuzadImageBuffer = await drawImageAssignments(
+    mainTankAssignment,
+    meleeGroups,
+    rangedGroups,
+    healerGroups,
+  );
 
   const dmAssignment = [
     `# Copy the following assignments to their specific use cases
 ## Discord Assignment for the specific raid channel:
-### Kel'thuzad Melee Assignment
+### Kel'thuzad Assignment
 \`\`\`
-${exportToDiscord(assignments, players)}
-\`\`\`
+${exportToDiscord(allDpsAssignments, assignments.interrupts, players)}
+\`\`\``,
+    `
 ## To be used as a raiding warning, copy these and use them in-game before the encounter:
 \`\`\`
-${exportToRaidWarning(assignments)}
+${exportToRaidWarning(assignments.interrupts)}
 \`\`\`
   `,
   ];
 
-  const announcementAssignment = exportToDiscord(assignments, players);
+  const announcementAssignment = exportToDiscord(
+    allDpsAssignments,
+    assignments.interrupts,
+    players,
+  );
   const officerAssignment = `\`\`\`
-${exportToRaidWarning(assignments)}
+${exportToRaidWarning(assignments.interrupts)}
 \`\`\``;
 
   return Promise.resolve({
     dmAssignment,
-    announcementTitle: "### Kel'Thuzad Melee Position Assignment",
+    announcementTitle: "### Kel'Thuzad Position Assignment",
     announcementAssignment,
     officerTitle: `### Kel'Thuzad assignments to post as a \`/rw\` in-game`,
     officerAssignment,
     files: [
       {
         attachment: kelThuzadImageBuffer,
-        name: "kel-thuzad-melee-positions.png",
+        name: "kel-thuzad-positions.png",
       },
     ],
   });
