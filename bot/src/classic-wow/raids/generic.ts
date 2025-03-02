@@ -322,6 +322,11 @@ export function makeAssignments(roster: Character[]): Raid {
   };
 }
 
+export function makeWarlockSSRotation(roster: RaidAssignmentRoster) {
+  const healerToRez = roster.characters.filter((t) => CLASS_ROLE_MAP[t.class][t.role].canResurrect && t.role === "Healer");
+  const soulStoners = roster.characters.filter((t) => t.class === "Warlock");
+}
+
 // Look into languages to have slightly nicer markdown colors
 // https://gist.github.com/matthewzring/9f7bbfd102003963f9be7dbcf7d40e51
 export function getGenericRaidAssignment(
@@ -334,6 +339,8 @@ export function getGenericRaidAssignment(
 \`\`\`prolog
 ${exportRaidGroupsToTable(raid)}
 \`\`\``;
+
+  // Add warlock SS rotation (?)
 
   const officerAssignment = getRaidsortLuaAssignment(raid);
 
