@@ -43,6 +43,7 @@ export async function updateWorldBuffHistory(
   raidEvent: RaidEvent,
 ) {
   // Runs every 20 mins AFTER the raid. Should only run once.
+  // TODO: Make sure this runs BEFORE the raid when assignments are locked
   if (
     !isRaidEventInAmountOfTime(
       raidEvent.startTime * 1000,
