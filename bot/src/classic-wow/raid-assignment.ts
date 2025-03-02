@@ -69,41 +69,41 @@ export const ALL_RAID_TARGETS: AllRaidTargets = {
   Skull: {
     name: "Skull",
     symbol: "{skull}",
-    discordEmoji: ":Skull:",
+    discordEmoji: "<:Skull:1345772813130399878>",
   },
   Cross: {
     name: "Cross",
     symbol: "{cross}",
-    discordEmoji: ":Cross:",
+    discordEmoji: "<:Cross:1345772808231321762>",
   },
   Square: {
     name: "Square",
     symbol: "{square}",
-    discordEmoji: ":Square:",
+    discordEmoji: "<:Square:1345772815349059667>",
   },
   Triangle: {
     name: "Triangle",
     symbol: "{triangle}",
-    discordEmoji: ":Triangle:",
+    discordEmoji: "<:Triangle:1345772816867528836>",
   },
   Circle: {
     name: "Circle",
     symbol: "{circle}",
-    discordEmoji: ":Circle:",
+    discordEmoji: "<:Circle:1345772806431965184>",
   },
   Diamond: {
     name: "Diamond",
     symbol: "{diamond}",
-    discordEmoji: ":Diamond:",
+    discordEmoji: "<:Diamond:1345772809842069596>",
   },
   Moon: {
     name: "Moon",
     symbol: "{moon}",
-    discordEmoji: ":Moon:",
+    discordEmoji: "<:Moon:1345772811578380328>",
   },
   Star: {
     name: "Star",
     symbol: "{star}",
-    discordEmoji: ":Star:",
+    discordEmoji: "<:Star:1345771449918685307>",
   },
 };
