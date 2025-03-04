@@ -12,6 +12,11 @@ const ApplicationConfigurationZod = z.object({
     RAID_SIGN_UP_CHANNELS: z.array(z.string()),
     RAID_AD_HOC_SIGN_UP_CHANNEL: z.string(),
     RAIDER_ROLES: z.array(z.string()),
+    WORLD_BUFF_ASSIGNMENT_LOCK_BEFORE_RAID_IN_SECONDS: z
+      .number()
+      .int()
+      .min(0)
+      .max(60 * 60 * 48), // 2 days
   }),
   WOW_HEAD: z.object({
     HOST_NAME: z.string().url(),
@@ -58,6 +63,7 @@ export const rawConfig: ApplicationConfiguration = {
     ),
     RAID_AD_HOC_SIGN_UP_CHANNEL: process.env
       .GUILD_DISCORD_RAID_SIGN_UP_AD_HOC_CHANNEL as string,
+    WORLD_BUFF_ASSIGNMENT_LOCK_BEFORE_RAID_IN_SECONDS: 60 * 60 * 24, // 24 hours
   },
   WOW_HEAD: {
     HOST_NAME: "https://www.wowhead.com",

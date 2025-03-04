@@ -27,8 +27,7 @@ export function makeAssignments(roster: Character[]): TargetAssignment[] {
       assignments: [
         {
           id: "Healer Cooldown",
-          description: 
-            `Order of druid Barkskin rotation${coolDownsOrder.length < 2 ? " - to be complemented with tank cooldowns." : "."}`,
+          description: `Order of druid Barkskin rotation${coolDownsOrder.length < 2 ? " - to be complemented with tank cooldowns." : "."}`,
           characters: coolDownsOrder,
         },
       ],
