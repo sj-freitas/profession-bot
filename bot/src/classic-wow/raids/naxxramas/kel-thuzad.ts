@@ -32,6 +32,58 @@ function createEmptyArrayOfArrays<T>(size: number): T[][] {
   return new Array(size).fill(null).map(() => []);
 }
 
+export function moveAllFeralsToGroup(
+  groups: Character[][],
+  indexOfDestination: number,
+) {
+  const groupToTransferTo = groups[indexOfDestination];
+  if (!groupToTransferTo) {
+    // Invalid group index.
+    return;
+  }
+
+  const feralInfos = groups
+    .map((x, idx) => ({
+      feralsOfGroup: x.filter((t) => t.class === "Druid" && t.role === "Melee"),
+      groupIndex: idx,
+    }))
+    .filter(({ groupIndex }) => groupIndex !== indexOfDestination)
+    .map((t) => ({
+      feralInfos: t.feralsOfGroup.map((x) => ({
+        feral: x,
+        groupIndex: t.groupIndex,
+      })),
+    }))
+    .flatMap((t) => t.feralInfos);
+
+  let currFeralIndex = 0;
+  for (let i = 0; i < groupToTransferTo.length; i += 1) {
+    const currMemberToMove = groupToTransferTo[i];
+    const currFeralInfo = feralInfos[currFeralIndex];
+    const canBeExchangedWithFeral = !(
+      currMemberToMove.role === "Tank" ||
+      (currMemberToMove.class === "Druid" && currMemberToMove.role === "Melee")
+    );
+
+    if (!currFeralInfo) {
+      // No more ferals to handle
+      return;
+    }
+
+    if (canBeExchangedWithFeral) {
+      groupToTransferTo[i] = currFeralInfo.feral;
+
+      const indexOfFeral = groups[currFeralInfo.groupIndex].findIndex(
+        (t) => t.name === currFeralInfo.feral.name,
+      );
+      const groupOfFeral = groups[currFeralInfo.groupIndex];
+      groupOfFeral[indexOfFeral] = currMemberToMove;
+
+      currFeralIndex += 1;
+    }
+  }
+}
+
 export function makeAssignments(roster: Character[]): {
   mainTankAssignment: TargetAssignment;
   rangedAssignments: TargetAssignment[];
@@ -77,6 +129,8 @@ export function makeAssignments(roster: Character[]): {
 
   const sortedMeleeGroupsBySmallest = sortBySmallerSize(meleeGroups);
   roundRobinAllocate(sortedMeleeGroupsBySmallest, allTanks);
+  // Something is off about the groups.
+  moveAllFeralsToGroup(sortedMeleeGroupsBySmallest, 1);
 
   const rangedIcons = [
     ALL_RAID_TARGETS.Star,
@@ -107,14 +161,14 @@ export function makeAssignments(roster: Character[]): {
   const meleeAssignments = meleeIcons.map((currIcon, groupIndex) => ({
     raidTarget: {
       icon: currIcon,
-      name: `${meleeGroups[groupIndex][0].name}'s Group`,
+      name: `${sortedMeleeGroupsBySmallest[groupIndex][0].name}'s Group`,
     },
     assignments: [
       {
         id: "Stack",
         description:
           "Melee group stack - includes where tanks should position when NOT tanking",
-        characters: meleeGroups[groupIndex],
+        characters: sortedMeleeGroupsBySmallest[groupIndex],
       },
     ],
   }));
@@ -173,9 +227,7 @@ export function exportToDiscord(
 ${interrupters.map((t, index) => `${index + 1}. <@${characterDiscordHandleMap.get(t.name)}>`).join("\n")}`;
 }
 
-export function exportToRaidWarning(
-  interrupts: Character[],
-): string {
+export function exportToRaidWarning(interrupts: Character[]): string {
   return `/rw Interrupts on Kel'Thuzad: ${interrupts.map((x) => x.name).join(" > ")}`;
 }
 
