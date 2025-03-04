@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import { getGenericRaidAssignment } from "./classic-wow/raids/generic";
 import { NAXXRAMAS } from "./classic-wow/raids/naxxramas/naxxramas-mapping";
 import { createClient } from "./discord/create-client";
 import { Database } from "./exports/mem-database";
@@ -28,10 +29,17 @@ async function main() {
       assignmentMaker(assignmentRoster),
     ),
   );
+  const genericAssignment = await getGenericRaidAssignment(assignmentRoster);
   try {
     const user = await discordClient.users.fetch(MY_DISCORD_ID);
     if (!user) {
       return;
+    }
+
+    for (const curr of genericAssignment.dmAssignment) {
+      await user.send({
+        content: curr,
+      });
     }
 
     for (const currBoss of allAssignments) {

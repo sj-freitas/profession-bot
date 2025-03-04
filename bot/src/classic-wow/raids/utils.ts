@@ -1,5 +1,6 @@
 import { Table, toTableMarkdown } from "../../exports/markdown";
 import { Class } from "../../integrations/raider-io/types";
+import { Player } from "../../integrations/sheets/get-players";
 import { Character, Group, Raid } from "../raid-assignment";
 
 export function pickOnePutOnTop<T>(array: T[], preselected?: T): T[] {
@@ -142,4 +143,18 @@ export function sortByClasses(
 
     return 0;
   });
+}
+
+export function getCharacterToPlayerDiscordMap(
+  player: Player[],
+): Map<string, Player> {
+  const characterDiscordHandleMap = new Map<string, Player>();
+
+  player.forEach((currPlayer) => {
+    currPlayer.characters.forEach((currCharacter) => {
+      characterDiscordHandleMap.set(currCharacter, currPlayer);
+    });
+  });
+
+  return characterDiscordHandleMap;
 }

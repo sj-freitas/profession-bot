@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-extend-native */
 import { Class } from "../../integrations/raider-io/types";
+import { Player } from "../../integrations/sheets/get-players";
 import { filterTwo } from "../../lib/array-utils";
 import { CLASS_ROLE_MAP } from "../class-role";
 import {
@@ -14,6 +15,7 @@ import { RaidAssignmentResult } from "./assignment-config";
 import { RaidAssignmentRoster } from "./raid-assignment-roster";
 import {
   exportRaidGroupsToTable,
+  getCharacterToPlayerDiscordMap,
   getRaidsortLuaAssignment,
   pickOneAtRandomAndRemoveFromArray,
 } from "./utils";
@@ -322,9 +324,42 @@ export function makeAssignments(roster: Character[]): Raid {
   };
 }
 
-export function makeWarlockSSRotation(roster: RaidAssignmentRoster) {
-  const healerToRez = roster.characters.filter((t) => CLASS_ROLE_MAP[t.class][t.role].canResurrect && t.role === "Healer");
+interface SoulStoneAssignments {
+  mainSoulStoner: Character;
+  healerToSoulStone: Character;
+  soulStoners: Character[];
+}
+
+export function makeWarlockSSRotation(
+  roster: RaidAssignmentRoster,
+): SoulStoneAssignments {
+  const healerToSoulStone = roster.characters.filter(
+    (t) =>
+      CLASS_ROLE_MAP[t.class][t.role].canResurrect &&
+      t.role === "Healer" &&
+      t.class !== "Paladin",
+  )[0];
   const soulStoners = roster.characters.filter((t) => t.class === "Warlock");
+
+  return {
+    mainSoulStoner: soulStoners[0],
+    healerToSoulStone,
+    soulStoners,
+  };
+}
+
+export function toSoulStoneAssignment(
+  assignment: SoulStoneAssignments,
+  characterPlayerMap: Map<string, Player>,
+): string {
+  return `### Soul Stone rotation
+Soul Stone target will be <@${characterPlayerMap.get(assignment.healerToSoulStone.name)?.discordId}>. <@${characterPlayerMap.get(assignment.mainSoulStoner.name)?.discordId}> will be in charge of tracking the turns of soul stones. Which will be in order:
+${assignment.soulStoners.map((t, idx) => `${idx + 1}. <@${characterPlayerMap.get(t.name)?.discordId}>`).join("\n")}`;
+}
+
+export function toRwStoneAssignment(assignment: SoulStoneAssignments): string {
+  return `### Raid warnings for warlock soul stone assignment
+  \`/rw Soul Stone on ${assignment.healerToSoulStone.name} called by ${assignment.mainSoulStoner.name} and in order [${assignment.soulStoners.map((t) => t.name).join(" > ")}]\``;
 }
 
 // Look into languages to have slightly nicer markdown colors
@@ -332,17 +367,26 @@ export function makeWarlockSSRotation(roster: RaidAssignmentRoster) {
 export function getGenericRaidAssignment(
   roster: RaidAssignmentRoster,
 ): Promise<RaidAssignmentResult> {
+  const characterPlayerMap = getCharacterToPlayerDiscordMap(roster.players);
   const raid = makeAssignments(roster.characters);
+  const soulStoneAssignments = makeWarlockSSRotation(roster);
+  const discordSoulStoneAssignment = toSoulStoneAssignment(
+    soulStoneAssignments,
+    characterPlayerMap,
+  );
 
-  const dmAssignment = [getRaidsortLuaAssignment(raid)];
+  const dmAssignment = [
+    getRaidsortLuaAssignment(raid),
+    toRwStoneAssignment(soulStoneAssignments),
+  ];
   const announcementAssignment = `## Raid Groups
 \`\`\`prolog
 ${exportRaidGroupsToTable(raid)}
-\`\`\``;
+\`\`\`
+${discordSoulStoneAssignment}`;
 
-  // Add warlock SS rotation (?)
-
-  const officerAssignment = getRaidsortLuaAssignment(raid);
+  const officerAssignment = `${getRaidsortLuaAssignment(raid)}
+  ${toRwStoneAssignment}`;
 
   return Promise.resolve({
     dmAssignment,
