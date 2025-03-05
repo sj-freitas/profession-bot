@@ -1,6 +1,9 @@
 import { Client, GuildMember } from "discord.js";
 import { CONFIG } from "../../config";
-import { AtieshCandidatesTable } from "../../integrations/sheets/atiesh/atiesh-candidates-data";
+import {
+  AtieshCandidate,
+  AtieshCandidatesTable,
+} from "../../integrations/sheets/atiesh/atiesh-candidates-data";
 import { AtieshPostConfigTable } from "../../integrations/sheets/atiesh/atiesh-post-config";
 import { createSheetClient } from "../../integrations/sheets/config";
 import { PlayerInfoTable } from "../../integrations/sheets/player-info-table";
@@ -72,7 +75,7 @@ export async function updateListOfAtieshCandidates(
   const members = await Promise.all(
     userIds.map(async (t) => fetchMemberOrNull(server, t)),
   );
-  const atieshCandidates = members
+  const atieshCandidates: AtieshCandidate[] = members
     .filter((t): t is GuildMember => t !== null)
     .filter((t) =>
       t.roles.cache.find((x) => ACCEPTED_ATIESH_CLASSES.has(x.name)),
@@ -82,6 +85,7 @@ export async function updateListOfAtieshCandidates(
         t.roles.cache.find((x) => ACCEPTED_ATIESH_CLASSES.has(x.name))?.name ??
         "",
       characterName: discordIdMainName.get(t.id) ?? "",
+      atieshStatus: "OnTheList",
     }));
 
   await atieshCandidatesTable.insertMany(
