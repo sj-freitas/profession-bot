@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-extend-native */
 import { Class } from "../../integrations/raider-io/types";
-import { Player } from "../../integrations/sheets/get-players";
+import { PlayerInfo } from "../../integrations/sheets/player-info-table";
 import { filterTwo } from "../../lib/array-utils";
 import { CLASS_ROLE_MAP } from "../class-role";
 import {
@@ -58,7 +56,7 @@ function tryMergeGroups(groups: Group[]): Group[] {
   return mergedGroups;
 }
 
-export function makeAssignments(roster: Character[]): Raid {
+export function makeAssignments({ characters }: RaidAssignmentRoster): Raid {
   // Ideally we want one group with the tanks
   // Each group needs to be sorted as melee group, caster group
   // Buffer casters buff caster group
@@ -66,7 +64,7 @@ export function makeAssignments(roster: Character[]): Raid {
   // Need to find out how many groups we make
   // Hunters are odd balls and can be spread around
   const [allHealers, nonHealers] = filterTwo(
-    roster,
+    characters,
     (t) => t.role === "Healer",
   );
   const [healerPaladins, remainingHealers] = filterTwo(
@@ -205,7 +203,7 @@ export function makeAssignments(roster: Character[]): Raid {
   );
   const pureCasterGroups = new Array(numberOfCasterGroups)
     .fill(null)
-    .map((_, index) => {
+    .map(() => {
       const currGroup: Character[] = [];
       const shadowPriest = pickOneAtRandomAndRemoveFromArray(shadowPriests);
       if (shadowPriest) {
@@ -350,7 +348,7 @@ export function makeWarlockSSRotation(
 
 export function toSoulStoneAssignment(
   assignment: SoulStoneAssignments,
-  characterPlayerMap: Map<string, Player>,
+  characterPlayerMap: Map<string, PlayerInfo>,
 ): string {
   return `### Soul Stone rotation
 Soul Stone target will be <@${characterPlayerMap.get(assignment.healerToSoulStone.name)?.discordId}>. <@${characterPlayerMap.get(assignment.mainSoulStoner.name)?.discordId}> will be in charge of tracking the turns of soul stones. Which will be in order:
@@ -368,7 +366,7 @@ export function getGenericRaidAssignment(
   roster: RaidAssignmentRoster,
 ): Promise<RaidAssignmentResult> {
   const characterPlayerMap = getCharacterToPlayerDiscordMap(roster.players);
-  const raid = makeAssignments(roster.characters);
+  const raid = makeAssignments(roster);
   const soulStoneAssignments = makeWarlockSSRotation(roster);
   const discordSoulStoneAssignment = toSoulStoneAssignment(
     soulStoneAssignments,

@@ -1,7 +1,7 @@
-import { Player } from "../../integrations/sheets/get-players";
+import { PlayerInfo } from "../../integrations/sheets/player-info-table";
 import { Character } from "../raid-assignment";
 
 export interface RaidAssignmentRoster {
   characters: Character[];
-  players: Player[];
+  players: PlayerInfo[];
 }

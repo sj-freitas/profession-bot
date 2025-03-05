@@ -1,4 +1,4 @@
-import { Player } from "../../../integrations/sheets/get-players";
+import { PlayerInfo } from "../../../integrations/sheets/player-info-table";
 import { filterTwo, Predicate } from "../../../lib/array-utils";
 import {
   ALL_RAID_TARGETS,
@@ -8,6 +8,7 @@ import {
 } from "../../raid-assignment";
 import { RaidAssignmentResult } from "../assignment-config";
 import { RaidAssignmentRoster } from "../raid-assignment-roster";
+import { getCharactersOfPlayer } from "../utils";
 
 const FIGHT_DURATION_ESTIMATION = 80;
 const NUMBER_OF_HATEFUL_STRIKE_TANKS = 1;
@@ -212,12 +213,12 @@ export function makeAssignments(roster: Character[]): TargetAssignment[] {
 
 export function exportToDiscord(
   patchwerkAssignment: TargetAssignment[],
-  player: Player[],
+  player: PlayerInfo[],
 ): string {
   const characterDiscordHandleMap = new Map<string, string>();
 
   player.forEach((currPlayer) => {
-    currPlayer.characters.forEach((currCharacter) => {
+    getCharactersOfPlayer(currPlayer).forEach((currCharacter) => {
       characterDiscordHandleMap.set(currCharacter, currPlayer.discordId);
     });
   });

@@ -166,7 +166,7 @@ const LARGE_ROSTER: Character[] = [
 describe("generic", () => {
   describe("makeAssignments", () => {
     it("Given a raid of several people, it finds the best setup possible", () => {
-      const raid = makeAssignments(LARGE_ROSTER);
+      const raid = makeAssignments({ characters: LARGE_ROSTER, players: [] });
       const allNames = raid.groups
         .map((t) =>
           t.slots.filter((x): x is Character => Boolean(x)).map((x) => x.name),

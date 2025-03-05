@@ -1,15 +1,37 @@
 /* eslint-disable no-console */
 import { CONFIG } from "../config";
+import { AtieshCandidatesTable } from "../integrations/sheets/atiesh/atiesh-candidates-data";
 import { createSheetClient, SheetClient } from "../integrations/sheets/config";
 import {
   getAllBuffHistory,
   getWorldBuffInfo,
 } from "../integrations/sheets/get-buffers";
 import { readProfessionData } from "../integrations/sheets/parse-prof";
-import { PlayerInfoTable } from "../integrations/sheets/player-info-table";
+import {
+  PlayerInfo,
+  PlayerInfoTable,
+} from "../integrations/sheets/player-info-table";
 import { SwitcherRoleDataTable } from "../integrations/sheets/switcher-role-data";
 import { Database, removeDuplicates, toFlattenData } from "./mem-database";
 import { getGuildInfo } from "./wowHeadIntegration";
+
+function addAtieshDataToCharacters(
+  roster: PlayerInfo[],
+  atieshCharacters: string[],
+): PlayerInfo[] {
+  const atieshCharactersSet = new Set(atieshCharacters);
+
+  return roster.map((x) => {
+    const charactersOfPlayer = [...x.altNames, x.mainName];
+
+    return {
+      ...x,
+      atieshCharacters: charactersOfPlayer.filter((t) =>
+        atieshCharactersSet.has(t),
+      ),
+    };
+  });
+}
 
 export async function refreshRoster(
   database: Database,
@@ -20,8 +42,19 @@ export async function refreshRoster(
     CONFIG.GUILD.INFO_SHEET,
   );
   const roster = await playerInfoTable.getAllValues();
+  const atieshCandidatesInfo = new AtieshCandidatesTable(
+    sheetClient,
+    CONFIG.GUILD.INFO_SHEET,
+  );
+  const atieshCandidates = await atieshCandidatesInfo.getAllValues();
+  const decoratedRoster = addAtieshDataToCharacters(
+    roster,
+    atieshCandidates
+      .filter((t) => t.atieshStatus === "Completed")
+      .map((t) => t.characterName),
+  );
 
-  database.setPlayersRoster(roster);
+  database.setPlayersRoster(decoratedRoster);
 }
 
 export async function refreshDatabase(database: Database): Promise<void> {

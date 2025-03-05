@@ -5,9 +5,9 @@ import {
   WorldBuffInfo,
 } from "../../integrations/sheets/get-buffers";
 import { CONFIG } from "../../config";
-import { getPlayers } from "../../integrations/sheets/get-players";
 import { WorldBuffPostConfigTable } from "../../integrations/sheets/world-buff-post-config";
 import { findMessageInHistoryById } from "../../discord/utils";
+import { PlayerInfoTable } from "../../integrations/sheets/player-info-table";
 
 const { INFO_SHEET, DISCORD_SERVER_ID } = CONFIG.GUILD;
 
@@ -26,7 +26,8 @@ export async function tryUpdateWorldBuffItemRotation(
   sheetClient: SheetClient,
 ) {
   const worldBuffConfig = await getWorldBuffInfo(sheetClient, INFO_SHEET);
-  const playerInfo = await getPlayers(sheetClient, INFO_SHEET);
+  const playerInfoTable = new PlayerInfoTable(sheetClient, INFO_SHEET);
+  const playerInfo = await playerInfoTable.getAllValues();
   const map = new Map(playerInfo.map((t) => [t.discordHandle, t.discordId]));
 
   const formattedContent = `## World buff assignment list
