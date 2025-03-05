@@ -11,13 +11,13 @@ import {
   isConfirmedSignup,
 } from "../integrations/raid-helper/utils";
 import { Class } from "../integrations/raider-io/types";
-import { Player } from "../integrations/sheets/get-players";
 import { CONFIG } from "../config";
 import { fetchCharacterData } from "../integrations/raider-io/raider-io-client";
 import { RaidRole } from "../integrations/raider-io/utils";
 import { Database } from "../exports/mem-database";
 import { RaidAssignmentRoster } from "../classic-wow/raids/raid-assignment-roster";
 import { Switcher } from "../integrations/sheets/switcher-role-data";
+import { PlayerInfo } from "../integrations/sheets/player-info-table";
 
 const tankNumberBasedOnRosterSize = [0, 1, 2, 2, 2, 2, 2, 2, 2];
 const healerNumberBasedOnRosterSize = [0, 1, 2, 2, 3, 3, 3, 4, 4];
@@ -94,7 +94,7 @@ function createSignUpsHash(array: SimplifiedSignUp[]): string {
 
 export interface CharacterWithMetadata extends Character {
   isMainCharacter: boolean;
-  player: Player;
+  player: PlayerInfo;
 }
 
 export interface Roster {
@@ -198,7 +198,7 @@ export async function getRosterFromRaidEvent(
   // Create a hash from this - this is the roster.
   // We should use the hash with all sign ups - this ensures that we don't exclude editing
   // The posts when someone signs-off
-  type SignUpWithPlayer = SimplifiedSignUp & { player: Player };
+  type SignUpWithPlayer = SimplifiedSignUp & { player: PlayerInfo };
   const allSignUpsRegardlessOfAbsence = raidEvent.signUps.map((t) => ({
     wowClass: inferWowClassFromSpec(t.specName!),
     simplifiedDiscordHandle: t.name.toLowerCase(),
@@ -207,7 +207,7 @@ export async function getRosterFromRaidEvent(
   }));
 
   const hash = createSignUpsHash(allSignUpsRegardlessOfAbsence);
-  const allPlayers = database.getPlayersRoster();
+  const allPlayers = database.getPlayerInfos();
   const playerMap = new Map(allPlayers.map((t) => [t.discordId, t]));
   const matchedPlayers = signUps
     .map(
@@ -238,9 +238,9 @@ export async function getRosterFromRaidEvent(
   const characters: CharacterWithMetadata[] = (
     await Promise.all(
       matchedPlayers.map(async (t) => {
-        if (t.player.characters.length === 1) {
+        if (t.player.altNames.length === 0) {
           return {
-            name: t.player.characters[0],
+            name: t.player.mainName,
             class: t.wowClass,
             role: t.role as RaidRole,
             isMainCharacter: true,
@@ -251,7 +251,7 @@ export async function getRosterFromRaidEvent(
         // Given that the player might have more than one raiding char
         // Fetch all the raiding chars from raider-io or cache.
         const allCharactersOfPlayer = await Promise.all(
-          t.player.characters.map(
+          [t.player.mainName, ...t.player.altNames].map(
             async (characterName) =>
               await safeCharacterFetch(
                 characterName,
@@ -273,7 +273,7 @@ export async function getRosterFromRaidEvent(
           class: t.wowClass,
           role: t.role as RaidRole,
           player: t.player,
-          isMainCharacter: matchingCharacter.name === t.player.characters[0],
+          isMainCharacter: matchingCharacter.name === t.player.mainName,
         };
 
         return characterWithMetadata;
@@ -289,6 +289,10 @@ export async function getRosterFromRaidEvent(
     database,
   );
 }
+
+// export function hasAtiesh(characteR: Character, roster: RaidAssignmentRoster) {
+//   const allAtieshCharacters = roster.players.map((x) => x..
+// }
 
 export function toRaidAssignmentRoster(roster: Roster): RaidAssignmentRoster {
   const allPlayers = roster.characters.map((t) => t.player).flatMap((t) => t);

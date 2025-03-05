@@ -1,13 +1,14 @@
 import { Client } from "discord.js";
 import { SheetClient } from "../../integrations/sheets/config";
 import { CONFIG } from "../../config";
-import { getPlayers } from "../../integrations/sheets/get-players";
 import { findMessageInHistoryById } from "../../discord/utils";
 import {
   Switcher,
   SwitcherRoleDataTable,
 } from "../../integrations/sheets/switcher-role-data";
 import { SwitcherRoleConfigTable } from "../../integrations/sheets/switcher-post-config";
+import { PlayerInfoTable } from "../../integrations/sheets/player-info-table";
+import { getCharactersOfPlayer } from "../../classic-wow/raids/utils";
 
 const { INFO_SHEET, DISCORD_SERVER_ID } = CONFIG.GUILD;
 
@@ -36,10 +37,11 @@ export async function tryUpdateSwitcherPost(
     return map;
   }, new Map<string, Switcher[]>());
 
-  const playerInfo = await getPlayers(sheetClient, INFO_SHEET);
+  const playerInfoTable = new PlayerInfoTable(sheetClient, INFO_SHEET);
+  const playerInfo = await playerInfoTable.getAllValues();
   const flattenedCharacter: [character: string, discordId: string][] =
     playerInfo
-      .map((t) => t.characters.map((x) => [x, t.discordId]))
+      .map((t) => getCharactersOfPlayer(t).map((x) => [x, t.discordId]))
       .flatMap((t) => t)
       .map(([character, discordId]) => [character, discordId]);
   const map = new Map<string, string>(flattenedCharacter);
@@ -53,7 +55,6 @@ ${value.map((t) => ` - ${getFormattedName(t)} (<@${map.get(t.characterName)}>)`)
   )
   .join("\n")}`;
 
-  // TODO Create the message if it doesn't exist
   const switcherRoleConfig = await new SwitcherRoleConfigTable(
     sheetClient,
     INFO_SHEET,

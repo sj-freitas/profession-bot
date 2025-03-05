@@ -1,4 +1,4 @@
-import { Player } from "../../../integrations/sheets/get-players";
+import { PlayerInfo } from "../../../integrations/sheets/player-info-table";
 import { CLASS_ROLE_MAP } from "../../class-role";
 import {
   ALL_RAID_TARGETS,
@@ -8,7 +8,7 @@ import {
 } from "../../raid-assignment";
 import { RaidAssignmentResult } from "../assignment-config";
 import { RaidAssignmentRoster } from "../raid-assignment-roster";
-import { sortByClasses } from "../utils";
+import { getCharactersOfPlayer, sortByClasses } from "../utils";
 import { drawImageAssignments } from "./kel-thuzad-hm4-image";
 
 export const NUMBER_OF_MELEE_SPOTS = 3;
@@ -208,12 +208,12 @@ export function makeAssignments(roster: Character[]): {
 export function exportToDiscord(
   kelThuzadAssignment: TargetAssignment[],
   interrupters: Character[],
-  player: Player[],
+  player: PlayerInfo[],
 ): string {
   const characterDiscordHandleMap = new Map<string, string>();
 
   player.forEach((currPlayer) => {
-    currPlayer.characters.forEach((currCharacter) => {
+    getCharactersOfPlayer(currPlayer).forEach((currCharacter) => {
       characterDiscordHandleMap.set(currCharacter, currPlayer.discordId);
     });
   });

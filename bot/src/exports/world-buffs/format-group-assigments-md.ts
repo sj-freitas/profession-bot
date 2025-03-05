@@ -2,7 +2,7 @@ import { GroupPreConfig } from "../../buff-management/find-next-assignment";
 import { CONFIG } from "../../config";
 import { RaidEvent } from "../../integrations/raid-helper/types";
 import { WorldBuffInfo } from "../../integrations/sheets/get-buffers";
-import { Player } from "../../integrations/sheets/get-players";
+import { PlayerInfo } from "../../integrations/sheets/player-info-table";
 
 const { DISCORD_SERVER_ID } = CONFIG.GUILD;
 
@@ -35,6 +35,7 @@ interface FormattedAssignmentBuffData {
 
 const MISSING_DEFAULT = "missing!";
 
+// TODO Fix this to consider alts for that raid. This might take a bit more work.
 export function formatGroupAssignmentsToStaffRaidWarning(
   groupConfig: GroupPreConfig[],
   buffInfo: Map<string, WorldBuffInfo>,
@@ -50,7 +51,7 @@ These are the assignments converted as raid warnings to be easily posted instead
 \`/rw ${Object.entries(groupConfig[0])
       .map(
         ([buff, players]) =>
-          `${buffInfo.get(buff)?.shortName}=${((Array.isArray(players) ? players[0] : players) as Player)?.characters[0] ?? MISSING_DEFAULT}`,
+          `${buffInfo.get(buff)?.shortName}=${((Array.isArray(players) ? players[0] : players) as PlayerInfo)?.mainName ?? MISSING_DEFAULT}`,
       )
       .join(" | ")}\`
 ** Group A2 **
@@ -61,14 +62,14 @@ These are the assignments converted as raid warnings to be easily posted instead
       )
       .map(
         ([buff, players]) =>
-          `${buffInfo.get(buff)?.shortName}=${(players?.[1] as Player)?.characters[0] ?? MISSING_DEFAULT}`,
+          `${buffInfo.get(buff)?.shortName}=${(players?.[1] as PlayerInfo)?.mainName ?? MISSING_DEFAULT}`,
       )
       .join(" | ")}\`
 ** Group B **
 \`/rw ${Object.entries(groupConfig[1])
       .map(
         ([buff, players]) =>
-          `${buffInfo.get(buff)?.shortName}=${((Array.isArray(players) ? players[0] : players) as Player)?.characters[0] ?? MISSING_DEFAULT}`,
+          `${buffInfo.get(buff)?.shortName}=${((Array.isArray(players) ? players[0] : players) as PlayerInfo)?.mainName ?? MISSING_DEFAULT}`,
       )
       .join(" | ")}\`
 ** Group B2 **
@@ -79,7 +80,7 @@ These are the assignments converted as raid warnings to be easily posted instead
       )
       .map(
         ([buff, players]) =>
-          `${buffInfo.get(buff)?.shortName}=${(players[1] as Player)?.characters[0] ?? MISSING_DEFAULT}`,
+          `${buffInfo.get(buff)?.shortName}=${(players[1] as PlayerInfo)?.mainName ?? MISSING_DEFAULT}`,
       )
       .join(" | ")}\`
   `,
@@ -105,7 +106,7 @@ export function formatGroupAssignmentsToMarkdown(
 
       formatted[currBuffInfo.shortName] = {
         ...formatted[currBuffInfo.shortName],
-        [groupId]: getArrayFromSingleOrArray<Player | null>(assignees).map(
+        [groupId]: getArrayFromSingleOrArray<PlayerInfo | null>(assignees).map(
           (t) =>
             t !== null
               ? `<@${t.discordId ?? t.discordHandle}>`

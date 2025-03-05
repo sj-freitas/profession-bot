@@ -7,9 +7,9 @@ import {
   findMessageOfBotInHistory,
   sendMessageToChannel,
 } from "../../discord/utils";
-import { Player } from "../../integrations/sheets/get-players";
 import { RaidEvent } from "../../integrations/raid-helper/types";
 import { isRaidEventInAmountOfTime } from "../time-utils";
+import { PlayerInfo } from "../../integrations/sheets/player-info-table";
 
 const { RAIDER_ROLES, DISCORD_SERVER_ID, STAFF_RAID_CHANNEL_ID } = CONFIG.GUILD;
 const raiderRolesSet = new Set(RAIDER_ROLES);
@@ -47,7 +47,7 @@ export async function tryNotifyOfficersMissingSignUps(
   }
 
   const guild = await discordClient.guilds.fetch(DISCORD_SERVER_ID);
-  const players = database.getPlayersRoster();
+  const players = database.getPlayerInfos();
   const members = await Promise.all(
     players.map(async (t) => fetchMemberOrNull(guild, t.discordId)),
   );
@@ -70,14 +70,14 @@ export async function tryNotifyOfficersMissingSignUps(
   const notSignedUpRaiders = guildRaiders.filter((t) => !signUppersMap.has(t));
   const notSignedUpPlayers = notSignedUpRaiders
     .map((raiderId) => players.find((player) => raiderId === player.discordId))
-    .filter((t): t is Player => t !== undefined);
+    .filter((t): t is PlayerInfo => t !== undefined);
 
   const roles = await Promise.all(
     RAIDER_ROLES.map(async (roleId) => guild.roles.fetch(roleId)),
   );
   const formatted = `${getMessageTag(raidEvent)} ${raidEvent.title}
 This is a list of players registered as ${roles.map((t) => t?.name).join(" or ")} that haven't signed-up yet.
-${notSignedUpPlayers.map((t) => ` - <@${t.discordId}> ${t.characters[0]}`).join("\n")}`;
+${notSignedUpPlayers.map((t) => ` - <@${t.discordId}> ${t.mainName}`).join("\n")}`;
 
   const message = await findMessageOfBotInHistory(
     discordClient,

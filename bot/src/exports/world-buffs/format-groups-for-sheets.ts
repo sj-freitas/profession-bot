@@ -1,6 +1,6 @@
 import { GroupPreConfig } from "../../buff-management/find-next-assignment";
 import { WorldBuffAssignments } from "../../integrations/sheets/get-buffers";
-import { Player } from "../../integrations/sheets/get-players";
+import { PlayerInfo } from "../../integrations/sheets/player-info-table";
 
 function incrementLetter(letter: string, incrementValue: number = 1): string {
   return (
@@ -29,7 +29,7 @@ export function formatGroupsForSheets(
       getArrayFromSingleOrArray(
         group[currBuff.buffInfo.shortName as keyof GroupPreConfig],
       )
-        .filter((t): t is Player => t !== null)
+        .filter((t): t is PlayerInfo => t !== null)
         .map((t) => t.discordHandle)
         .join(";"),
     );

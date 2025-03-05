@@ -1,6 +1,6 @@
 import { Table, toTableMarkdown } from "../../exports/markdown";
 import { Class } from "../../integrations/raider-io/types";
-import { Player } from "../../integrations/sheets/get-players";
+import { PlayerInfo } from "../../integrations/sheets/player-info-table";
 import { Character, Group, Raid } from "../raid-assignment";
 
 export function pickOnePutOnTop<T>(array: T[], preselected?: T): T[] {
@@ -145,16 +145,45 @@ export function sortByClasses(
   });
 }
 
-export function getCharacterToPlayerDiscordMap(
-  player: Player[],
-): Map<string, Player> {
-  const characterDiscordHandleMap = new Map<string, Player>();
+export function getCharactersOfPlayer(player: PlayerInfo): string[] {
+  return [player.mainName, ...player.altNames];
+}
 
-  player.forEach((currPlayer) => {
-    currPlayer.characters.forEach((currCharacter) => {
+export function getCharacterToPlayerDiscordMap(
+  players: PlayerInfo[],
+): Map<string, PlayerInfo> {
+  const characterDiscordHandleMap = new Map<string, PlayerInfo>();
+
+  players.forEach((currPlayer) => {
+    getCharactersOfPlayer(currPlayer).forEach((currCharacter) => {
       characterDiscordHandleMap.set(currCharacter, currPlayer);
     });
   });
 
   return characterDiscordHandleMap;
+}
+
+/**
+ * Indicates whether or not this character has the Atiesh staff which can be relevant when looking
+ * into group composition.
+ *
+ * @param character The character to verify.
+ * @param playerInfoMap All the player infos.
+ * @returns True if the specific character has the Atiesh staff.
+ */
+export function hasAtiesh(
+  character: Character,
+  players: PlayerInfo[],
+): boolean {
+  const playerInfoOfCharacter = getCharacterToPlayerDiscordMap(players).get(
+    character.name,
+  );
+
+  if (!playerInfoOfCharacter) {
+    return false;
+  }
+
+  return Boolean(
+    playerInfoOfCharacter.atieshCharacters.find((t) => t === character.name),
+  );
 }

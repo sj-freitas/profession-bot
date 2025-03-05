@@ -4,7 +4,7 @@ import {
   WorldBuffHistory,
   WorldBuffInfo,
 } from "../integrations/sheets/get-buffers";
-import { Player } from "../integrations/sheets/get-players";
+import { PlayerInfo } from "../integrations/sheets/player-info-table";
 import { AssignmentConfig, GroupConfig, History } from "./find-next-assignment";
 
 export type BuffAssignmentEntry = {
@@ -34,11 +34,11 @@ export function findBuff(
 
 export function getAssignees(
   entry: BuffAssignmentEntry,
-  playerData: Map<string, Player>,
-): Player[] {
+  playerData: Map<string, PlayerInfo>,
+): PlayerInfo[] {
   const assignees = entry.assignees
     .map((t) => playerData.get(t))
-    .filter((t): t is Player => Boolean(t));
+    .filter((t): t is PlayerInfo => Boolean(t));
 
   if (assignees.length === 0) {
     console.warn(
@@ -59,7 +59,7 @@ export function getFirstTwoOfArray<T>(array: T[]): [T?, T?] {
 
 export function mapRawHistory(
   rawHistory: WorldBuffHistory[],
-  playerData: Map<string, Player>,
+  playerData: Map<string, PlayerInfo>,
 ): History {
   return {
     assignments: rawHistory.map((event) => ({
@@ -84,7 +84,7 @@ export function mapRawHistory(
 
 export function mapRawAssignmentConfig(
   rawAssignmentConfig: WorldBuffAssignments[],
-  playerData: Map<string, Player>,
+  playerData: Map<string, PlayerInfo>,
 ): AssignmentConfig {
   const value = rawAssignmentConfig.reduce((obj, curr) => {
     const key = curr.buffInfo.shortName as keyof AssignmentConfig;

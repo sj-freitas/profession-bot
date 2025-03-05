@@ -1,23 +1,23 @@
-import { Player } from "../integrations/sheets/get-players";
+import { PlayerInfo } from "../integrations/sheets/player-info-table";
 
 export interface GroupPreConfig {
-  dmt: Player | null;
-  dmf: Player | null;
-  dragon: Player | null;
-  zg: Player | null;
-  rend: [Player | null, Player | null];
-  firewater: [Player | null, Player | null];
-  songflower: [Player | null, Player | null];
+  dmt: PlayerInfo | null;
+  dmf: PlayerInfo | null;
+  dragon: PlayerInfo | null;
+  zg: PlayerInfo | null;
+  rend: [PlayerInfo | null, PlayerInfo | null];
+  firewater: [PlayerInfo | null, PlayerInfo | null];
+  songflower: [PlayerInfo | null, PlayerInfo | null];
 }
 
 export interface GroupConfig {
-  dmt: Player;
-  dmf: Player;
-  dragon: Player;
-  zg: Player;
-  rend: [Player?, Player?];
-  firewater: [Player?, Player?];
-  songflower: [Player?, Player?];
+  dmt: PlayerInfo;
+  dmf: PlayerInfo;
+  dragon: PlayerInfo;
+  zg: PlayerInfo;
+  rend: [PlayerInfo?, PlayerInfo?];
+  firewater: [PlayerInfo?, PlayerInfo?];
+  songflower: [PlayerInfo?, PlayerInfo?];
 }
 
 export interface BuffAssignment {
@@ -29,7 +29,7 @@ export interface History {
 }
 
 export interface AssignmentInfo {
-  assignees: Player[];
+  assignees: PlayerInfo[];
   durationInHours: number;
 }
 
@@ -82,7 +82,7 @@ export function findNextAssignment({
   numberOfGroups,
 }: {
   assignmentConfig: AssignmentConfig;
-  roster: Player[];
+  roster: PlayerInfo[];
   history: History;
   numberOfGroups: number;
 }): GroupPreConfig[] {
@@ -133,7 +133,7 @@ export function findNextAssignment({
   // recency bias can be a thing, we can address it later
   const preGroupConfig = new Map<
     keyof AssignmentConfig,
-    (Player | null | undefined)[]
+    (PlayerInfo | null | undefined)[]
   >();
   for (const currKey of Object.keys(assignmentConfig)) {
     const buffName = currKey as keyof AssignmentConfig;

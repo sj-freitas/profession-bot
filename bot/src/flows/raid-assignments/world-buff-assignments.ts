@@ -27,7 +27,7 @@ const { INFO_SHEET, STAFF_RAID_CHANNEL_ID } = CONFIG.GUILD;
 export function getAssignmentConfigAndHistory(database: Database) {
   const rawHistory = database.getWorldBuffHistory();
   const rawAssignmentConfig = database.getWorldBuffAssignments();
-  const allPlayers = database.getPlayersRoster();
+  const allPlayers = database.getPlayerInfos();
   const playerMap = new Map(allPlayers.map((t) => [t.discordHandle, t]));
   const history = mapRawHistory(rawHistory, playerMap);
   const assignmentConfig = mapRawAssignmentConfig(

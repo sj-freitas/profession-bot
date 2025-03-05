@@ -1,4 +1,4 @@
-import { Player } from "../../../integrations/sheets/get-players";
+import { PlayerInfo } from "../../../integrations/sheets/player-info-table";
 import { filterTwo } from "../../../lib/array-utils";
 import {
   ALL_RAID_TARGETS,
@@ -9,7 +9,7 @@ import {
 } from "../../raid-assignment";
 import { RaidAssignmentResult } from "../assignment-config";
 import { RaidAssignmentRoster } from "../raid-assignment-roster";
-import { sortByClasses } from "../utils";
+import { getCharactersOfPlayer, sortByClasses } from "../utils";
 import { drawImageAssignments } from "./four-horsemen-images";
 
 const THANE_KORTHAZZ = {
@@ -111,12 +111,12 @@ export function makeAssignments(roster: Character[]): TargetAssignment[] {
 
 export function exportToDiscord(
   fourHorsemenAssignment: TargetAssignment[],
-  player: Player[],
+  player: PlayerInfo[],
 ): string {
   const characterDiscordHandleMap = new Map<string, string>();
 
   player.forEach((currPlayer) => {
-    currPlayer.characters.forEach((currCharacter) => {
+    getCharactersOfPlayer(currPlayer).forEach((currCharacter) => {
       characterDiscordHandleMap.set(currCharacter, currPlayer.discordId);
     });
   });

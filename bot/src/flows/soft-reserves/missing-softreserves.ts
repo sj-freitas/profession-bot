@@ -1,27 +1,29 @@
 import { RaidEvent } from "../../integrations/raid-helper/types";
 import { SheetClient } from "../../integrations/sheets/config";
-import { Player } from "../../integrations/sheets/get-players";
+import { PlayerInfo } from "../../integrations/sheets/player-info-table";
 import { RaidInfoTable } from "../../integrations/sheets/raid-info";
 import { getRaid } from "../../integrations/softres/softres-client";
 import { filterTwo } from "../../lib/array-utils";
 import { CharacterWithMetadata, Roster } from "../roster-helper";
 
 function getCharacterThatSoftReserved(
-  player: Player,
+  player: PlayerInfo,
   softReservedCharacters: string[],
 ): string | undefined {
-  return player.characters.find((t) => softReservedCharacters.indexOf(t) >= 0);
+  return [player.mainName, ...player.altNames].find(
+    (t) => softReservedCharacters.indexOf(t) >= 0,
+  );
 }
 
 function hasPlayerSoftReserved(
-  player: Player,
+  player: PlayerInfo,
   softReservedCharacters: string[],
 ): boolean {
   return Boolean(getCharacterThatSoftReserved(player, softReservedCharacters));
 }
 
 export interface SelectedCharacterOfPlayer {
-  player: Player;
+  player: PlayerInfo;
   selectedCharacter: string;
 }
 
@@ -33,7 +35,7 @@ export interface InstanceRoster {
 
 export interface SoftReserveInformation {
   instanceRoster: InstanceRoster;
-  missingPlayers: Player[];
+  missingPlayers: PlayerInfo[];
 }
 
 function getRosterForDungeon(

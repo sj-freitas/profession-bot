@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import { getCharactersOfPlayer } from "../classic-wow/raids/utils";
 import { Database } from "../exports/mem-database";
 import { queryWowHead } from "../integrations/wowhead/client";
 import {
@@ -31,9 +32,9 @@ export const handleCrafter: CommandHandler<Database> = async ({
   };
   const allPlayers = new Map(
     database
-      .getPlayersRoster()
+      .getPlayerInfos()
       .map((t) =>
-        t.characters.map((x) => ({
+        getCharactersOfPlayer(t).map((x) => ({
           characterName: x,
           discordId: t.discordId,
         })),

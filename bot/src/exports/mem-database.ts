@@ -1,9 +1,7 @@
-import { Character } from "../classic-wow/raid-assignment";
 import {
   WorldBuffAssignments,
   WorldBuffHistory,
 } from "../integrations/sheets/get-buffers";
-import { Player } from "../integrations/sheets/get-players";
 import { PlayerInfo } from "../integrations/sheets/player-info-table";
 import { Switcher } from "../integrations/sheets/switcher-role-data";
 import { AvailableProfession, GuildProfessionData } from "./types";
@@ -32,8 +30,6 @@ export class Database {
   private worldBuffHistory: WorldBuffHistory[] = [];
 
   private playerInfos: PlayerInfo[] = [];
-
-  private characterRoster: Character[] = [];
 
   private switchers: Switcher[] = [];
 
@@ -69,25 +65,8 @@ export class Database {
     return this.playerInfos;
   }
 
-  getPlayersRoster(): Player[] {
-    return this.playerInfos.map((t) => ({
-      discordHandle: t.discordHandle,
-      discordId: t.discordId,
-      serverHandle: t.discordServerHandle,
-      characters: [t.mainName, ...t.altNames],
-    }));
-  }
-
   setPlayersRoster(players: PlayerInfo[]) {
     this.playerInfos = players;
-  }
-
-  getCharacterRoster(): Character[] {
-    return this.characterRoster;
-  }
-
-  setCharacterRoster(characters: Character[]) {
-    this.characterRoster = characters;
   }
 
   getSwitchers(): Switcher[] {

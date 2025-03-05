@@ -44,6 +44,10 @@ export interface PlayerInfo {
    * READONLY a flush of the user's roles on discord, it'll help officers map who should be entitled to what.
    */
   discordRoles: string[];
+  /**
+   * Characters that belong to this player that have the Atiesh staff.
+   */
+  atieshCharacters: string[];
 }
 
 // Sheet table column names:
@@ -64,6 +68,7 @@ const config: SheetTableConfig<PlayerInfo> = {
     mainName: getCharactersFromCHars(allCharacterNames).main,
     altNames: getCharactersFromCHars(allCharacterNames).alts,
     discordRoles: toEntityValue(discordRoles),
+    atieshCharacters: [],
   }),
   mapEntityToRaw: ({
     discordHandle,
