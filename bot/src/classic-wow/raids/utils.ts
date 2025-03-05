@@ -37,6 +37,10 @@ export function pickOneAtRandomAndRemoveFromArray<T>(
   return array.splice(indexOfElementToRemove, 1)[0];
 }
 
+export function pickFirstAndRemoveFromArray<T>(array: T[]): T | null {
+  return pickOneAtRandomAndRemoveFromArray(array, () => 0);
+}
+
 export function removeFirstOnPredicate<T>(
   array: T[],
   predicate: (t: T) => boolean,
@@ -186,4 +190,20 @@ export function hasAtiesh(
   return Boolean(
     playerInfoOfCharacter.atieshCharacters.find((t) => t === character.name),
   );
+}
+
+export function sortByAtiesh(
+  characters: Character[],
+  playerInfos: PlayerInfo[],
+): Character[] {
+  return characters.sort((a, b) => {
+    if (hasAtiesh(a, playerInfos)) {
+      return 1;
+    }
+    if (hasAtiesh(b, playerInfos)) {
+      return -1;
+    }
+
+    return 0;
+  });
 }
