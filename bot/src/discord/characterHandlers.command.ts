@@ -78,6 +78,7 @@ export const handleCharacterAdd: CommandHandler<Database> = async ({
       mainName: sanitizedName,
       altNames: [],
       discordRoles: [],
+      atieshCharacters: [],
     });
 
     // No characters registered, this is a main!
