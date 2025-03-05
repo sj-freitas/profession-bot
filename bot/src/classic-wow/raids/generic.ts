@@ -15,7 +15,7 @@ import {
   exportRaidGroupsToTable,
   getCharacterToPlayerDiscordMap,
   getRaidsortLuaAssignment,
-  pickOneAtRandomAndRemoveFromArray,
+  pickFirstAndRemoveFromArray,
 } from "./utils";
 
 const MAX_NUMBER_OF_TANKS_PER_GROUP = 1;
@@ -132,7 +132,7 @@ export function makeAssignments({ characters }: RaidAssignmentRoster): Raid {
   const numberOfMeleeGroups = Math.ceil(nonCasters.length / MAX_GROUP_SIZE);
   const pureMeleeGroups = new Array(numberOfMeleeGroups).fill(null).map(() => {
     const currGroup: Character[] = [];
-    const meleeBuffer = pickOneAtRandomAndRemoveFromArray(meleeBuffers);
+    const meleeBuffer = pickFirstAndRemoveFromArray(meleeBuffers);
     if (meleeBuffer) {
       currGroup.push(meleeBuffer);
     }
@@ -140,18 +140,18 @@ export function makeAssignments({ characters }: RaidAssignmentRoster): Raid {
     // Paladins give horn buff, make them sure they are in melee groups.
     // If there aren't sufficient melee paladins, use the healer ones.
     const paladin =
-      pickOneAtRandomAndRemoveFromArray(meleePaladins) ??
-      pickOneAtRandomAndRemoveFromArray(healerPaladins);
+      pickFirstAndRemoveFromArray(meleePaladins) ??
+      pickFirstAndRemoveFromArray(healerPaladins);
     if (paladin) {
       currGroup.push(paladin);
     }
-    const druid = pickOneAtRandomAndRemoveFromArray(meleeDruids);
+    const druid = pickFirstAndRemoveFromArray(meleeDruids);
     if (druid) {
       currGroup.push(druid);
     }
 
     for (let i = 0; i < MAX_NUMBER_OF_TANKS_PER_GROUP; i += 1) {
-      const tank = pickOneAtRandomAndRemoveFromArray(meleeTanks);
+      const tank = pickFirstAndRemoveFromArray(meleeTanks);
       if (!tank) {
         break;
       }
@@ -159,7 +159,7 @@ export function makeAssignments({ characters }: RaidAssignmentRoster): Raid {
     }
 
     for (let i = currGroup.length; i < MAX_GROUP_SIZE; i += 1) {
-      const meleeDps = pickOneAtRandomAndRemoveFromArray(remainingMelee);
+      const meleeDps = pickFirstAndRemoveFromArray(remainingMelee);
       if (!meleeDps) {
         break;
       }
@@ -205,15 +205,15 @@ export function makeAssignments({ characters }: RaidAssignmentRoster): Raid {
     .fill(null)
     .map(() => {
       const currGroup: Character[] = [];
-      const shadowPriest = pickOneAtRandomAndRemoveFromArray(shadowPriests);
+      const shadowPriest = pickFirstAndRemoveFromArray(shadowPriests);
       if (shadowPriest) {
         currGroup.push(shadowPriest);
       }
-      const moonkin = pickOneAtRandomAndRemoveFromArray(moonkins);
+      const moonkin = pickFirstAndRemoveFromArray(moonkins);
       if (moonkin) {
         currGroup.push(moonkin);
       }
-      const paladin = pickOneAtRandomAndRemoveFromArray(healerPaladins);
+      const paladin = pickFirstAndRemoveFromArray(healerPaladins);
       if (paladin) {
         currGroup.push(paladin);
       }
@@ -222,7 +222,7 @@ export function makeAssignments({ characters }: RaidAssignmentRoster): Raid {
         MAX_NUMBER_OF_HEALERS_PER_GROUP -
         currGroup.filter((t) => t.role === "Healer").length;
       for (let i = 0; i < remainingAmountOfHealersForGroup; i += 1) {
-        const healer = pickOneAtRandomAndRemoveFromArray(remainingHealers);
+        const healer = pickFirstAndRemoveFromArray(remainingHealers);
         if (!healer) {
           break;
         }
@@ -230,7 +230,7 @@ export function makeAssignments({ characters }: RaidAssignmentRoster): Raid {
       }
 
       for (let i = currGroup.length; i < MAX_GROUP_SIZE; i += 1) {
-        const casterDps = pickOneAtRandomAndRemoveFromArray(nonBufferCasters);
+        const casterDps = pickFirstAndRemoveFromArray(nonBufferCasters);
         if (!casterDps) {
           break;
         }
@@ -279,7 +279,7 @@ export function makeAssignments({ characters }: RaidAssignmentRoster): Raid {
       break;
     }
 
-    const currHunter = pickOneAtRandomAndRemoveFromArray(rangedHunters);
+    const currHunter = pickFirstAndRemoveFromArray(rangedHunters);
     if (!currHunter) {
       break;
     }
