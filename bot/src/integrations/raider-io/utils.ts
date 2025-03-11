@@ -89,10 +89,20 @@ function getRoleOfRogue(characterDetails: CharacterDetails): "Tank" | "Melee" {
 }
 
 function getRoleOfShaman(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   characterDetails: CharacterDetails,
 ): "Ranged" | "Tank" | "Melee" | "Healer" {
-  // Unsupported for now...
+  const allRunes = getAllRunes(characterDetails);
+  const allTalents = getAllTalents(characterDetails);
+  if (allRunes.has("Shield Mastery")) {
+    return "Tank";
+  }
+  if (allTalents.has("Elemental Fury")) {
+    return "Ranged";
+  }
+  if (allTalents.has("Mana Tide Totem")) {
+    return "Healer";
+  }
+
   return "Melee";
 }
 
