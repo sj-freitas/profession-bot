@@ -1,5 +1,5 @@
 import { PlayerInfo } from "../../../integrations/sheets/player-info-table";
-import { filterTwo, Predicate } from "../../../lib/array-utils";
+import { Predicate } from "../../../lib/array-utils";
 import {
   ALL_RAID_TARGETS,
   AssignmentDetails,
@@ -8,9 +8,9 @@ import {
 } from "../../raid-assignment";
 import { RaidAssignmentResult } from "../assignment-config";
 import { RaidAssignmentRoster } from "../raid-assignment-roster";
-import { getCharactersOfPlayer } from "../utils";
+import { getCharactersOfPlayer, sortByClasses } from "../utils";
 
-const FIGHT_DURATION_ESTIMATION = 80;
+const FIGHT_DURATION_ESTIMATION = 60;
 const NUMBER_OF_HATEFUL_STRIKE_TANKS = 1;
 
 function calculateWhenToApplyCooldowns(
@@ -18,8 +18,8 @@ function calculateWhenToApplyCooldowns(
   totalFightDurationInSeconds: number,
 ): number {
   const classCooldownDurationMap: { [key: string]: number } = {
-    Druid: 8,
-    Priest: 15,
+    Druid: 15,
+    Priest: 8,
     Warrior: 15,
   };
 
@@ -35,80 +35,37 @@ function calculateWhenToApplyCooldowns(
   return 100 - percentage;
 }
 
-function sortHealersBasedOnSingleTarget(healers: Character[]): Character[] {
-  return healers.sort((a, b) => {
-    if (b.class === "Paladin") {
-      return +1;
-    }
-    if (a.class === "Paladin") {
-      return -1;
-    }
-    if (b.class === "Priest") {
-      return +1;
-    }
-    if (a.class === "Priest") {
-      return -1;
-    }
-    if (b.class === "Druid") {
-      return +1;
-    }
-    if (a.class === "Druid") {
-      return -1;
-    }
-
-    return 0;
-  });
-}
-
-function sortDefensiveCooldownUsers(cooldownUsers: Character[]): Character[] {
-  return cooldownUsers.sort((a, b) => {
-    if (b.class === "Priest") {
-      return +1;
-    }
-    if (a.class === "Priest") {
-      return -1;
-    }
-    if (b.class === "Druid") {
-      return +1;
-    }
-    if (a.class === "Druid") {
-      return -1;
-    }
-
-    return 0;
-  });
-}
-
 export function makeAssignments(roster: Character[]): TargetAssignment[] {
   const tanks = roster.filter((t) => t.role === "Tank");
-  const [mainTanks, hatefulStrikeTanks] = filterTwo(
-    tanks,
-    (t) => t.class !== "Druid" && t.class !== "Rogue" && t.class !== "Warrior",
-  );
+  const sortedTanks = sortByClasses(tanks, [
+    "Warlock",
+    "Shaman",
+    "Warrior",
+    "Druid",
+    "Rogue",
+  ]);
 
-  const [mainTank, ...rest] = mainTanks;
-  const allHatefulStrikeTanks = [...rest, ...hatefulStrikeTanks].slice(
+  const [mainTank, ...otherTanks] = sortedTanks;
+  const hatefulStrikeTanks = [...otherTanks].slice(
     0,
     NUMBER_OF_HATEFUL_STRIKE_TANKS,
   );
 
   const healers = roster.filter((t) => t.role === "Healer");
-  const sortedHealers = sortHealersBasedOnSingleTarget(healers);
+  const sortedHealers = sortByClasses(healers, ["Paladin", "Priest", "Druid"]);
 
   // Split sorted tanks by number of hateful strike tanks.
   const NUMBER_OF_HEALERS_PER_TANK = Math.floor(
-    healers.length / (allHatefulStrikeTanks.length + 1),
+    healers.length / (hatefulStrikeTanks.length + 1),
   );
-  const tankAssignments = [...allHatefulStrikeTanks, mainTank].map(
-    (x, index) => ({
-      tank: x,
-      healers: sortedHealers.slice(
-        index * NUMBER_OF_HEALERS_PER_TANK,
-        index * NUMBER_OF_HEALERS_PER_TANK + NUMBER_OF_HEALERS_PER_TANK,
-      ),
-      isMainTank: x.name === mainTank.name,
-    }),
-  );
+  const tankAssignments = [...hatefulStrikeTanks, mainTank].map((x, index) => ({
+    tank: x,
+    healers: sortedHealers.slice(
+      index * NUMBER_OF_HEALERS_PER_TANK,
+      index * NUMBER_OF_HEALERS_PER_TANK + NUMBER_OF_HEALERS_PER_TANK,
+    ),
+    isMainTank: x.name === mainTank.name,
+  }));
 
   // Get the list of who has the defensive cooldowns. Assign them all to the hateful strike tanks.
   const hasBarkskin: Predicate<Character> = (t: Character) =>
@@ -120,8 +77,9 @@ export function makeAssignments(roster: Character[]): TargetAssignment[] {
     index: number,
     array: Character[],
   ) => hasBarkskin(t, index, array) || hasPainSuppression(t, index, array);
-  const defensiveCooldownUsers = sortDefensiveCooldownUsers(
+  const defensiveCooldownUsers = sortByClasses(
     roster.filter(hasDefensiveCooldowns),
+    ["Priest", "Druid"],
   );
 
   // Assign the defensive cooldowns to the hateful strike tanks. However if the
@@ -139,7 +97,7 @@ export function makeAssignments(roster: Character[]): TargetAssignment[] {
     (t) => !assignedHealersWithCooldowns.has(t.name),
   );
   const NUMBER_OF_DEFENSIVE_COOLDOWNS_PER_TANK = Math.ceil(
-    availableCooldownAssignees.length / allHatefulStrikeTanks.length,
+    availableCooldownAssignees.length / hatefulStrikeTanks.length,
   );
   const hatefulStrikeTankAssignments = tankAssignmentsWithCooldowns
     .filter((t) => !t.isMainTank)
@@ -180,7 +138,7 @@ export function makeAssignments(roster: Character[]): TargetAssignment[] {
         },
         {
           id: `Defensive cooldown rotation (last 30%) Suppression / Barkskin for ${mainTankAssignment.tank.name} by`,
-          description: `defensive cooldowns (last ${calculateWhenToApplyCooldowns([mainTankAssignment.tank, ...mainTankAssignment.cooldownAssignments], FIGHT_DURATION_ESTIMATION)}%) by`,
+          description: `defensive cooldowns (last ${calculateWhenToApplyCooldowns([...mainTankAssignment.cooldownAssignments], FIGHT_DURATION_ESTIMATION)}%) by`,
           characters: mainTankAssignment.cooldownAssignments,
         },
       ],
@@ -202,8 +160,8 @@ export function makeAssignments(roster: Character[]): TargetAssignment[] {
           characters: currTank.healers,
         },
         {
-          id: `Defensive cooldown rotation (last ${calculateWhenToApplyCooldowns([currTank.tank, ...currTank.cooldownAssignments], FIGHT_DURATION_ESTIMATION)}%) Suppression / Barkskin for ${currTank.tank.name} by`,
-          description: `defensive cooldowns (last ${calculateWhenToApplyCooldowns([currTank.tank, ...currTank.cooldownAssignments], FIGHT_DURATION_ESTIMATION)}%) by`,
+          id: `Defensive cooldown rotation (last ${calculateWhenToApplyCooldowns([...currTank.cooldownAssignments], FIGHT_DURATION_ESTIMATION)}%) Suppression / Barkskin for ${currTank.tank.name} by`,
+          description: `defensive cooldowns (last ${calculateWhenToApplyCooldowns([...currTank.cooldownAssignments], FIGHT_DURATION_ESTIMATION)}%) by`,
           characters: currTank.cooldownAssignments,
         },
       ],

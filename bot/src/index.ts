@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { getGenericRaidAssignment } from "./classic-wow/raids/generic";
-import { TEMPLE_OF_AHNQIRAJ } from "./classic-wow/raids/temple-of-aq/temple-of-aq-mapping";
+import { NAXXRAMAS } from "./classic-wow/raids/naxxramas/naxxramas-mapping";
 import { createClient } from "./discord/create-client";
 import { Database } from "./exports/mem-database";
 import { refreshDatabase } from "./exports/utils";
@@ -17,7 +17,7 @@ async function main() {
   const database = new Database();
   await refreshDatabase(database);
 
-  const raidEvent = await fetchEvent("1345874138467799164");
+  const raidEvent = await fetchEvent("1348941500314161194");
   if (!raidEvent) {
     return;
   }
@@ -25,7 +25,7 @@ async function main() {
   const assignmentRoster = toRaidAssignmentRoster(roster);
 
   const allAssignments = await Promise.all(
-    TEMPLE_OF_AHNQIRAJ.assignmentMakers.map(async (assignmentMaker) =>
+    NAXXRAMAS.assignmentMakers.map(async (assignmentMaker) =>
       assignmentMaker(assignmentRoster),
     ),
   );

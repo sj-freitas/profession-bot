@@ -48,10 +48,12 @@ export function makeAssignments(roster: Character[]): TargetAssignment[] {
     ...restOfTanks,
     ...roster.filter((t) => t.class === "Priest" && t.role === "Ranged"),
   ];
-  const [backTankOne, backTankTwo] = sortByClasses(allAvailableBackTanks, [
-    "Warlock",
-    "Priest",
-  ]);
+  const [backTankOne, backTankTwo] = [
+    ...sortByClasses(allAvailableBackTanks, ["Warlock", "Priest"]),
+    ...roster.filter((t) => t.class === "Warlock" && t.role === "Ranged"),
+    ...roster.filter((t) => t.class === "Druid" && t.role === "Ranged"),
+    ...roster.filter((t) => t.class === "Mage" && t.role === "Ranged"),
+  ];
   const backTanks = [backTankOne, backTankTwo];
   const healers = roster.filter((t) => t.role === "Healer");
   const [backHealers, otherHealers] = filterTwo(
