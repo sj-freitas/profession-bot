@@ -8,7 +8,7 @@ import {
 } from "../../raid-assignment";
 import { RaidAssignmentResult } from "../assignment-config";
 import { RaidAssignmentRoster } from "../raid-assignment-roster";
-import { getCharactersOfPlayer, shuffleArray } from "../utils";
+import { getCharactersOfPlayer } from "../utils";
 
 const YAUJ = {
   raidTarget: {
@@ -30,19 +30,32 @@ const VEM = {
 };
 
 export function makeAssignments(roster: Character[]): TargetAssignment[] {
-  const tanks = roster.filter((t) => t.role === "Tank");
-  const shuffledTanks = shuffleArray(tanks);
+  const [mainTank, ...otherTanks] = roster.filter((t) => t.role === "Tank");
 
-  return [YAUJ, KRI, VEM].map((currBug, idx) => ({
-    ...currBug,
+  const yaujAssigment = {
+    ...YAUJ,
     assignments: [
       {
         id: "Tanks",
         description: "tanked by",
-        characters: [shuffledTanks[idx]],
+        characters: [mainTank],
       },
     ],
-  }));
+  };
+
+  return [
+    yaujAssigment,
+    ...[KRI, VEM].map((currBug, idx) => ({
+      ...currBug,
+      assignments: [
+        {
+          id: "Tanks",
+          description: "tanked by",
+          characters: [otherTanks[idx % otherTanks.length]],
+        },
+      ],
+    })),
+  ];
 }
 
 export function exportToDiscord(
