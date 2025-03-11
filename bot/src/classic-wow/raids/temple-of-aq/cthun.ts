@@ -152,7 +152,9 @@ export function makeAssignments(roster: Character[]): Raid {
   const TOP_GROUPS = [0, 1, 6, 7].filter((t) => refinedGroups[t] !== undefined);
   const allTankGroupIndexes = refinedGroups
     .map((t, index) => ({
-      isTankGroup: t.slots.find((x) => x?.role === "Tank"),
+      isTankGroup: t.slots.find(
+        (x) => x?.role === "Tank" && x?.class !== "Warlock",
+      ),
       groupIndex: index,
     }))
     .filter((t) => t.isTankGroup)
@@ -223,7 +225,8 @@ export function makeAssignments(roster: Character[]): Raid {
     });
 
   return {
-    groups: refinedGroups,
+    // In case of empty groups, make sure to have everything in the correct order
+    groups: refinedGroups.filter((t) => Boolean(t)),
   };
 }
 

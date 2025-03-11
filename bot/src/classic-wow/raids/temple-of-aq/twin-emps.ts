@@ -8,7 +8,7 @@ import {
 } from "../../raid-assignment";
 import { RaidAssignmentResult } from "../assignment-config";
 import { RaidAssignmentRoster } from "../raid-assignment-roster";
-import { getCharactersOfPlayer, shuffleArray } from "../utils";
+import { getCharactersOfPlayer, sortByClasses } from "../utils";
 
 const CASTER_TWIN = {
   raidTarget: {
@@ -25,18 +25,12 @@ const MELEE_TWIN = {
 
 export function makeAssignments(roster: Character[]): TargetAssignment[] {
   const tanks = roster.filter((t) => t.role === "Tank");
-  const [casterMainTank, casterOffTank, meleeMainTank] = shuffleArray(tanks);
-  const [healerCaster, healerMelee] = [
-    ...shuffleArray(
-      roster.filter((t) => t.class === "Paladin" && t.role === "Healer"),
-    ),
-    ...shuffleArray(
-      roster.filter(
-        (t) =>
-          !(t.class === "Paladin" || t.class === "Mage") && t.role === "Healer",
-      ),
-    ),
-  ];
+  const healers = roster.filter((t) => t.role === "Healer");
+  const sortedTanks = sortByClasses(tanks, ["Warrior", "Druid"]);
+  const sortedHealers = sortByClasses(healers, ["Paladin", "Priest", "Druid"]);
+
+  const [healerCaster, ...healersMelee] = sortedHealers;
+  const [meleeTank, ...casterTanks] = sortedTanks;
 
   return [
     {
@@ -45,7 +39,7 @@ export function makeAssignments(roster: Character[]): TargetAssignment[] {
         {
           id: "Tanks",
           description: "tanked by",
-          characters: [casterMainTank, casterOffTank],
+          characters: casterTanks,
         },
         {
           id: "Healer",
@@ -60,12 +54,12 @@ export function makeAssignments(roster: Character[]): TargetAssignment[] {
         {
           id: "Tank",
           description: "tanked by",
-          characters: [meleeMainTank],
+          characters: [meleeTank],
         },
         {
           id: "Healer",
           description: "healed by",
-          characters: [healerMelee],
+          characters: healersMelee,
         },
       ],
     },

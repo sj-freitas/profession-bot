@@ -61,3 +61,33 @@ export async function getRaid(raidId: string): Promise<RaidInstance | null> {
     return null;
   }
 }
+
+export async function lockRaid(
+  raidId: string,
+  token: string,
+): Promise<number | null> {
+  const response = await fetch(
+    `${CONFIG.SOFTRES_IT.API_HOST_NAME}/raid/update`,
+    {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        raid: {
+          raidId,
+          lock: true,
+        },
+        token,
+      }),
+    },
+  );
+  try {
+    const text = await response.text();
+
+    return Number.parseInt(text, 10);
+  } catch {
+    return null;
+  }
+}

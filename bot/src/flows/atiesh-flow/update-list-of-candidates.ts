@@ -85,7 +85,7 @@ export async function updateListOfAtieshCandidates(
         t.roles.cache.find((x) => ACCEPTED_ATIESH_CLASSES.has(x.name))?.name ??
         "",
       characterName: discordIdMainName.get(t.id) ?? "",
-      atieshStatus: "OnTheList",
+      atieshStatus: "NotAnnounced",
     }));
 
   await atieshCandidatesTable.insertMany(
