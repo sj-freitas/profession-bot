@@ -39,6 +39,15 @@ export async function pollChannelForWorldBuffAssignments(
   }
 
   const roster = await getRosterFromRaidEvent(raidEvent, database);
+  const rosterForSoftreserves = await getRosterFromRaidEvent(
+    raidEvent,
+    database,
+    {
+      includeBench: true,
+      includeLate: true,
+      includeTentative: true,
+    },
+  );
 
   // Stuff that should be done even if the hash doesn't changed, since this
   // isn't really tracked by the hash itself.
@@ -46,7 +55,7 @@ export async function pollChannelForWorldBuffAssignments(
     discordClient,
     sheetClient,
     raidEvent,
-    roster,
+    rosterForSoftreserves,
   );
 
   const worldBuffAssignmentMessageExistsInHistory =

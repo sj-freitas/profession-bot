@@ -7,6 +7,7 @@ import {
 } from "../classic-wow/raid-assignment";
 import { ClassName, RaidEvent } from "../integrations/raid-helper/types";
 import {
+  ExtraFilters,
   inferWowClassFromSpec,
   isConfirmedSignup,
 } from "../integrations/raid-helper/utils";
@@ -181,13 +182,20 @@ export function calibrateRoster(roster: Roster, database: Database): Roster {
   };
 }
 
+const defaultFilter: ExtraFilters = {
+  includeLate: false,
+  includeAbsence: false,
+  includeTentative: false,
+  includeBench: false,
+};
+
 export async function getRosterFromRaidEvent(
   raidEvent: RaidEvent,
   database: Database,
-  includeAbsences = false,
+  additionalFilters = defaultFilter,
 ): Promise<Roster> {
   const signUps = raidEvent.signUps
-    .filter((t) => includeAbsences || isConfirmedSignup(t))
+    .filter((t) => isConfirmedSignup(t, additionalFilters))
     .map((t) => ({
       wowClass: inferWowClassFromSpec(t.specName!),
       simplifiedDiscordHandle: t.name.toLowerCase(),

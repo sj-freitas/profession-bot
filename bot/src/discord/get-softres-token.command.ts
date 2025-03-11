@@ -3,7 +3,7 @@ import { MessageFlags } from "discord.js";
 import { CONFIG } from "../config";
 import { Database } from "../exports/mem-database";
 import { RAID_HELPER_AUTHOR } from "../integrations/raid-helper/constants";
-import { createSheetClient } from "../integrations/sheets/config";
+import { createSheetClient, SheetClient } from "../integrations/sheets/config";
 import { RaidInfoTable } from "../integrations/sheets/raid-info";
 import { RaidConfigTable } from "../integrations/sheets/raid-config-table";
 import { getRaid } from "../integrations/softres/softres-client";
@@ -89,3 +89,25 @@ ${allSoftresRaids.map((t) => `- [${raidNameMap.get(t.instances[0])} (${t.raidId}
     flags: MessageFlags.SuppressEmbeds,
   });
 };
+
+export interface SoftresData {
+  raidId: string;
+  token: string;
+}
+
+export async function getSoftresTokensFromEventId(
+  eventId: string,
+  sheetClient: SheetClient,
+): Promise<SoftresData[]> {
+  const raidInfoTable = new RaidInfoTable(sheetClient, INFO_SHEET);
+  const raidEvent = await raidInfoTable.getValueById(eventId);
+
+  if (!raidEvent) {
+    return [];
+  }
+
+  return raidEvent.softresTokens.map((t, idx) => ({
+    raidId: raidEvent.softresIds[idx],
+    token: t,
+  }));
+}

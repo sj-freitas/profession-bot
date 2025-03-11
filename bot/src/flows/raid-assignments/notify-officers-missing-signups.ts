@@ -62,7 +62,12 @@ export async function tryNotifyOfficersMissingSignUps(
     })
     .map((t) => t.id);
 
-  const signUppers = await getRosterFromRaidEvent(raidEvent, database, true);
+  const signUppers = await getRosterFromRaidEvent(raidEvent, database, {
+    includeAbsence: true,
+    includeBench: true,
+    includeLate: true,
+    includeTentative: true,
+  });
   const signUppersMap = new Set(
     signUppers.characters.map((t) => t.player.discordId),
   );

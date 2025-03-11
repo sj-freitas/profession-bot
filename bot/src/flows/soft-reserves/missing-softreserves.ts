@@ -113,6 +113,7 @@ export async function getSoftReserveInformation(
           allPlayersOfRaid.characters,
           (t) => hasPlayerSoftReserved(t.player, charactersThatReserved),
         );
+        // TODO: Check late as well...
         const instanceRoster = getRosterForDungeon(
           softReserveRaidInstance.instances[0],
           softReserveRaidInstance.raidId,

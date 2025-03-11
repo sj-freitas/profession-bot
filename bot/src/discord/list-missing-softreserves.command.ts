@@ -27,13 +27,21 @@ export const handleMissingSoftreserves: CommandHandler<Database> = async ({
     return;
   }
 
-  const roster = await getRosterFromRaidEvent(raidEvent, database);
+  const rosterWithTentative = await getRosterFromRaidEvent(
+    raidEvent,
+    database,
+    {
+      includeBench: true,
+      includeLate: true,
+      includeTentative: true,
+    },
+  );
   const allSoftresRaidInfo = await softResInfoTable.getAllValues();
   const softReserveInfo = await getSoftReserveInformation(
     raidEvent,
     sheetClient,
     INFO_SHEET,
-    roster,
+    rosterWithTentative,
   );
 
   const formatted = `## Missing Soft Reserves
