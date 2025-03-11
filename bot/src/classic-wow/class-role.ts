@@ -119,7 +119,32 @@ export const CLASS_ROLE_MAP: ClassRoleFeatures = {
       canResurrect: false,
     },
   },
-  Shaman: {},
+  Shaman: {
+    Ranged: {
+      canStun: false,
+      canBuff: false,
+      canInterrupt: true,
+      canResurrect: true,
+    },
+    Healer: {
+      canStun: false,
+      canBuff: false,
+      canInterrupt: true,
+      canResurrect: true,
+    },
+    Tank: {
+      canStun: false,
+      canBuff: true,
+      canInterrupt: true,
+      canResurrect: true,
+    },
+    Melee: {
+      canStun: false,
+      canBuff: true,
+      canInterrupt: true,
+      canResurrect: true,
+    }
+  },
   Warlock: {
     Ranged: {
       canStun: false,
