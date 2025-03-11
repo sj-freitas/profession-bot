@@ -14,7 +14,6 @@ import { drawImageAssignments } from "./kel-thuzad-hm4-image";
 export const NUMBER_OF_MELEE_SPOTS = 3;
 export const NUMBER_OF_RANGED_SPOTS = 4;
 export const NUMBER_OF_HEALING_SPOTS = 4;
-export const NUMBER_OF_INTERRUPTERS = 5;
 
 function sortBySmallerSize<T>(array: T[][]): T[][] {
   return [...array].sort((t, v) => t.length - v.length);
@@ -84,12 +83,28 @@ export function moveAllFeralsToGroup(
   }
 }
 
+export interface Interrupts {
+  groupA: Character[];
+  groupB: Character[];
+  groupC: Character[];
+}
+
+function getInterrupters(characters: Character[]): Character[] {
+  return characters.filter(
+    (t) =>
+      CLASS_ROLE_MAP[t.class][t.role].canInterrupt &&
+      t.role !== "Tank" &&
+      t.role !== "Healer" &&
+      t.class !== "Paladin",
+  );
+}
+
 export function makeAssignments(roster: Character[]): {
   mainTankAssignment: TargetAssignment;
   rangedAssignments: TargetAssignment[];
   meleeAssignments: TargetAssignment[];
   healerAssignments: Character[][];
-  interrupts: Character[];
+  interrupts: Interrupts;
 } {
   // Melee Group assignment
   const [mainTank, ...otherTanks] = sortByClasses(
@@ -186,28 +201,22 @@ export function makeAssignments(roster: Character[]): {
     ],
   };
 
-  const interrupts = roster
-    .filter(
-      (t) =>
-        CLASS_ROLE_MAP[t.class][t.role].canInterrupt &&
-        t.role !== "Tank" &&
-        t.role !== "Healer" &&
-        t.class !== "Paladin",
-    )
-    .slice(0, NUMBER_OF_INTERRUPTERS);
-
   return {
     mainTankAssignment,
     rangedAssignments,
     meleeAssignments,
     healerAssignments: healerGroups,
-    interrupts,
+    interrupts: {
+      groupA: getInterrupters(meleeAssignments[0].assignments[0].characters),
+      groupB: getInterrupters(meleeAssignments[1].assignments[0].characters),
+      groupC: getInterrupters(meleeAssignments[2].assignments[0].characters),
+    },
   };
 }
 
 export function exportToDiscord(
   kelThuzadAssignment: TargetAssignment[],
-  interrupters: Character[],
+  interrupters: Interrupts,
   player: PlayerInfo[],
 ): string {
   const characterDiscordHandleMap = new Map<string, string>();
@@ -224,11 +233,13 @@ export function exportToDiscord(
   return `${kelThuzadAssignment.map((t) => `- ${t.raidTarget.icon.discordEmoji} [${t.raidTarget.icon.name}] (${t.raidTarget.name}): ${t.assignments.map(printAssignment).join(" ")} `).join("\n")}
 
 ### Interrupts on Kel'Thuzad
-${interrupters.map((t, index) => `${index + 1}. <@${characterDiscordHandleMap.get(t.name)}>`).join("\n")}`;
+- Group A: ${interrupters.groupA.map((t, index) => `${index + 1}. <@${characterDiscordHandleMap.get(t.name)}>`).join("\n")}
+- Group B: ${interrupters.groupB.map((t, index) => `${index + 1}. <@${characterDiscordHandleMap.get(t.name)}>`).join("\n")}
+- Group C: ${interrupters.groupC.map((t, index) => `${index + 1}. <@${characterDiscordHandleMap.get(t.name)}>`).join("\n")}`;
 }
 
-export function exportToRaidWarning(interrupts: Character[]): string {
-  return `/rw Interrupts on Kel'Thuzad: ${interrupts.map((x) => x.name).join(" > ")}`;
+export function exportToRaidWarning(interrupts: Interrupts): string {
+  return `/rw Interrupts on Kel'Thuzad: A: ${interrupts.groupA.map((x) => x.name).join(",")} B: ${interrupts.groupB.map((x) => x.name).join(",")} C: ${interrupts.groupC.map((x) => x.name).join(",")}`;
 }
 
 export async function getKelThuzadAssignment({
