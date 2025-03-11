@@ -38,6 +38,7 @@ import { addWhatListener } from "./flows/whaaaat/what-listener";
 import { updateListOfAtieshCandidates } from "./flows/atiesh-flow/update-list-of-candidates";
 import { updateAtieshSelectedMembers } from "./flows/atiesh-flow/update-selected-members";
 import { getMissingRaiderFromEmojiReaction } from "./discord/missing-reaction.command";
+import { tryLockSoftreserves } from "./flows/soft-reserves/try-lock-soft-reserves.job";
 
 const { RAID_SIGN_UP_CHANNELS } = CONFIG.GUILD;
 const FIVE_MINUTES = 5 * 60 * 1000;
@@ -343,6 +344,10 @@ async function bootstrapServer(): Promise<void> {
   void loop(
     async () => automaticFlushOfDiscordRoles(discordClient, sheetClient),
     TWO_HOURS,
+  );
+  void loop(
+    async () => tryLockSoftreserves(discordClient, sheetClient),
+    FIVE_MINUTES,
   );
 
   try {

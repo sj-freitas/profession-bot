@@ -1,5 +1,5 @@
 import { Class } from "../raider-io/types";
-import { SignUp, Spec } from "./types";
+import { ClassName, SignUp, Spec } from "./types";
 
 export function inferWowClassFromSpec(specName: Spec): Class {
   switch (specName) {
@@ -51,10 +51,30 @@ export function inferWowClassFromSpec(specName: Spec): Class {
   }
 }
 
-const signedUpClassNames = new Set(["Healer", "Melee", "Tank", "Ranged"]);
+const signedUpClassNames: Set<ClassName> = new Set([
+  "Healer",
+  "Melee",
+  "Tank",
+  "Ranged",
+]);
 
-export function isConfirmedSignup(signUp: SignUp) {
-  return signedUpClassNames.has(signUp.className);
+export interface ExtraFilters {
+  includeLate?: boolean;
+  includeAbsence?: boolean;
+  includeBench?: boolean;
+  includeTentative?: boolean;
+}
+
+export function isConfirmedSignup(signUp: SignUp, extraFilters: ExtraFilters) {
+  const acceptedClasses = new Set([
+    ...signedUpClassNames,
+    ...(extraFilters.includeAbsence ? ["Absence"] : []),
+    ...(extraFilters.includeLate ? ["Late"] : []),
+    ...(extraFilters.includeBench ? ["Bench"] : []),
+    ...(extraFilters.includeTentative ? ["Tentative"] : []),
+  ]);
+
+  return acceptedClasses.has(signUp.className);
 }
 
 export function toSimplifiedHandle(discordHandle: string) {

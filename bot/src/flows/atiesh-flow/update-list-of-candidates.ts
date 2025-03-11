@@ -10,6 +10,7 @@ import { PlayerInfoTable } from "../../integrations/sheets/player-info-table";
 import { fetchMemberOrNull } from "../../discord/utils";
 
 const ACCEPTED_ATIESH_CLASSES = new Set(["Mage", "Priest", "Warlock", "Druid"]);
+const ACCEPTED_ATIESH_ROLES = new Set(["Raider"]);
 
 export async function updateListOfAtieshCandidates(
   discordClient: Client,
@@ -75,18 +76,21 @@ export async function updateListOfAtieshCandidates(
   const members = await Promise.all(
     userIds.map(async (t) => fetchMemberOrNull(server, t)),
   );
-  const atieshCandidates: AtieshCandidate[] = members
+  const casterRaiders = members
     .filter((t): t is GuildMember => t !== null)
-    .filter((t) =>
-      t.roles.cache.find((x) => ACCEPTED_ATIESH_CLASSES.has(x.name)),
-    )
-    .map((t) => ({
-      characterClass:
-        t.roles.cache.find((x) => ACCEPTED_ATIESH_CLASSES.has(x.name))?.name ??
-        "",
-      characterName: discordIdMainName.get(t.id) ?? "",
-      atieshStatus: "NotAnnounced",
-    }));
+    .filter((t) => {
+      return t.roles.cache.find((x) => ACCEPTED_ATIESH_ROLES.has(x.name));
+    })
+    .filter((t) => {
+      return t.roles.cache.find((x) => ACCEPTED_ATIESH_CLASSES.has(x.name));
+    });
+  const atieshCandidates: AtieshCandidate[] = casterRaiders.map((t) => ({
+    characterClass:
+      t.roles.cache.find((x) => ACCEPTED_ATIESH_CLASSES.has(x.name))?.name ??
+      "",
+    characterName: discordIdMainName.get(t.id) ?? "",
+    atieshStatus: "NotAnnounced",
+  }));
 
   await atieshCandidatesTable.insertMany(
     atieshCandidates.sort((x, y) =>
