@@ -1,6 +1,10 @@
 /* eslint-disable no-console */
 import { CONFIG } from "../config";
 import { AtieshCandidatesTable } from "../integrations/sheets/atiesh/atiesh-candidates-data";
+import {
+  CharacterMetadata,
+  CharacterMetadataConfigTable,
+} from "../integrations/sheets/character-metadata.config";
 import { createSheetClient, SheetClient } from "../integrations/sheets/config";
 import {
   getAllBuffHistory,
@@ -33,6 +37,29 @@ function addAtieshDataToCharacters(
   });
 }
 
+function addCharacterMetadata(
+  roster: PlayerInfo[],
+  characterMetadata: CharacterMetadata[],
+): PlayerInfo[] {
+  const charactersMetadata = new Map(
+    characterMetadata.map((t) => [t.characterName, t]),
+  );
+
+  return roster.map((currPlayer) => {
+    const metadataOfPlayerCharacters = [
+      currPlayer.mainName,
+      ...currPlayer.altNames,
+    ]
+      .map((currCharacterName) => charactersMetadata.get(currCharacterName))
+      .filter((t): t is CharacterMetadata => Boolean(t));
+
+    return {
+      ...currPlayer,
+      charactersMetadata: metadataOfPlayerCharacters,
+    };
+  });
+}
+
 export async function refreshRoster(
   database: Database,
   sheetClient: SheetClient = createSheetClient(),
@@ -46,12 +73,20 @@ export async function refreshRoster(
     sheetClient,
     CONFIG.GUILD.INFO_SHEET,
   );
+  const characterMetadataTable = new CharacterMetadataConfigTable(
+    sheetClient,
+    CONFIG.GUILD.INFO_SHEET,
+  );
   const atieshCandidates = await atieshCandidatesInfo.getAllValues();
-  const decoratedRoster = addAtieshDataToCharacters(
-    roster,
-    atieshCandidates
-      .filter((t) => t.atieshStatus === "Completed")
-      .map((t) => t.characterName),
+  const characterMetadata = await characterMetadataTable.getAllValues();
+  const decoratedRoster = addCharacterMetadata(
+    addAtieshDataToCharacters(
+      roster,
+      atieshCandidates
+        .filter((t) => t.atieshStatus === "Completed")
+        .map((t) => t.characterName),
+    ),
+    characterMetadata,
   );
 
   database.setPlayersRoster(decoratedRoster);

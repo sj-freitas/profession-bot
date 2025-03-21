@@ -1,5 +1,8 @@
 /* eslint-disable no-console */
-import { getGenericRaidAssignment } from "./classic-wow/raids/generic";
+import {
+  getGenericRaidAssignment,
+  makeAssignments,
+} from "./classic-wow/raids/generic";
 import { NAXXRAMAS } from "./classic-wow/raids/naxxramas/naxxramas-mapping";
 import { createClient } from "./discord/create-client";
 import { Database } from "./exports/mem-database";
@@ -17,7 +20,7 @@ async function main() {
   const database = new Database();
   await refreshDatabase(database);
 
-  const raidEvent = await fetchEvent("1348941500314161194");
+  const raidEvent = await fetchEvent("1350951772964782120");
   if (!raidEvent) {
     return;
   }
@@ -30,6 +33,8 @@ async function main() {
     ),
   );
   const genericAssignment = await getGenericRaidAssignment(assignmentRoster);
+  makeAssignments(assignmentRoster);
+
   try {
     const user = await discordClient.users.fetch(MY_DISCORD_ID);
     if (!user) {

@@ -143,7 +143,7 @@ export const CLASS_ROLE_MAP: ClassRoleFeatures = {
       canBuff: true,
       canInterrupt: true,
       canResurrect: true,
-    }
+    },
   },
   Warlock: {
     Ranged: {

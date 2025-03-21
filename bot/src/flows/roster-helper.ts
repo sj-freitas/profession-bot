@@ -200,6 +200,7 @@ export async function getRosterFromRaidEvent(
       wowClass: inferWowClassFromSpec(t.specName!),
       simplifiedDiscordHandle: t.name.toLowerCase(),
       role: t.className,
+      spec: t.specName,
       userId: t.userId,
     }));
 
@@ -211,6 +212,7 @@ export async function getRosterFromRaidEvent(
     wowClass: inferWowClassFromSpec(t.specName!),
     simplifiedDiscordHandle: t.name.toLowerCase(),
     role: t.className,
+    spec: t.specName,
     userId: t.userId,
   }));
 

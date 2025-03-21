@@ -1,4 +1,5 @@
 import { PlayerInfo } from "../../../integrations/sheets/player-info-table";
+import { filterTwo } from "../../../lib/array-utils";
 import { CLASS_ROLE_MAP } from "../../class-role";
 import {
   ALL_RAID_TARGETS,
@@ -94,8 +95,7 @@ function getInterrupters(characters: Character[]): Character[] {
     (t) =>
       CLASS_ROLE_MAP[t.class][t.role].canInterrupt &&
       t.role !== "Tank" &&
-      t.role !== "Healer" &&
-      t.class !== "Paladin",
+      t.role !== "Healer",
   );
 }
 
@@ -107,16 +107,21 @@ export function makeAssignments(roster: Character[]): {
   interrupts: Interrupts;
 } {
   // Melee Group assignment
+  // Balance interrupters
   const [mainTank, ...otherTanks] = sortByClasses(
     roster.filter((t) => t.role === "Tank"),
     ["Warrior", "Paladin", "Rogue", "Warlock", "Druid"],
   );
   const allTanks = [...otherTanks, mainTank];
 
-  const meleeDps = sortByClasses(
+  const [interrupters, everyoneElse] = filterTwo(
     roster.filter((t) => t.role === "Melee"),
-    ["Warrior", "Paladin", "Rogue", "Hunter"],
+    (t) => CLASS_ROLE_MAP[t.class][t.role].canInterrupt,
   );
+  const meleeDps = [
+    ...interrupters,
+    ...sortByClasses(everyoneElse, ["Warrior", "Paladin", "Rogue", "Hunter"]),
+  ];
   const rangedDps = sortByClasses(
     roster.filter((t) => t.role === "Ranged"),
     ["Priest", "Druid", "Mage", "Warlock"],
@@ -201,16 +206,27 @@ export function makeAssignments(roster: Character[]): {
     ],
   };
 
+  const mageInterrupters = roster.filter(
+    (t) => t.class === "Mage" && t.role !== "Healer",
+  );
+  const interrupts = {
+    groupA: getInterrupters(meleeAssignments[0].assignments[0].characters),
+    groupB: getInterrupters(meleeAssignments[1].assignments[0].characters),
+    groupC: getInterrupters(meleeAssignments[2].assignments[0].characters),
+  };
+  for (const value of Object.values(interrupts)) {
+    if (value.length <= 1) {
+      const [mageToAdd] = mageInterrupters.splice(0, 1);
+      value.push(mageToAdd);
+    }
+  }
+
   return {
     mainTankAssignment,
     rangedAssignments,
     meleeAssignments,
     healerAssignments: healerGroups,
-    interrupts: {
-      groupA: getInterrupters(meleeAssignments[0].assignments[0].characters),
-      groupB: getInterrupters(meleeAssignments[1].assignments[0].characters),
-      groupC: getInterrupters(meleeAssignments[2].assignments[0].characters),
-    },
+    interrupts,
   };
 }
 
@@ -233,9 +249,9 @@ export function exportToDiscord(
   return `${kelThuzadAssignment.map((t) => `- ${t.raidTarget.icon.discordEmoji} [${t.raidTarget.icon.name}] (${t.raidTarget.name}): ${t.assignments.map(printAssignment).join(" ")} `).join("\n")}
 
 ### Interrupts on Kel'Thuzad
-- Group A: ${interrupters.groupA.map((t, index) => `${index + 1}. <@${characterDiscordHandleMap.get(t.name)}>`).join("\n")}
-- Group B: ${interrupters.groupB.map((t, index) => `${index + 1}. <@${characterDiscordHandleMap.get(t.name)}>`).join("\n")}
-- Group C: ${interrupters.groupC.map((t, index) => `${index + 1}. <@${characterDiscordHandleMap.get(t.name)}>`).join("\n")}`;
+- Group A: ${interrupters.groupA.map((t) => `<@${characterDiscordHandleMap.get(t.name)}>`).join(" > ")}
+- Group B: ${interrupters.groupB.map((t) => `<@${characterDiscordHandleMap.get(t.name)}>`).join(" > ")}
+- Group C: ${interrupters.groupC.map((t) => `<@${characterDiscordHandleMap.get(t.name)}>`).join(" > ")}`;
 }
 
 export function exportToRaidWarning(interrupts: Interrupts): string {

@@ -1,325 +1,260 @@
-import { Class } from "../../integrations/raider-io/types";
 import { PlayerInfo } from "../../integrations/sheets/player-info-table";
-import { filterTwo } from "../../lib/array-utils";
+import { sortByBooleanPredicate } from "../../lib/array-utils";
 import { CLASS_ROLE_MAP } from "../class-role";
-import {
-  Character,
-  Group,
-  GroupSlots,
-  MAX_GROUP_SIZE,
-  Raid,
-} from "../raid-assignment";
+import { Character, Group, MAX_GROUP_SIZE, Raid } from "../raid-assignment";
 import { RaidAssignmentResult } from "./assignment-config";
 import { RaidAssignmentRoster } from "./raid-assignment-roster";
 import {
   exportRaidGroupsToTable,
   getCharacterToPlayerDiscordMap,
   getRaidsortLuaAssignment,
-  pickFirstAndRemoveFromArray,
+  hasAtiesh,
+  sortByClasses,
 } from "./utils";
+import { mergeGroups } from "./utils/merge-groups";
 
-const MAX_NUMBER_OF_TANKS_PER_GROUP = 1;
-const MAX_NUMBER_OF_HEALERS_PER_GROUP = 2;
-
-function tryMergeGroups(groups: Group[]): Group[] {
-  const mergedGroups: Group[] = [];
-  const remainingGroups = [...groups];
-
-  while (remainingGroups.length > 0) {
-    const currentGroup = remainingGroups.shift();
-
-    if (!currentGroup) {
-      // eslint-disable-next-line no-continue
-      continue;
-    }
-
-    let merged = false;
-
-    for (let i = 0; i < mergedGroups.length; i += 1) {
-      if (
-        mergedGroups[i].slots.length + currentGroup.slots.length <=
-        MAX_GROUP_SIZE
-      ) {
-        mergedGroups[i].slots = mergedGroups[i].slots.concat(
-          currentGroup.slots,
-        ) as GroupSlots;
-        merged = true;
-        break;
-      }
-    }
-
-    if (!merged) {
-      mergedGroups.push(currentGroup);
-    }
-  }
-
-  return mergedGroups;
+export interface GroupReviewResult {
+  groupType: "Melee" | "Ranged" | "Hybrid";
+  isGroupFull: boolean;
+  isIdealGroup: boolean;
 }
 
-export function makeAssignments({ characters }: RaidAssignmentRoster): Raid {
-  // Ideally we want one group with the tanks
-  // Each group needs to be sorted as melee group, caster group
-  // Buffer casters buff caster group
-  // Melee buffers buff melee group
-  // Need to find out how many groups we make
-  // Hunters are odd balls and can be spread around
-  const [allHealers, nonHealers] = filterTwo(
-    characters,
-    (t) => t.role === "Healer",
+/**
+ * Helper function that given a group of characters, will review the group. If it
+ * identifies the group as ranged, it'll access of the group has at least one shadow
+ * priest and a balance druid. If the group is melee, it requires one paladin, one warrior and
+ * one feral druid (tank or DPS).
+ *
+ * @param group The group to evaluate.
+ * @returns A report containing the meta information about the group.
+ */
+export function isIdealGroup(group: Character[]): GroupReviewResult {
+  const isGroupFull = group.length >= MAX_GROUP_SIZE;
+  const meleeDps = group.filter(
+    (t) =>
+      t.role === "Melee" ||
+      (t.role === "Tank" && t.class !== "Warlock") ||
+      t.class === "Hunter",
   );
-  const [healerPaladins, remainingHealers] = filterTwo(
-    allHealers,
-    (t) => t.class === "Paladin",
+  const isMeleeGroup = meleeDps.length >= 3;
+  const rangedDps = group.filter(
+    (t) =>
+      (t.role === "Ranged" || (t.role === "Tank" && t.class === "Warlock")) &&
+      t.class !== "Hunter",
   );
-  // Including warlocks here because of warlock tanks since they are somewhat different
-  const [allRanged, nonCasters] = filterTwo(
-    nonHealers,
-    (t) => t.role === "Ranged" || t.class === "Warlock",
+  const isRangedGroup = rangedDps.length >= 3;
+  const hasPaladin = Boolean(group.find((t) => t.class === "Paladin"));
+  const hasWarrior = Boolean(group.find((t) => t.class === "Warrior"));
+  const hasFeralDruid = Boolean(
+    group.find(
+      (t) => t.class === "Druid" && (t.role === "Tank" || t.role === "Melee"),
+    ),
   );
-  const [allMelee, meleeTanks] = filterTwo(
-    nonCasters,
-    (t) => t.role === "Melee" || (t.role === "Tank" && t.class === "Druid"),
+  const hasShadowPriest = Boolean(
+    group.find((t) => t.class === "Priest" && t.role === "Ranged"),
   );
-  const [meleeBuffers, nonBufferMelee] = filterTwo(
-    allMelee,
-    (t) => CLASS_ROLE_MAP[t.class][t.role].canBuff,
-  );
-  const [meleePaladins, nonBufferMeleeExcludingPaladins] = filterTwo(
-    nonBufferMelee,
-    (t) => t.class === "Paladin",
-  );
-  const [meleeDruids, remainingMelee] = filterTwo(
-    nonBufferMeleeExcludingPaladins,
-    (t) => t.class === "Druid",
-  );
-
-  // Final groups
-  const [rangedHunters, allCasters] = filterTwo(
-    allRanged,
-    (t) => t.class === "Hunter",
-  );
-  const [casterBuffers, nonBufferCasters] = filterTwo(
-    allCasters,
-    (t) => CLASS_ROLE_MAP[t.class][t.role].canBuff,
-  );
-  const [shadowPriests, remainingCasters] = filterTwo(
-    casterBuffers,
-    (t) => t.class === "Priest",
-  );
-  const [moonkins, miscBufferCasters] = filterTwo(
-    remainingCasters,
-    (t) => t.class === "Druid",
+  const hasBalanceDruid = Boolean(
+    group.find((t) => t.class === "Druid" && t.role === "Ranged"),
   );
 
-  nonBufferCasters.push(...miscBufferCasters);
-
-  // rangedHunters,
-  // nonBufferCasters,  allHealers, shadowPriests, moonkins,
-  // meleeTanks, meleeBuffers, remainingMelee, meleePaladins, meleeDruids
-
-  // Separate the healers the by class
-  const healersGroupedByClass = new Map<Class, Character[]>();
-  allHealers.forEach((currHealer) => {
-    const existing = healersGroupedByClass.get(currHealer.class) ?? [];
-
-    existing.push(currHealer);
-    healersGroupedByClass.set(currHealer.class, existing);
-
-    return healersGroupedByClass;
-  });
-
-  // We should try making 1 paladin per group too if possible
-  const numberOfMeleeGroups = Math.ceil(nonCasters.length / MAX_GROUP_SIZE);
-  const pureMeleeGroups = new Array(numberOfMeleeGroups).fill(null).map(() => {
-    const currGroup: Character[] = [];
-    const meleeBuffer = pickFirstAndRemoveFromArray(meleeBuffers);
-    if (meleeBuffer) {
-      currGroup.push(meleeBuffer);
-    }
-
-    // Paladins give horn buff, make them sure they are in melee groups.
-    // If there aren't sufficient melee paladins, use the healer ones.
-    const paladin =
-      pickFirstAndRemoveFromArray(meleePaladins) ??
-      pickFirstAndRemoveFromArray(healerPaladins);
-    if (paladin) {
-      currGroup.push(paladin);
-    }
-    const druid = pickFirstAndRemoveFromArray(meleeDruids);
-    if (druid) {
-      currGroup.push(druid);
-    }
-
-    for (let i = 0; i < MAX_NUMBER_OF_TANKS_PER_GROUP; i += 1) {
-      const tank = pickFirstAndRemoveFromArray(meleeTanks);
-      if (!tank) {
-        break;
-      }
-      currGroup.push(tank);
-    }
-
-    for (let i = currGroup.length; i < MAX_GROUP_SIZE; i += 1) {
-      const meleeDps = pickFirstAndRemoveFromArray(remainingMelee);
-      if (!meleeDps) {
-        break;
-      }
-      currGroup.push(meleeDps);
-    }
-
-    return currGroup;
-  });
-
-  const [completeMeleeGroups, incompleteMeleeGroups] = filterTwo(
-    pureMeleeGroups,
-    (t) => t.length === MAX_GROUP_SIZE,
-  );
-
-  const ungroupedMelee = incompleteMeleeGroups.flatMap((t) => t);
-  ungroupedMelee.push(
-    ...remainingMelee,
-    ...meleeTanks,
-    ...meleePaladins,
-    ...meleeBuffers,
-    ...meleeDruids,
-  );
-
-  const meleeGroups = [
-    ...completeMeleeGroups,
-    ...ungroupedMelee.reduce<Character[][]>((acc, next) => {
-      let lastGroup = acc[acc.length - 1];
-      if (lastGroup === undefined || lastGroup.length === MAX_GROUP_SIZE) {
-        lastGroup = [];
-        acc.push(lastGroup);
-      }
-
-      lastGroup.push(next);
-
-      return acc;
-    }, []),
-  ];
-
-  const numberOfCasterGroups = Math.ceil(
-    (allCasters.length + allHealers.length) / MAX_GROUP_SIZE,
-  );
-  const pureCasterGroups = new Array(numberOfCasterGroups)
-    .fill(null)
-    .map(() => {
-      const currGroup: Character[] = [];
-      const shadowPriest = pickFirstAndRemoveFromArray(shadowPriests);
-      if (shadowPriest) {
-        currGroup.push(shadowPriest);
-      }
-      const moonkin = pickFirstAndRemoveFromArray(moonkins);
-      if (moonkin) {
-        currGroup.push(moonkin);
-      }
-      const paladin = pickFirstAndRemoveFromArray(healerPaladins);
-      if (paladin) {
-        currGroup.push(paladin);
-      }
-
-      const remainingAmountOfHealersForGroup =
-        MAX_NUMBER_OF_HEALERS_PER_GROUP -
-        currGroup.filter((t) => t.role === "Healer").length;
-      for (let i = 0; i < remainingAmountOfHealersForGroup; i += 1) {
-        const healer = pickFirstAndRemoveFromArray(remainingHealers);
-        if (!healer) {
-          break;
-        }
-        currGroup.push(healer);
-      }
-
-      for (let i = currGroup.length; i < MAX_GROUP_SIZE; i += 1) {
-        const casterDps = pickFirstAndRemoveFromArray(nonBufferCasters);
-        if (!casterDps) {
-          break;
-        }
-        currGroup.push(casterDps);
-      }
-
-      return currGroup;
-    });
-
-  const [completeCasterGroups, incompleteCasterGroups] = filterTwo(
-    pureCasterGroups,
-    (t) => t.length === MAX_GROUP_SIZE,
-  );
-
-  const ungroupedCasters = incompleteCasterGroups.flatMap((t) => t);
-  ungroupedCasters.push(
-    ...remainingHealers,
-    ...nonBufferCasters,
-    ...healerPaladins,
-    ...moonkins,
-    ...shadowPriests,
-  );
-
-  const casterGroups = [
-    ...completeCasterGroups,
-    ...ungroupedCasters.reduce<Character[][]>((acc, next) => {
-      let lastGroup = acc[acc.length - 1];
-      if (lastGroup === undefined || lastGroup.length === MAX_GROUP_SIZE) {
-        lastGroup = [];
-        acc.push(lastGroup);
-      }
-
-      lastGroup.push(next);
-
-      return acc;
-    }, []),
-  ];
-
-  const groups = [...meleeGroups, ...casterGroups];
-
-  // Distribute all hunters through free slots in groups
-  const numberOfHunters = rangedHunters.length;
-  for (let i = 0; i < numberOfHunters; i += 1) {
-    const notFullGroup = groups.find((t) => t.length !== MAX_GROUP_SIZE);
-    if (!notFullGroup) {
-      break;
-    }
-
-    const currHunter = pickFirstAndRemoveFromArray(rangedHunters);
-    if (!currHunter) {
-      break;
-    }
-
-    notFullGroup.push(currHunter);
+  if (isMeleeGroup) {
+    return {
+      isGroupFull,
+      groupType: "Melee",
+      isIdealGroup: hasPaladin && hasWarrior && hasFeralDruid,
+    };
   }
 
-  const hunterGroups = rangedHunters.reduce<Character[][]>((acc, next) => {
-    let lastGroup = acc[acc.length - 1];
-    if (lastGroup === undefined || lastGroup.length === MAX_GROUP_SIZE) {
-      lastGroup = [];
-      acc.push(lastGroup);
-    }
-
-    lastGroup.push(next);
-
-    return acc;
-  }, []);
-
-  // If we have more than 8 groups we need to split the smaller groups ?
-
-  const merged = tryMergeGroups(
-    [...groups, ...hunterGroups].map((t) => ({ slots: t }) as Group),
-  );
-  const adjustedGroups = merged.map(
-    (currGroup) =>
-      ({
-        slots: new Array(MAX_GROUP_SIZE)
-          .fill(null)
-          .map((_, idx) => currGroup.slots[idx] ?? null),
-      }) as Group,
-  );
+  if (isRangedGroup) {
+    return {
+      isGroupFull,
+      groupType: "Ranged",
+      isIdealGroup: hasShadowPriest && hasBalanceDruid,
+    };
+  }
 
   return {
-    groups: adjustedGroups.sort(
-      (group1, group2) =>
-        group2.slots.filter((t) => t !== null).length -
-        group1.slots.filter((t) => t !== null).length,
-    ),
+    isGroupFull,
+    groupType: "Hybrid",
+    isIdealGroup:
+      hasPaladin &&
+      hasWarrior &&
+      hasFeralDruid &&
+      hasShadowPriest &&
+      hasBalanceDruid,
   };
+}
+
+function calculateMaximumNumberOfGroups(buffers: Character[][]): number {
+  const numberOfBuffersPerKind = buffers.map((t) => t.length);
+
+  return Math.max(...numberOfBuffersPerKind);
+}
+
+export function getMissingCharacters(
+  characters: Character[],
+  groups: Character[][],
+): Character[] {
+  const groupedCharacters = new Set(
+    groups.flatMap((t) => t).map((t) => t.name),
+  );
+
+  return characters.filter((t) => !groupedCharacters.has(t.name));
+}
+
+function calculateShortEndScore(
+  characterName: string,
+  playerInfo: PlayerInfo,
+  aggregateDataFromPLayer = false,
+): number {
+  const metadataOfCharacter = playerInfo.charactersMetadata.filter(
+    (t) => aggregateDataFromPLayer || t.characterName === characterName,
+  );
+
+  return metadataOfCharacter
+    .map((t) => t.shortEndCount)
+    .reduce((res, next) => res + next, 0);
+}
+
+/**
+ * This algorithm is deterministic meaning that it can be used to export the short-enders as
+ * these will always be the same, but should also depend on them.
+ */
+export function makeAssignments({
+  characters: allCharacters,
+  players,
+}: RaidAssignmentRoster): Raid {
+  const playerCharMap = new Map(
+    players
+      .map((t) =>
+        [t.mainName, ...t.altNames].map((x) => ({
+          charName: x,
+          data: {
+            discordId: t.discordId,
+            shortEndCount: calculateShortEndScore(x, t),
+          },
+        })),
+      )
+      .flatMap((t) => t)
+      .map(({ charName, data }) => [charName, data]),
+  );
+
+  // Round Robin all of these to groups
+  const characters = allCharacters.sort(
+    (a, b) =>
+      (playerCharMap.get(b.name)?.shortEndCount ?? 0) -
+      (playerCharMap.get(a.name)?.shortEndCount ?? 0),
+  );
+  const paladins = characters.filter((t) => t.class === "Paladin");
+  const feralDruids = characters.filter(
+    (t) => t.class === "Druid" && (t.role === "Melee" || t.role === "Tank"),
+  );
+  const warriors = characters.filter((t) => t.class === "Warrior");
+
+  // Figure out the number of groups
+  const numberOfIdealMeleeGroups = calculateMaximumNumberOfGroups([
+    paladins,
+    feralDruids,
+    warriors,
+  ]);
+  const meleeToBoost = characters.filter(
+    (t) => t.class === "Rogue" || t.class === "Hunter",
+  );
+  const allMeleeGroups: Character[][] = new Array(numberOfIdealMeleeGroups)
+    .fill(null)
+    .map(() => {
+      return [
+        ...paladins.splice(0, 1),
+        ...feralDruids.splice(0, 1),
+        ...warriors.splice(0, 1),
+        ...meleeToBoost.splice(0, 1),
+        ...meleeToBoost.splice(0, 1),
+      ];
+    });
+  const assignedMelee = new Set(
+    allMeleeGroups.flatMap((t) => t).map((t) => t.name),
+  );
+  const unassignedMelee = meleeToBoost
+    .filter((t) => !assignedMelee.has(t.name))
+    .map((t) => [t]);
+
+  // Healers and casters ordered by who has Atiesh
+  const casters = sortByBooleanPredicate(
+    characters.filter(
+      (t) =>
+        (t.role === "Healer" && t.class !== "Paladin") ||
+        (t.role === "Ranged" && t.class !== "Hunter") ||
+        (t.role === "Tank" && t.class === "Warlock"),
+    ),
+    (t) => hasAtiesh(t, players),
+  );
+  const balanceDruids = casters.filter(
+    (t) => t.class === "Druid" && t.role === "Ranged",
+  );
+  const shadowPriests = casters.filter(
+    (t) => t.class === "Priest" && t.role === "Ranged",
+  );
+
+  // Figure out the number of caster groups
+  const numberOfIdealCasterGroups = calculateMaximumNumberOfGroups([
+    balanceDruids,
+    shadowPriests,
+  ]);
+  const castersToBoost = casters.filter(
+    (t) => t.class === "Warlock" || t.class === "Mage" || t.role === "Healer",
+  );
+  const allCasterGroups: Character[][] = new Array(numberOfIdealCasterGroups)
+    .fill(null)
+    .map(() => {
+      return [
+        ...balanceDruids.splice(0, 1),
+        ...shadowPriests.splice(0, 1),
+        ...castersToBoost.splice(0, 1),
+        ...castersToBoost.splice(0, 1),
+        ...castersToBoost.splice(0, 1),
+      ];
+    });
+  const assignedCasters = new Set(
+    allCasterGroups.flatMap((t) => t).map((t) => t.name),
+  );
+  const unassignedCasters = castersToBoost
+    .filter((t) => !assignedCasters.has(t.name))
+    .map((t) => [t]);
+
+  const compressedMelee = mergeGroups([...allMeleeGroups, ...unassignedMelee]);
+  const compressedCasters = mergeGroups([
+    ...allCasterGroups,
+    ...unassignedCasters,
+  ]);
+  const allGroups: Group[] = mergeGroups([
+    ...compressedMelee,
+    ...compressedCasters,
+  ])
+    .sort((a, b) => b.length - a.length)
+    .map(([p1, p2, p3, p4, p5]) => ({
+      slots: [p1 ?? null, p2 ?? null, p3 ?? null, p4 ?? null, p5 ?? null],
+    }));
+
+  // Remove from max amount of players, remove the non-ideal groups first
+  return {
+    groups: allGroups,
+  };
+}
+
+export function getShortEndersOfRaid(
+  roster: RaidAssignmentRoster,
+): Character[] {
+  const allGroups = makeAssignments(roster).groups;
+  const areIdealGroups = allGroups.map((t) => ({
+    report: isIdealGroup(t.slots.filter((x): x is Character => Boolean(x))),
+    group: t,
+  }));
+  const shortEnders = areIdealGroups
+    .filter((t) => !t.report.isIdealGroup)
+    .flatMap((t) => t.group.slots)
+    .filter((t): t is Character => Boolean(t));
+
+  return shortEnders;
 }
 
 interface SoulStoneAssignments {
@@ -331,11 +266,12 @@ interface SoulStoneAssignments {
 export function makeWarlockSSRotation(
   roster: RaidAssignmentRoster,
 ): SoulStoneAssignments {
-  const healerToSoulStone = roster.characters.filter(
-    (t) =>
-      CLASS_ROLE_MAP[t.class][t.role].canResurrect &&
-      t.role === "Healer" &&
-      t.class !== "Paladin",
+  const healerToSoulStone = sortByClasses(
+    roster.characters.filter(
+      (t) =>
+        CLASS_ROLE_MAP[t.class][t.role].canResurrect && t.role === "Healer",
+    ),
+    ["Priest", "Druid", "Paladin"],
   )[0];
   const soulStoners = roster.characters.filter((t) => t.class === "Warlock");
 
@@ -351,8 +287,8 @@ export function toSoulStoneAssignment(
   characterPlayerMap: Map<string, PlayerInfo>,
 ): string {
   return `### Soul Stone rotation
-Soul Stone target will be <@${characterPlayerMap.get(assignment.healerToSoulStone.name)?.discordId}>. <@${characterPlayerMap.get(assignment.mainSoulStoner.name)?.discordId}> will be in charge of tracking the turns of soul stones. Which will be in order:
-${assignment.soulStoners.map((t, idx) => `${idx + 1}. <@${characterPlayerMap.get(t.name)?.discordId}>`).join("\n")}`;
+Soul Stone target will be ${assignment.healerToSoulStone.name} (<@${characterPlayerMap.get(assignment.healerToSoulStone.name)?.discordId}>). <@${characterPlayerMap.get(assignment.mainSoulStoner.name)?.discordId}> will be in charge of tracking the turns of soul stones. Which will be in order:
+${assignment.soulStoners.map((t, idx) => `${idx + 1}. ${t.name} (<@${characterPlayerMap.get(t.name)?.discordId}>)`).join("\n")}`;
 }
 
 export function toRwStoneAssignment(assignment: SoulStoneAssignments): string {
@@ -384,7 +320,7 @@ ${exportRaidGroupsToTable(raid)}
 ${discordSoulStoneAssignment}`;
 
   const officerAssignment = `${getRaidsortLuaAssignment(raid)}
-  ${toRwStoneAssignment}`;
+  ${toRwStoneAssignment(soulStoneAssignments)}`;
 
   return Promise.resolve({
     dmAssignment,
