@@ -32,4 +32,11 @@ RAID_HELPER_API_KEY="{RAIDER_HELPER_API_KEY_CAN_BE_OBTAINED_WITH_COMMAND_ON_DISC
 
 
 ## Backlog
-- All backlog has been completed!
+[X] Set the short enders when updating WBs
+[X] New group algorithm
+[X] Groups on KT interrupts are broken
+[X] Remove Faerlina Assignments
+[ ] Add short end based assignments
+[ ] Sapphiron
+[ ] Gothik
+[ ] Thaddius

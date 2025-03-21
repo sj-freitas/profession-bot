@@ -1,3 +1,4 @@
+import { CharacterMetadata } from "./character-metadata.config";
 import { SheetClient } from "./config";
 import { SheetTableConfig, TableWrapper } from "./table-wrapper";
 import { toColumnValue, toEntityValue } from "./table-wrapper-utils";
@@ -48,6 +49,10 @@ export interface PlayerInfo {
    * Characters that belong to this player that have the Atiesh staff.
    */
   atieshCharacters: string[];
+  /**
+   * Character Metadata associated with this player
+   */
+  charactersMetadata: CharacterMetadata[];
 }
 
 // Sheet table column names:
@@ -69,6 +74,7 @@ const config: SheetTableConfig<PlayerInfo> = {
     altNames: getCharactersFromCHars(allCharacterNames).alts,
     discordRoles: toEntityValue(discordRoles),
     atieshCharacters: [],
+    charactersMetadata: [],
   }),
   mapEntityToRaw: ({
     discordHandle,

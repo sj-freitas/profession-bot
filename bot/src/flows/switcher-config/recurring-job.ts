@@ -47,7 +47,7 @@ export async function tryUpdateSwitcherPost(
   const map = new Map<string, string>(flattenedCharacter);
 
   const formattedContent = `## Switcher List
-Names in bold are highlighted as main switchers and they should have slightly priority on gear and should end up doing these roles more frequently.
+Names in **bold** are highlighted as main switchers and they have higher priority on gear and will perform these roles more frequently.
 ${[...groupedByRole.entries()]
   .map(
     ([key, value]) => `### ${key}
