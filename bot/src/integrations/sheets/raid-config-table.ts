@@ -16,10 +16,11 @@ export interface RaidConfig {
   useWbItems: boolean;
   softresAmount: number;
   allowDuplicates: boolean;
+  usePointSystem: boolean;
 }
 
 const config: SheetTableConfig<RaidConfig> = {
-  tableRange: "A2:G",
+  tableRange: "A2:H",
   idColumnName: "raidId",
   mapRawToEntity: ([
     softresId,
@@ -29,6 +30,7 @@ const config: SheetTableConfig<RaidConfig> = {
     useWbItems,
     softresAmount,
     allowDuplicates,
+    usePointSystem,
   ]) => ({
     raidId: softresId,
     raidNameMatchingTerms: toEntityValue(raidNameMatchingTerms),
@@ -37,6 +39,7 @@ const config: SheetTableConfig<RaidConfig> = {
     useWbItems: useWbItems === "TRUE",
     softresAmount: parseIntOrDefault(softresAmount, DEFAULT_SOFTRES_AMOUNT),
     allowDuplicates: allowDuplicates === "TRUE",
+    usePointSystem: usePointSystem === "TRUE",
   }),
   mapEntityToRaw: ({
     raidId: softresId,
@@ -46,6 +49,7 @@ const config: SheetTableConfig<RaidConfig> = {
     useWbItems,
     softresAmount,
     allowDuplicates,
+    usePointSystem,
   }) => [
     softresId,
     toColumnValue(raidNameMatchingTerms),
@@ -54,6 +58,7 @@ const config: SheetTableConfig<RaidConfig> = {
     useWbItems ? "TRUE" : "FALSE",
     `${softresAmount}`,
     allowDuplicates ? "TRUE" : "FALSE",
+    usePointSystem ? "TRUE" : "FALSE",
   ],
 };
 

@@ -13,6 +13,7 @@ import { RaidAssignmentRoster } from "../classic-wow/raids/raid-assignment-roste
 import { RaidAssignmentResult } from "../classic-wow/raids/assignment-config";
 import { getTwinsAssignment } from "../classic-wow/raids/temple-of-aq/twin-emps";
 import { getBugTrioAssignment } from "../classic-wow/raids/temple-of-aq/bug-trio";
+import { getSapphironAssignment } from "../classic-wow/raids/naxxramas/sapphiron";
 import { getKelThuzadAssignment } from "../classic-wow/raids/naxxramas/kel-thuzad";
 import { getMaexxnaAssignment } from "../classic-wow/raids/naxxramas/maexxna";
 import { getPatchwerkAssignment } from "../classic-wow/raids/naxxramas/patchwerk";
@@ -33,6 +34,7 @@ export const ENCOUNTER_HANDLERS: { [key: string]: RaidAssignment } = {
   "naxx-loatheb": getLoathebAssignment,
   "naxx-patchwerk": getPatchwerkAssignment,
   "naxx-4hm": getFourHorsemenAssignmentAssignment,
+  "naxx-sapphiron": getSapphironAssignment,
   "naxx-kelthuzad": getKelThuzadAssignment,
 };
 

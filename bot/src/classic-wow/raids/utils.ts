@@ -207,3 +207,47 @@ export function sortByAtiesh(
     return 0;
   });
 }
+
+export function calculateShortEndScore(
+  characterName: string,
+  playerInfo: PlayerInfo,
+  aggregateDataFromPLayer = false,
+): number {
+  const metadataOfCharacter = playerInfo.charactersMetadata.filter(
+    (t) => aggregateDataFromPLayer || t.characterName === characterName,
+  );
+
+  return metadataOfCharacter
+    .map((t) => t.shortEndCount)
+    .reduce((res, next) => res + next, 0);
+}
+
+/**
+ * Returns the set of characters sorted by short-end from highest (unluckiest) to lowest (luckiest)
+ */
+export function sortByShortEnd(
+  characters: Character[],
+  playerInfos: PlayerInfo[],
+) {
+  const playerCharMap = new Map(
+    playerInfos
+      .map((t) =>
+        [t.mainName, ...t.altNames].map((x) => ({
+          charName: x,
+          data: {
+            discordId: t.discordId,
+            shortEndCount: calculateShortEndScore(x, t),
+          },
+        })),
+      )
+      .flatMap((t) => t)
+      .map(({ charName, data }) => [charName, data]),
+  );
+
+  // Round Robin all of these to groups
+  return characters.sort(
+    (a, b) =>
+      (playerCharMap.get(b.name)?.shortEndCount ?? 0) -
+      (playerCharMap.get(a.name)?.shortEndCount ?? 0),
+  );
+}

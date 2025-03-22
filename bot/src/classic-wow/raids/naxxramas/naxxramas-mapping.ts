@@ -3,6 +3,7 @@ import { getFourHorsemenAssignmentAssignment } from "./four-horsemen";
 import { getKelThuzadAssignment } from "./kel-thuzad";
 import { getLoathebAssignment } from "./loatheb";
 import { getMaexxnaAssignment } from "./maexxna";
+import { getSapphironAssignment } from "./sapphiron";
 import { getPatchwerkAssignment } from "./patchwerk";
 
 export const NAXXRAMAS: AssignmentConfig = {
@@ -12,6 +13,7 @@ export const NAXXRAMAS: AssignmentConfig = {
     getLoathebAssignment,
     getPatchwerkAssignment,
     getFourHorsemenAssignmentAssignment,
+    getSapphironAssignment,
     getKelThuzadAssignment,
   ],
 };

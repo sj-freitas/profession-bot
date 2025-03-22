@@ -8,15 +8,24 @@ import {
 } from "../../raid-assignment";
 import { RaidAssignmentResult } from "../assignment-config";
 import { RaidAssignmentRoster } from "../raid-assignment-roster";
-import { getCharactersOfPlayer, shuffleArray } from "../utils";
+import { getCharactersOfPlayer, sortByShortEnd } from "../utils";
 
-export function makeAssignments(roster: Character[]): TargetAssignment[] {
-  // Melee Group assignment
-  const druids = roster.filter(
-    (t) => t.class === "Druid" && (t.role === "Ranged" || t.role === "Healer"),
-  );
+const NUMBER_OF_COOLDOWN_USERS = 2;
+const NUMBER_OF_COCOON_KILLERS = 2;
 
-  const coolDownsOrder = shuffleArray([...druids]).slice(0, 2);
+export function makeAssignments(
+  roster: Character[],
+  players: PlayerInfo[],
+): TargetAssignment[] {
+  const druids = sortByShortEnd(
+    roster.filter(
+      (t) =>
+        t.class === "Druid" && (t.role === "Ranged" || t.role === "Healer"),
+    ),
+    players,
+  ).reverse();
+  const coolDownsOrder = druids.slice(0, NUMBER_OF_COOLDOWN_USERS);
+  const cocoonAssignment = druids.reverse().slice(0, NUMBER_OF_COCOON_KILLERS);
 
   return [
     {
@@ -29,6 +38,19 @@ export function makeAssignments(roster: Character[]): TargetAssignment[] {
           id: "Healer Cooldown",
           description: `Order of druid Barkskin rotation${coolDownsOrder.length < 2 ? " - to be complemented with tank cooldowns." : "."}`,
           characters: coolDownsOrder,
+        },
+      ],
+    },
+    {
+      raidTarget: {
+        icon: ALL_RAID_TARGETS.Cross,
+        name: `Players in charge of webbed players`,
+      },
+      assignments: [
+        {
+          id: "Cocoon Assignment",
+          description: `Players in charge of freeing webbed players`,
+          characters: cocoonAssignment,
         },
       ],
     },
@@ -92,7 +114,7 @@ export async function getMaexxnaAssignment({
   characters,
   players,
 }: RaidAssignmentRoster): Promise<RaidAssignmentResult> {
-  const assignments = makeAssignments(characters);
+  const assignments = makeAssignments(characters, players);
   const dmAssignment = [
     `# Copy the following assignments to their specific use cases
 ## Discord Assignment for the specific raid channel:
@@ -122,5 +144,6 @@ ${assignments[0].assignments[0].characters.map((x, idx) => ` ${idx + 1}. ${x.nam
     announcementAssignment,
     officerTitle: `### Maexxna Healing Cooldown assignments to post as a \`/rw\` in-game`,
     officerAssignment,
+    shortEnders: assignments[1].assignments[0].characters,
   });
 }
