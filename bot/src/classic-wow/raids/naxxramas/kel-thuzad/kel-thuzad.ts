@@ -1,15 +1,19 @@
-import { PlayerInfo } from "../../../integrations/sheets/player-info-table";
-import { filterTwo } from "../../../lib/array-utils";
-import { CLASS_ROLE_MAP } from "../../class-role";
+import { PlayerInfo } from "../../../../integrations/sheets/player-info-table";
+import { filterTwo } from "../../../../lib/array-utils";
+import { CLASS_ROLE_MAP } from "../../../class-role";
 import {
   ALL_RAID_TARGETS,
   AssignmentDetails,
   Character,
   TargetAssignment,
-} from "../../raid-assignment";
-import { RaidAssignmentResult } from "../assignment-config";
-import { RaidAssignmentRoster } from "../raid-assignment-roster";
-import { getCharactersOfPlayer, sortByClasses, sortByShortEnd } from "../utils";
+} from "../../../raid-assignment";
+import { RaidAssignmentResult } from "../../assignment-config";
+import { RaidAssignmentRoster } from "../../raid-assignment-roster";
+import {
+  getCharactersOfPlayer,
+  sortByClasses,
+  sortByShortEnd,
+} from "../../utils";
 import { drawImageAssignments } from "./kel-thuzad-hm4-image";
 
 export const NUMBER_OF_MELEE_SPOTS = 3;

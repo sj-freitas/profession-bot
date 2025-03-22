@@ -1,5 +1,5 @@
-import { isHealerCharacter, isMeleeCharacter } from "../../class-role";
-import { Character } from "../../raid-assignment";
+import { isHealerCharacter, isMeleeCharacter } from "../../../class-role";
+import { Character } from "../../../raid-assignment";
 import {
   ABSOLUTE_MAXIMUM_AMOUNT_OF_MELEE_IN_GROUP,
   makeAssignments,

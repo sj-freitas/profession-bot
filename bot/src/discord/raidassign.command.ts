@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { Database } from "../exports/mem-database";
-import { getCthunAssignment } from "../classic-wow/raids/temple-of-aq/cthun";
+import { getCthunAssignment } from "../classic-wow/raids/temple-of-aq/cthun/cthun";
 import { getSarturaAssignment } from "../classic-wow/raids/temple-of-aq/sartura";
 import { CommandHandler } from "./commandHandler";
 import { getGenericRaidAssignment } from "../classic-wow/raids/generic";
@@ -11,14 +11,15 @@ import {
 import { fetchEvent } from "../integrations/raid-helper/raid-helper-client";
 import { RaidAssignmentRoster } from "../classic-wow/raids/raid-assignment-roster";
 import { RaidAssignmentResult } from "../classic-wow/raids/assignment-config";
-import { getTwinsAssignment } from "../classic-wow/raids/temple-of-aq/twin-emps";
+import { getTwinsAssignment } from "../classic-wow/raids/temple-of-aq/twin-emperors";
 import { getBugTrioAssignment } from "../classic-wow/raids/temple-of-aq/bug-trio";
 import { getSapphironAssignment } from "../classic-wow/raids/naxxramas/sapphiron";
-import { getKelThuzadAssignment } from "../classic-wow/raids/naxxramas/kel-thuzad";
+import { getKelThuzadAssignment } from "../classic-wow/raids/naxxramas/kel-thuzad/kel-thuzad";
 import { getMaexxnaAssignment } from "../classic-wow/raids/naxxramas/maexxna";
 import { getPatchwerkAssignment } from "../classic-wow/raids/naxxramas/patchwerk";
 import { getLoathebAssignment } from "../classic-wow/raids/naxxramas/loatheb";
 import { getFourHorsemenAssignmentAssignment } from "../classic-wow/raids/naxxramas/four-horsemen";
+import { getGluthAssignment } from "../classic-wow/raids/naxxramas/gluth";
 
 type RaidAssignment = (
   roster: RaidAssignmentRoster,
@@ -33,6 +34,7 @@ export const ENCOUNTER_HANDLERS: { [key: string]: RaidAssignment } = {
   "naxx-maexxna": getMaexxnaAssignment,
   "naxx-loatheb": getLoathebAssignment,
   "naxx-patchwerk": getPatchwerkAssignment,
+  "naxx-gluth": getGluthAssignment,
   "naxx-4hm": getFourHorsemenAssignmentAssignment,
   "naxx-sapphiron": getSapphironAssignment,
   "naxx-kelthuzad": getKelThuzadAssignment,

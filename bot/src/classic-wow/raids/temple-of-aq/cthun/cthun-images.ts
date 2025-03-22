@@ -73,7 +73,7 @@ export async function drawImageAssignments(
 ): Promise<Buffer> {
   const groupCount = Math.max(Math.min(groupLeaders.length, 8), 4);
   const imageName = `cthun-assign-${groupCount}.png`;
-  const imageDir = `${path.resolve(__dirname, "../../../..")}/images/${imageName}`;
+  const imageDir = `${path.resolve(__dirname, "../../../../..")}/images/${imageName}`;
 
   const image = await loadImage(imageDir);
   const canvas = createCanvas(image.width, image.height);
