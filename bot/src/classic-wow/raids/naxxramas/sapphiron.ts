@@ -1,4 +1,5 @@
 import { PlayerInfo } from "../../../integrations/sheets/player-info-table";
+import { CLASS_ROLE_MAP } from "../../class-role";
 import {
   ALL_RAID_TARGETS,
   AssignmentDetails,
@@ -10,31 +11,31 @@ import { RaidAssignmentResult } from "../assignment-config";
 import { RaidAssignmentRoster } from "../raid-assignment-roster";
 import { getCharactersOfPlayer, sortByShortEnd } from "../utils";
 
-const MAX_NUMBER_OF_DRUIDS = 4;
+const MAX_NUMBER_OF_DECURSERS = 2;
 
 export function makeAssignments(
   roster: Character[],
   players: PlayerInfo[],
 ): TargetAssignment[] {
-  const druids = roster.filter(
-    (t) => t.class === "Druid" && (t.role === "Ranged" || t.role === "Healer"),
+  const damageDealerDecursers = roster.filter(
+    (t) => CLASS_ROLE_MAP[t.class][t.role].canDecurse && t.role !== "Healer",
   );
 
-  const coolDownsOrder = sortByShortEnd(druids, players)
+  const decurseAssignments = sortByShortEnd(damageDealerDecursers, players)
     .reverse()
-    .slice(0, MAX_NUMBER_OF_DRUIDS);
+    .slice(0, MAX_NUMBER_OF_DECURSERS);
 
   return [
     {
       raidTarget: {
         icon: ALL_RAID_TARGETS.Skull,
-        name: `Healing/Defensive CD order on MT`,
+        name: `Raid decurse assignments`,
       },
       assignments: [
         {
-          id: "Healer Cooldown",
-          description: `Order of druid Barkskin rotation${coolDownsOrder.length < MAX_NUMBER_OF_DRUIDS ? " - to be complemented with tank cooldowns." : "."}`,
-          characters: coolDownsOrder,
+          id: "Raid decurse assignments",
+          description: `Players who will be on decurse duty on Sapphiron`,
+          characters: decurseAssignments,
         },
       ],
     },
@@ -42,7 +43,7 @@ export function makeAssignments(
 }
 
 export function exportToDiscord(
-  loathebAssignment: TargetAssignment[],
+  sapphironAssignment: TargetAssignment[],
   player: PlayerInfo[],
 ): string {
   const characterDiscordHandleMap = new Map<string, string>();
@@ -56,7 +57,7 @@ export function exportToDiscord(
   const printAssignment = (currAssignment: AssignmentDetails) =>
     `${currAssignment.description} ${currAssignment.characters.map((t) => `<@${characterDiscordHandleMap.get(t.name)}>`).join(", ")}`;
 
-  return `${loathebAssignment.map((t) => `- ${t.raidTarget.icon.discordEmoji} [${t.raidTarget.icon.name}] (${t.raidTarget.name}): ${t.assignments.map(printAssignment).join(" ")} `).join("\n")}`;
+  return `${sapphironAssignment.map((t) => `- ${t.raidTarget.icon.discordEmoji} [${t.raidTarget.icon.name}] (${t.raidTarget.name}): ${t.assignments.map(printAssignment).join(" ")} `).join("\n")}`;
 }
 
 interface AssignmentInfo {
@@ -67,9 +68,9 @@ interface AssignmentInfo {
 }
 
 export function exportToRaidWarning(
-  loathebAssignments: TargetAssignment[],
+  sapphironAssignments: TargetAssignment[],
 ): string {
-  const groupedByAssignmentTypeId = loathebAssignments.reduce<AssignmentInfo>(
+  const groupedByAssignmentTypeId = sapphironAssignments.reduce<AssignmentInfo>(
     (res, curr) => {
       curr.assignments.forEach((t) => {
         res[t.id] = [
@@ -94,7 +95,7 @@ export function exportToRaidWarning(
     .join("\n");
 }
 
-export async function getLoathebAssignment({
+export async function getSapphironAssignment({
   characters,
   players,
 }: RaidAssignmentRoster): Promise<RaidAssignmentResult> {
@@ -102,7 +103,7 @@ export async function getLoathebAssignment({
   const dmAssignment = [
     `# Copy the following assignments to their specific use cases
 ## Discord Assignment for the specific raid channel:
-### Loatheb Assignments
+### Sapphiron Decurse Assignments
 \`\`\`
 ${exportToDiscord(assignments, players)}
 \`\`\`
@@ -124,9 +125,10 @@ ${assignments[0].assignments[0].characters.map((x, idx) => ` ${idx + 1}. ${x.nam
 
   return Promise.resolve({
     dmAssignment,
-    announcementTitle: "### Loatheb Healing Cooldown Assignment",
+    announcementTitle: "### Sapphiron Decurse Assignments",
     announcementAssignment,
-    officerTitle: `### Loatheb Healing Cooldown assignments to post as a \`/rw\` in-game`,
+    officerTitle: `### Sapphiron Decurse Assignments to post as a \`/rw\` in-game`,
     officerAssignment,
+    shortEnders: assignments[0].assignments[0].characters,
   });
 }

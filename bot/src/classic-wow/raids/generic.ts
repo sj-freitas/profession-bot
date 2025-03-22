@@ -10,6 +10,7 @@ import {
   getRaidsortLuaAssignment,
   hasAtiesh,
   sortByClasses,
+  sortByShortEnd,
 } from "./utils";
 import { mergeGroups } from "./utils/merge-groups";
 
@@ -102,20 +103,6 @@ export function getMissingCharacters(
   return characters.filter((t) => !groupedCharacters.has(t.name));
 }
 
-function calculateShortEndScore(
-  characterName: string,
-  playerInfo: PlayerInfo,
-  aggregateDataFromPLayer = false,
-): number {
-  const metadataOfCharacter = playerInfo.charactersMetadata.filter(
-    (t) => aggregateDataFromPLayer || t.characterName === characterName,
-  );
-
-  return metadataOfCharacter
-    .map((t) => t.shortEndCount)
-    .reduce((res, next) => res + next, 0);
-}
-
 /**
  * This algorithm is deterministic meaning that it can be used to export the short-enders as
  * these will always be the same, but should also depend on them.
@@ -124,27 +111,8 @@ export function makeAssignments({
   characters: allCharacters,
   players,
 }: RaidAssignmentRoster): Raid {
-  const playerCharMap = new Map(
-    players
-      .map((t) =>
-        [t.mainName, ...t.altNames].map((x) => ({
-          charName: x,
-          data: {
-            discordId: t.discordId,
-            shortEndCount: calculateShortEndScore(x, t),
-          },
-        })),
-      )
-      .flatMap((t) => t)
-      .map(({ charName, data }) => [charName, data]),
-  );
-
   // Round Robin all of these to groups
-  const characters = allCharacters.sort(
-    (a, b) =>
-      (playerCharMap.get(b.name)?.shortEndCount ?? 0) -
-      (playerCharMap.get(a.name)?.shortEndCount ?? 0),
-  );
+  const characters = sortByShortEnd(allCharacters, players);
   const paladins = characters.filter((t) => t.class === "Paladin");
   const feralDruids = characters.filter(
     (t) => t.class === "Druid" && (t.role === "Melee" || t.role === "Tank"),

@@ -6,6 +6,7 @@ export interface RoleFeatures {
   canBuff: boolean;
   canInterrupt: boolean;
   canResurrect: boolean;
+  canDecurse: boolean;
 }
 
 type RoleWithRoleFeatures = {
@@ -23,24 +24,28 @@ export const CLASS_ROLE_MAP: ClassRoleFeatures = {
       canBuff: false,
       canInterrupt: false,
       canResurrect: true,
+      canDecurse: false,
     },
     Melee: {
       canStun: false,
       canBuff: false,
       canInterrupt: false,
       canResurrect: true,
+      canDecurse: false,
     },
     Healer: {
       canStun: false,
       canBuff: false,
       canInterrupt: false,
       canResurrect: true,
+      canDecurse: true,
     },
     Ranged: {
       canStun: false,
       canBuff: true,
       canInterrupt: false,
       canResurrect: true,
+      canDecurse: true,
     },
   },
   Hunter: {
@@ -49,12 +54,14 @@ export const CLASS_ROLE_MAP: ClassRoleFeatures = {
       canBuff: false,
       canInterrupt: false,
       canResurrect: false,
+      canDecurse: false,
     },
     Ranged: {
       canStun: false,
       canBuff: false,
       canInterrupt: false,
       canResurrect: false,
+      canDecurse: false,
     },
   },
   Mage: {
@@ -63,12 +70,14 @@ export const CLASS_ROLE_MAP: ClassRoleFeatures = {
       canBuff: false,
       canInterrupt: true,
       canResurrect: false,
+      canDecurse: true,
     },
     Ranged: {
       canStun: false,
       canBuff: false,
       canInterrupt: true,
       canResurrect: false,
+      canDecurse: true,
     },
   },
   Paladin: {
@@ -77,18 +86,21 @@ export const CLASS_ROLE_MAP: ClassRoleFeatures = {
       canBuff: false,
       canInterrupt: false,
       canResurrect: true,
+      canDecurse: false,
     },
     Melee: {
       canStun: true,
       canBuff: false,
       canInterrupt: true,
       canResurrect: true,
+      canDecurse: false,
     },
     Healer: {
       canStun: false,
       canBuff: true,
       canInterrupt: false,
       canResurrect: true,
+      canDecurse: false,
     },
   },
   Priest: {
@@ -97,12 +109,14 @@ export const CLASS_ROLE_MAP: ClassRoleFeatures = {
       canBuff: true,
       canInterrupt: false,
       canResurrect: true,
+      canDecurse: false,
     },
     Healer: {
       canStun: false,
       canBuff: false,
       canInterrupt: false,
       canResurrect: true,
+      canDecurse: false,
     },
   },
   Rogue: {
@@ -111,12 +125,14 @@ export const CLASS_ROLE_MAP: ClassRoleFeatures = {
       canBuff: false,
       canInterrupt: true,
       canResurrect: false,
+      canDecurse: false,
     },
     Tank: {
       canStun: true,
       canBuff: false,
       canInterrupt: true,
       canResurrect: false,
+      canDecurse: false,
     },
   },
   Shaman: {
@@ -125,24 +141,28 @@ export const CLASS_ROLE_MAP: ClassRoleFeatures = {
       canBuff: false,
       canInterrupt: true,
       canResurrect: true,
+      canDecurse: false,
     },
     Healer: {
       canStun: false,
       canBuff: false,
       canInterrupt: true,
       canResurrect: true,
+      canDecurse: false,
     },
     Tank: {
       canStun: false,
       canBuff: true,
       canInterrupt: true,
       canResurrect: true,
+      canDecurse: false,
     },
     Melee: {
       canStun: false,
       canBuff: true,
       canInterrupt: true,
       canResurrect: true,
+      canDecurse: false,
     },
   },
   Warlock: {
@@ -151,12 +171,14 @@ export const CLASS_ROLE_MAP: ClassRoleFeatures = {
       canBuff: false,
       canInterrupt: false,
       canResurrect: false,
+      canDecurse: false,
     },
     Tank: {
       canStun: false,
       canBuff: false,
       canInterrupt: false,
       canResurrect: false,
+      canDecurse: false,
     },
   },
   Warrior: {
@@ -165,12 +187,14 @@ export const CLASS_ROLE_MAP: ClassRoleFeatures = {
       canBuff: false,
       canInterrupt: true,
       canResurrect: false,
+      canDecurse: false,
     },
     Melee: {
       canStun: false,
       canBuff: true,
       canInterrupt: true,
       canResurrect: false,
+      canDecurse: false,
     },
   },
 };

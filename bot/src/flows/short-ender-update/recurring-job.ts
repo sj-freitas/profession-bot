@@ -1,3 +1,6 @@
+import { Character } from "../../classic-wow/raid-assignment";
+import { INSTANCE_ASSIGNMENT_MAKERS } from "../../classic-wow/raids";
+import { AssignmentConfig as RaidAssignmentConfig } from "../../classic-wow/raids/assignment-config";
 import { CONFIG } from "../../config";
 import { Database } from "../../exports/mem-database";
 import {
@@ -9,6 +12,7 @@ import {
   createSheetClient,
   SheetClient,
 } from "../../integrations/sheets/config";
+import { getInstanceInfosFromRaidEventId } from "../raid-info-utils";
 import {
   getRosterFromRaidEvent,
   toRaidAssignmentRoster,
@@ -17,6 +21,7 @@ import { isRaidEventInAmountOfTime } from "../time-utils";
 import { updateShortEnders } from "./update-short-enders";
 
 const TWENTY_MINUTES_AFTER_RAID = -1 * 20 * 60 * 1000;
+const { INFO_SHEET } = CONFIG.GUILD;
 
 export async function updateShortEnderIfRaidIsOver(
   sheetClient: SheetClient,
@@ -34,8 +39,32 @@ export async function updateShortEnderIfRaidIsOver(
 
   const roster = await getRosterFromRaidEvent(raidEvent, database);
   const raidAssignmentRoster = toRaidAssignmentRoster(roster);
+  const associatedAssignmentConfigs = (
+    await getInstanceInfosFromRaidEventId(sheetClient, INFO_SHEET, raidEvent.id)
+  )
+    .filter((t) => t.usePointSystem)
+    .map((t) => INSTANCE_ASSIGNMENT_MAKERS.get(t.raidId))
+    .filter((t): t is RaidAssignmentConfig => Boolean(t));
 
-  await updateShortEnders(sheetClient, raidAssignmentRoster);
+  const allShortEnders = (
+    await Promise.all(
+      associatedAssignmentConfigs.map(async (assignmentConfig) => {
+        const allAssignmentsOfRaid = await Promise.all(
+          assignmentConfig.assignmentMakers.map(async (assignmentMaker) =>
+            assignmentMaker(raidAssignmentRoster),
+          ),
+        );
+        const shortEndersOfRaid = allAssignmentsOfRaid
+          .map((t) => t.shortEnders)
+          .filter((t): t is Character[] => Boolean(t) && Array.isArray(t))
+          .flatMap((t) => t);
+
+        return shortEndersOfRaid;
+      }),
+    )
+  ).flatMap((t) => t);
+
+  await updateShortEnders(sheetClient, raidAssignmentRoster, allShortEnders);
 }
 
 export async function pollChannelsToUpdateShortEndersAfterRaids(

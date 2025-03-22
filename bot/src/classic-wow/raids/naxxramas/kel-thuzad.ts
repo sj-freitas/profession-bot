@@ -9,7 +9,7 @@ import {
 } from "../../raid-assignment";
 import { RaidAssignmentResult } from "../assignment-config";
 import { RaidAssignmentRoster } from "../raid-assignment-roster";
-import { getCharactersOfPlayer, sortByClasses } from "../utils";
+import { getCharactersOfPlayer, sortByClasses, sortByShortEnd } from "../utils";
 import { drawImageAssignments } from "./kel-thuzad-hm4-image";
 
 export const NUMBER_OF_MELEE_SPOTS = 3;
@@ -99,7 +99,10 @@ function getInterrupters(characters: Character[]): Character[] {
   );
 }
 
-export function makeAssignments(roster: Character[]): {
+export function makeAssignments(
+  roster: Character[],
+  playerInfos: PlayerInfo[],
+): {
   mainTankAssignment: TargetAssignment;
   rangedAssignments: TargetAssignment[];
   meleeAssignments: TargetAssignment[];
@@ -206,9 +209,10 @@ export function makeAssignments(roster: Character[]): {
     ],
   };
 
-  const mageInterrupters = roster.filter(
-    (t) => t.class === "Mage" && t.role !== "Healer",
-  );
+  const mageInterrupters = sortByShortEnd(
+    roster.filter((t) => t.class === "Mage" && t.role !== "Healer"),
+    playerInfos,
+  ).reverse();
   const interrupts = {
     groupA: getInterrupters(meleeAssignments[0].assignments[0].characters),
     groupB: getInterrupters(meleeAssignments[1].assignments[0].characters),
@@ -233,11 +237,11 @@ export function makeAssignments(roster: Character[]): {
 export function exportToDiscord(
   kelThuzadAssignment: TargetAssignment[],
   interrupters: Interrupts,
-  player: PlayerInfo[],
+  playerInfos: PlayerInfo[],
 ): string {
   const characterDiscordHandleMap = new Map<string, string>();
 
-  player.forEach((currPlayer) => {
+  playerInfos.forEach((currPlayer) => {
     getCharactersOfPlayer(currPlayer).forEach((currCharacter) => {
       characterDiscordHandleMap.set(currCharacter, currPlayer.discordId);
     });
@@ -262,7 +266,7 @@ export async function getKelThuzadAssignment({
   characters,
   players,
 }: RaidAssignmentRoster): Promise<RaidAssignmentResult> {
-  const assignments = makeAssignments(characters);
+  const assignments = makeAssignments(characters, players);
   const allDpsAssignments = [
     ...assignments.meleeAssignments,
     ...assignments.rangedAssignments,

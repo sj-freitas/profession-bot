@@ -12,6 +12,7 @@ export interface InstanceInfo {
   raidId: string;
   useSoftres: boolean;
   useWorldBuffs: boolean;
+  usePointSystem: boolean;
 }
 
 /**
@@ -53,5 +54,6 @@ export async function getInstanceInfosFromRaidEventId(
     raidId: t.raidId,
     useSoftres: t.useSoftRes,
     useWorldBuffs: t.useWbItems,
+    usePointSystem: t.usePointSystem,
   }));
 }

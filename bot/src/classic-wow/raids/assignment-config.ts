@@ -1,3 +1,4 @@
+import { Character } from "../raid-assignment";
 import { RaidAssignmentRoster } from "./raid-assignment-roster";
 
 export interface AttachmentFile {
@@ -12,6 +13,7 @@ export interface RaidAssignmentResult {
   officerTitle?: string;
   officerAssignment?: string;
   files?: AttachmentFile[];
+  shortEnders?: Character[];
 }
 
 export type RaidAssignmentMaker = (
