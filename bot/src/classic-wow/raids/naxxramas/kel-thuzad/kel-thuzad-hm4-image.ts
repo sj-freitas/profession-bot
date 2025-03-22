@@ -59,7 +59,7 @@ export async function drawImageAssignments(
   healerGroups: string[][],
 ): Promise<Buffer> {
   const imageName = `kel-thuzad-assign.png`;
-  const imageDir = `${path.resolve(__dirname, "../../../..")}/images/${imageName}`;
+  const imageDir = `${path.resolve(__dirname, "../../../../..")}/images/${imageName}`;
 
   const image = await loadImage(imageDir);
   const canvas = createCanvas(image.width, image.height);

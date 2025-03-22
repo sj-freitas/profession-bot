@@ -39,6 +39,7 @@ RAID_HELPER_API_KEY="{RAIDER_HELPER_API_KEY_CAN_BE_OBTAINED_WITH_COMMAND_ON_DISC
 [X] Add short end based assignments to Maexxna
 [X] Sapphiron
 [X] Maexxna Cocoon Assignment
+[X] Gluth Assignment
 [X] Extra bonus "short-end" points if assigned to a not great task (Sapphiron, Maexxna)
 [ ] Gothik (undead, living setup)
 [ ] Thaddius (left = 1,3,5; right = 2,4,6)

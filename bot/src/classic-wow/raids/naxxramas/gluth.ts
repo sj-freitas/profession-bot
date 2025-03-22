@@ -1,5 +1,4 @@
 import { PlayerInfo } from "../../../integrations/sheets/player-info-table";
-import { CLASS_ROLE_MAP } from "../../class-role";
 import {
   ALL_RAID_TARGETS,
   AssignmentDetails,
@@ -11,31 +10,42 @@ import { RaidAssignmentResult } from "../assignment-config";
 import { RaidAssignmentRoster } from "../raid-assignment-roster";
 import { getCharactersOfPlayer, sortByShortEnd } from "../utils";
 
-const MAX_NUMBER_OF_DECURSERS = 2;
+const MAX_KITERS = 2;
 
 export function makeAssignments(
   roster: Character[],
   players: PlayerInfo[],
 ): TargetAssignment[] {
-  const damageDealerDecursers = roster.filter(
-    (t) => CLASS_ROLE_MAP[t.class][t.role].canDecurse && t.role !== "Healer",
+  // Get Ranged Hunters first
+  // Fill in empty spots with warlocks and melee hunters
+  const sortedCharacters = sortByShortEnd(roster, players).reverse();
+  const tanks = sortedCharacters.filter((t) => t.role === "Tank");
+  const rangedHunters = sortedCharacters.filter(
+    (t) => t.role === "Ranged" && t.class === "Hunter",
+  );
+  const availableTankKiters =
+    tanks.length > 1 ? tanks.filter((t) => t.class === "Warlock") : [];
+  const meleeHunters = sortedCharacters.filter(
+    (t) => t.role === "Melee" && t.class === "Hunter",
   );
 
-  const decurseAssignments = sortByShortEnd(damageDealerDecursers, players)
-    .reverse()
-    .slice(0, MAX_NUMBER_OF_DECURSERS);
+  const selectedKiters = [
+    ...rangedHunters,
+    ...availableTankKiters,
+    ...meleeHunters,
+  ].slice(0, MAX_KITERS);
 
   return [
     {
       raidTarget: {
-        icon: ALL_RAID_TARGETS.Skull,
-        name: `Raid decurse assignments`,
+        icon: ALL_RAID_TARGETS.Diamond,
+        name: `Kiting assignments`,
       },
       assignments: [
         {
-          id: "Raid decurse assignments",
-          description: `Players who will be on decurse duty on Sapphiron`,
-          characters: decurseAssignments,
+          id: "Kiter assignments",
+          description: `Players who will be on kiting the zombies on Gluth`,
+          characters: selectedKiters,
         },
       ],
     },
@@ -43,7 +53,7 @@ export function makeAssignments(
 }
 
 export function exportToDiscord(
-  sapphironAssignment: TargetAssignment[],
+  gluthAssignment: TargetAssignment[],
   player: PlayerInfo[],
 ): string {
   const characterDiscordHandleMap = new Map<string, string>();
@@ -57,7 +67,7 @@ export function exportToDiscord(
   const printAssignment = (currAssignment: AssignmentDetails) =>
     `${currAssignment.description} ${currAssignment.characters.map((t) => `<@${characterDiscordHandleMap.get(t.name)}>`).join(", ")}`;
 
-  return `${sapphironAssignment.map((t) => `- ${t.raidTarget.icon.discordEmoji} [${t.raidTarget.icon.name}] (${t.raidTarget.name}): ${t.assignments.map(printAssignment).join(" ")} `).join("\n")}`;
+  return `${gluthAssignment.map((t) => `- ${t.raidTarget.icon.discordEmoji} [${t.raidTarget.icon.name}] (${t.raidTarget.name}): ${t.assignments.map(printAssignment).join(" ")} `).join("\n")}`;
 }
 
 interface AssignmentInfo {
@@ -68,9 +78,9 @@ interface AssignmentInfo {
 }
 
 export function exportToRaidWarning(
-  sapphironAssignments: TargetAssignment[],
+  gluthAssignments: TargetAssignment[],
 ): string {
-  const groupedByAssignmentTypeId = sapphironAssignments.reduce<AssignmentInfo>(
+  const groupedByAssignmentTypeId = gluthAssignments.reduce<AssignmentInfo>(
     (res, curr) => {
       curr.assignments.forEach((t) => {
         res[t.id] = [
@@ -95,7 +105,7 @@ export function exportToRaidWarning(
     .join("\n");
 }
 
-export async function getSapphironAssignment({
+export async function getGluthAssignment({
   characters,
   players,
 }: RaidAssignmentRoster): Promise<RaidAssignmentResult> {
@@ -103,7 +113,7 @@ export async function getSapphironAssignment({
   const dmAssignment = [
     `# Copy the following assignments to their specific use cases
 ## Discord Assignment for the specific raid channel:
-### Sapphiron Decurse Assignments
+### Gluth Kiter Assignments
 \`\`\`
 ${exportToDiscord(assignments, players)}
 \`\`\`
@@ -120,14 +130,14 @@ ${exportToRaidWarning(assignments)}
 \`\`\`
 
 ### As a list for people to see:
-The players should manage to decurse as many as they can.
+The characters are in order and should cycle through
 ${assignments[0].assignments[0].characters.map((x, idx) => ` ${idx + 1}. ${x.name}`).join("\n")}`;
 
   return Promise.resolve({
     dmAssignment,
-    announcementTitle: "### Sapphiron Decurse Assignments",
+    announcementTitle: "### Gluth Kiter Assignments",
     announcementAssignment,
-    officerTitle: `### Sapphiron Decurse Assignments to post as a \`/rw\` in-game`,
+    officerTitle: `### Gluth Kiter Assignments to post as a \`/rw\` in-game`,
     officerAssignment,
     shortEnders: assignments[0].assignments[0].characters,
   });

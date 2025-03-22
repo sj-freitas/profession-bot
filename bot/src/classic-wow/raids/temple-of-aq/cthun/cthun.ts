@@ -1,17 +1,17 @@
-import { CLASS_ROLE_MAP, isMeleeCharacter } from "../../class-role";
+import { CLASS_ROLE_MAP, isMeleeCharacter } from "../../../class-role";
 import {
   ALL_RAID_TARGETS,
   Character,
   Group,
   Raid,
-} from "../../raid-assignment";
-import { RaidAssignmentResult } from "../assignment-config";
-import { RaidAssignmentRoster } from "../raid-assignment-roster";
+} from "../../../raid-assignment";
+import { RaidAssignmentResult } from "../../assignment-config";
+import { RaidAssignmentRoster } from "../../raid-assignment-roster";
 import {
   exportRaidGroupsToTable,
   exportToLuaTable,
   pickOneAtRandomAndRemoveFromArray,
-} from "../utils";
+} from "../../utils";
 import { drawImageAssignments } from "./cthun-images";
 
 export const IDEAL_NUMBER_OF_MELEE_PER_GROUP = 2;
