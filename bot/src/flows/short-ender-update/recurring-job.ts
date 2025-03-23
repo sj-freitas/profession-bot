@@ -8,6 +8,7 @@ import {
   fetchServerEvents,
 } from "../../integrations/raid-helper/raid-helper-client";
 import { RaidEvent } from "../../integrations/raid-helper/types";
+import { CharacterMetadataUpdateConfigTable } from "../../integrations/sheets/character-metadata-updade.config";
 import {
   createSheetClient,
   SheetClient,
@@ -64,7 +65,22 @@ export async function updateShortEnderIfRaidIsOver(
     )
   ).flatMap((t) => t);
 
+  const updateTable = new CharacterMetadataUpdateConfigTable(
+    sheetClient,
+    CONFIG.GUILD.INFO_SHEET,
+  );
+  const value = await updateTable.getValueById(CONFIG.GUILD.DISCORD_SERVER_ID);
+  if (value?.lastUpdatedRaidId === raidEvent.id) {
+    // No need to update
+    return;
+  }
+
   await updateShortEnders(sheetClient, raidAssignmentRoster, allShortEnders);
+  await updateTable.updateValue({
+    id: CONFIG.GUILD.DISCORD_SERVER_ID,
+    lastUpdatedRaidId: raidEvent.id,
+    lastUpdate: new Date(),
+  });
 }
 
 export async function pollChannelsToUpdateShortEndersAfterRaids(
