@@ -48,8 +48,8 @@ export async function updateShortEnders(
     )
     .map(([name, count]) => ({
       characterName: name,
-      shortEndCount: 1,
-      tierThreeSetBonusStatus: count,
+      shortEndCount: count,
+      tierThreeSetBonusStatus: 1,
     }));
 
   const allShortEndersToUpsert = [...existingShortEnders, ...newShortEnders];
