@@ -39,6 +39,7 @@ import { updateListOfAtieshCandidates } from "./flows/atiesh-flow/update-list-of
 import { updateAtieshSelectedMembers } from "./flows/atiesh-flow/update-selected-members";
 import { getMissingRaiderFromEmojiReaction } from "./discord/missing-reaction.command";
 import { tryLockSoftreserves } from "./flows/soft-reserves/try-lock-soft-reserves.job";
+import { pollChannelsToUpdateShortEndersAfterRaids } from "./flows/short-ender-update/recurring-job";
 
 const { RAID_SIGN_UP_CHANNELS } = CONFIG.GUILD;
 const FIVE_MINUTES = 5 * 60 * 1000;
@@ -307,6 +308,14 @@ async function bootstrapServer(): Promise<void> {
   void loop(
     async () =>
       pollChannelsForWorldBuffHistory(
+        database,
+        CONFIG.GUILD.RAID_SIGN_UP_CHANNELS,
+      ),
+    FORTY_FIVE_MINUTES,
+  );
+  void loop(
+    async () =>
+      pollChannelsToUpdateShortEndersAfterRaids(
         database,
         CONFIG.GUILD.RAID_SIGN_UP_CHANNELS,
       ),
