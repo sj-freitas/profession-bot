@@ -37,7 +37,7 @@ function calculateWhenToApplyCooldowns(
 
 export function makeAssignments(roster: Character[]): TargetAssignment[] {
   const tanks = roster.filter((t) => t.role === "Tank");
-  const sortedTanks = sortByClasses(tanks, [
+  const sortedMainTanks = sortByClasses(tanks, [
     "Warlock",
     "Shaman",
     "Warrior",
@@ -45,11 +45,11 @@ export function makeAssignments(roster: Character[]): TargetAssignment[] {
     "Rogue",
   ]);
 
-  const [mainTank, ...otherTanks] = sortedTanks;
-  const hatefulStrikeTanks = [...otherTanks].slice(
-    0,
-    NUMBER_OF_HATEFUL_STRIKE_TANKS,
-  );
+  const [mainTank, ...otherTanks] = sortedMainTanks;
+  const hatefulStrikeTanks = sortByClasses(
+    [...otherTanks],
+    ["Druid", "Rogue", "Warrior", "Paladin"],
+  ).slice(0, NUMBER_OF_HATEFUL_STRIKE_TANKS);
 
   const healers = roster.filter((t) => t.role === "Healer");
   const sortedHealers = sortByClasses(healers, ["Paladin", "Priest", "Druid"]);
