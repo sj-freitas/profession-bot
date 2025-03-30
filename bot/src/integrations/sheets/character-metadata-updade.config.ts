@@ -18,7 +18,7 @@ const config: SheetTableConfig<CharacterMetadataUpdate> = {
   mapEntityToRaw: ({ id, lastUpdatedRaidId, lastUpdate }) => [
     id,
     lastUpdatedRaidId,
-    lastUpdate.toDateString(),
+    lastUpdate.toString(),
   ],
 };
 
