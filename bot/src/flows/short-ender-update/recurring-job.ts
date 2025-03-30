@@ -47,6 +47,11 @@ export async function updateShortEnderIfRaidIsOver(
     .map((t) => INSTANCE_ASSIGNMENT_MAKERS.get(t.raidId))
     .filter((t): t is RaidAssignmentConfig => Boolean(t));
 
+  if (associatedAssignmentConfigs.length === 0) {
+    // No supported raids, therefore do not add the short enders
+    return;
+  }
+
   const allShortEnders = (
     await Promise.all(
       associatedAssignmentConfigs.map(async (assignmentConfig) => {
