@@ -223,7 +223,7 @@ export function makeAssignments(
     groupC: getInterrupters(meleeAssignments[2].assignments[0].characters),
   };
   for (const value of Object.values(interrupts)) {
-    if (value.length <= 1) {
+    if (value.length <= 1 && mageInterrupters.length !== 0) {
       const [mageToAdd] = mageInterrupters.splice(0, 1);
       value.push(mageToAdd);
     }

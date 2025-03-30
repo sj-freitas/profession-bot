@@ -20,7 +20,7 @@ async function main() {
   const database = new Database();
   await refreshDatabase(database);
 
-  const raidEvent = await fetchEvent("1350951772964782120");
+  const raidEvent = await fetchEvent("1353489743962443869");
   if (!raidEvent) {
     return;
   }
