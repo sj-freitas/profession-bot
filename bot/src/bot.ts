@@ -40,6 +40,8 @@ import { updateAtieshSelectedMembers } from "./flows/atiesh-flow/update-selected
 import { getMissingRaiderFromEmojiReaction } from "./discord/missing-reaction.command";
 import { tryLockSoftreserves } from "./flows/soft-reserves/try-lock-soft-reserves.job";
 import { pollChannelsToUpdateShortEndersAfterRaids } from "./flows/short-ender-update/recurring-job";
+import { updateAshbringerSelectedMembers } from "./flows/ashbringer-flow/update-selected-members";
+import { updateListOfAshbringerCandidates } from "./flows/ashbringer-flow/update-list-of-candidates";
 
 const { RAID_SIGN_UP_CHANNELS } = CONFIG.GUILD;
 const FIVE_MINUTES = 5 * 60 * 1000;
@@ -326,6 +328,14 @@ async function bootstrapServer(): Promise<void> {
   void loop(async () => updateListOfAtieshCandidates(discordClient), TWO_HOURS);
   void loop(
     async () => updateAtieshSelectedMembers(discordClient),
+    FIVE_MINUTES,
+  );
+  void loop(
+    async () => updateListOfAshbringerCandidates(discordClient),
+    TWO_HOURS,
+  );
+  void loop(
+    async () => updateAshbringerSelectedMembers(discordClient),
     FIVE_MINUTES,
   );
   void loop(
