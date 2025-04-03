@@ -60,8 +60,8 @@ ${ashbringerCandidateSelection.map((t, idx) => `${idx + 1}. <@${playerMainMap.ge
 
 We don't know exactly yet how The Ashbringer is obtained, but if there's a drop that is needed, the list is in the order of those drops. If a person isn't in a raid the next in line will get the item. If a person drops for any reason the next inline will be promoted, we'll keep the list at 3 people for as long as it makes sense.
 
-Congratulations to all of you, your efforts are well known and respected in this guild!
-Keep it up!`;
+You are an extremely valued member of our guild and we appreciate all you've done for us!
+Hope you'll bring destruction to our enemies!`;
 
   if (!ashbringerPostConfig.postMessageId) {
     const message = await announcementChannel.send(post);
