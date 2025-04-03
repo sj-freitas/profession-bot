@@ -8,6 +8,7 @@ import { AshbringerCandidate, AshbringerCandidatesTable } from "../../integratio
 
 const ACCEPTED_ASHBRINGER_CLASSES = new Set(["Warrior", "Hunter", "Paladin"]);
 const ACCEPTED_ASHBRINGER_ROLES = new Set(["Raider"]);
+const ACCEPTED_ASHBRINGER_SPECS = new Set(["Melee"]);
 
 export async function updateListOfAshbringerCandidates(
   discordClient: Client,
@@ -80,6 +81,9 @@ export async function updateListOfAshbringerCandidates(
     })
     .filter((t) => {
       return t.roles.cache.find((x) => ACCEPTED_ASHBRINGER_CLASSES.has(x.name));
+    })
+    .filter((t) => {
+      return t.roles.cache.find((x) => ACCEPTED_ASHBRINGER_SPECS.has(x.name));
     });
   const ashbringerCandidates: AshbringerCandidate[] = casterRaiders.map((t) => ({
     characterClass:
