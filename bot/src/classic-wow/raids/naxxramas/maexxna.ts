@@ -145,5 +145,10 @@ ${assignments[0].assignments[0].characters.map((x, idx) => ` ${idx + 1}. ${x.nam
     officerTitle: `### Maexxna Healing Cooldown assignments to post as a \`/rw\` in-game`,
     officerAssignment,
     shortEnders: assignments[1].assignments[0].characters,
+    assignedCharacters: [
+      ...new Set(
+        assignments.flatMap((t) => t.assignments.flatMap((x) => x.characters)),
+      ),
+    ],
   });
 }

@@ -2,6 +2,17 @@ import { SheetClient } from "./config";
 import { SheetTableConfig, TableWrapper } from "./table-wrapper";
 import { toColumnValue, toEntityValue } from "./table-wrapper-utils";
 
+function isValidateDate(dateString: unknown): boolean {
+  if (!dateString) {
+    return false;
+  }
+  if (typeof dateString !== "string") {
+    return false;
+  }
+
+  return !Number.isNaN(new Date(dateString).getTime());
+}
+
 export interface RaidInfo {
   eventId: string;
   serverId: string;
@@ -10,6 +21,7 @@ export interface RaidInfo {
   softresTokens: string[];
   rosterHash: string;
   lastUpdated: Date;
+  assignmentsLocked?: Date;
 }
 
 const config: SheetTableConfig<RaidInfo> = {
@@ -23,6 +35,7 @@ const config: SheetTableConfig<RaidInfo> = {
     softresTokens,
     rosterHash,
     lastUpdated,
+    assignmentsLocked,
   ]) => ({
     eventId,
     serverId,
@@ -31,6 +44,9 @@ const config: SheetTableConfig<RaidInfo> = {
     softresTokens: toEntityValue(softresTokens),
     rosterHash,
     lastUpdated: new Date(lastUpdated),
+    assignmentsLocked: isValidateDate(assignmentsLocked)
+      ? new Date(assignmentsLocked)
+      : undefined,
   }),
   mapEntityToRaw: ({
     eventId,
@@ -40,6 +56,7 @@ const config: SheetTableConfig<RaidInfo> = {
     softresTokens,
     rosterHash,
     lastUpdated,
+    assignmentsLocked,
   }) => [
     eventId,
     serverId,
@@ -48,6 +65,7 @@ const config: SheetTableConfig<RaidInfo> = {
     toColumnValue(softresTokens),
     rosterHash,
     lastUpdated.toString(),
+    assignmentsLocked ? assignmentsLocked.toString() : "",
   ],
 };
 

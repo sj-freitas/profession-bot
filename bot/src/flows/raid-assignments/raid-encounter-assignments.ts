@@ -9,6 +9,7 @@ import { INSTANCE_ASSIGNMENT_MAKERS } from "../../classic-wow/raids";
 import { createOrEditDiscordMessage } from "../../discord/utils";
 import { AttachmentFile } from "../../classic-wow/raids/assignment-config";
 
+const THIRTY_FIVE_MINUTES = 35 * 60 * 1000;
 const SIX_HOURS = 6 * 60 * 60 * 1000;
 const { INFO_SHEET, STAFF_RAID_CHANNEL_ID, DISCORD_SERVER_ID } = CONFIG.GUILD;
 
@@ -31,6 +32,10 @@ export async function tryPostFightAssignments(
 ): Promise<void> {
   // Check if it's 6 hours before the raid
   if (!isRaidEventInAmountOfTime(raidEvent, SIX_HOURS)) {
+    return;
+  }
+  // If it's 30 minutes before the raid, don't run this anymore
+  if (isRaidEventInAmountOfTime(raidEvent, THIRTY_FIVE_MINUTES)) {
     return;
   }
 

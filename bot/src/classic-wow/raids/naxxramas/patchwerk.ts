@@ -238,5 +238,10 @@ ${exportToRaidWarning(assignments)}
     announcementAssignment,
     officerTitle: `### Patchwork assignments to post as a \`/rw\` in-game`,
     officerAssignment,
+    assignedCharacters: [
+      ...new Set(
+        assignments.flatMap((t) => t.assignments.flatMap((x) => x.characters)),
+      ),
+    ],
   });
 }

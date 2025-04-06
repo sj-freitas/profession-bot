@@ -21,6 +21,7 @@ import { CONFIG } from "../../config";
 import { getInstanceInfosFromRaidEventId } from "../raid-info-utils";
 import { createSheetClient } from "../../integrations/sheets/config";
 
+const THIRTY_FIVE_MINUTES = 35 * 60 * 1000;
 const THREE_DAYS_BEFORE_RAID = 3 * 24 * 60 * 60 * 1000;
 const { INFO_SHEET, STAFF_RAID_CHANNEL_ID } = CONFIG.GUILD;
 
@@ -66,21 +67,13 @@ export async function tryPostWorldBuffAssignments(
   roster: Roster,
 ): Promise<void> {
   // Check if it's 3 days before the raid
-  // TODO STOP DOING IT AFTER THE ASSIGNMENT IS LOCKED
-  // WORLD_BUFF_ASSIGNMENT_LOCK_BEFORE_RAID_IN_SECONDS
   if (!isRaidEventInAmountOfTime(raidEvent, THREE_DAYS_BEFORE_RAID)) {
     return;
   }
-  // if (
-  //   isRaidEventInAmountOfTime(
-  //     raidEvent,
-  //     WORLD_BUFF_ASSIGNMENT_LOCK_BEFORE_RAID_IN_SECONDS,
-  //   )
-  // ) {
-  //   // DEBUG
-  //   // Stop running this update 24 hours before the raid.
-  //   return;
-  // }
+  if (isRaidEventInAmountOfTime(raidEvent, THIRTY_FIVE_MINUTES)) {
+    return;
+  }
+
   const instanceInfos = await getInstanceInfosFromRaidEventId(
     createSheetClient(),
     INFO_SHEET,

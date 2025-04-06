@@ -9,6 +9,7 @@ import {
 } from "../../discord/utils";
 import { getGenericRaidAssignment } from "../../classic-wow/raids/generic";
 
+const THIRTY_FIVE_MINUTES = 35 * 60 * 1000;
 const SIX_HOURS = 6 * 60 * 60 * 1000;
 const { DISCORD_SERVER_ID, STAFF_RAID_CHANNEL_ID } = CONFIG.GUILD;
 
@@ -53,6 +54,10 @@ export async function tryPostRaidComposition(
 ): Promise<void> {
   // Check if it's 6 hours before the raid
   if (!isRaidEventInAmountOfTime(raidEvent, SIX_HOURS)) {
+    return;
+  }
+  // If it's 30 minutes before the raid, don't run this anymore
+  if (isRaidEventInAmountOfTime(raidEvent, THIRTY_FIVE_MINUTES)) {
     return;
   }
 

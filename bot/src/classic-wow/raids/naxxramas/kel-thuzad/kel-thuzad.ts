@@ -326,6 +326,11 @@ ${exportToRaidWarning(assignments.interrupts)}
     announcementAssignment,
     officerTitle: `### Kel'Thuzad assignments to post as a \`/rw\` in-game`,
     officerAssignment,
+    assignedCharacters: [
+      ...assignments.interrupts.groupA,
+      ...assignments.interrupts.groupB,
+      ...assignments.interrupts.groupC,
+    ],
     files: [
       {
         attachment: kelThuzadImageBuffer,

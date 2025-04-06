@@ -80,6 +80,7 @@ export const handleCharacterAdd: CommandHandler<Database> = async ({
       discordRoles: [],
       atieshCharacters: [],
       charactersMetadata: [],
+      hasDmRaidAssignmentsEnabled: true,
     });
 
     // No characters registered, this is a main!

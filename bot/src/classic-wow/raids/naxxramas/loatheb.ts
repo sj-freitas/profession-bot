@@ -128,5 +128,10 @@ ${assignments[0].assignments[0].characters.map((x, idx) => ` ${idx + 1}. ${x.nam
     announcementAssignment,
     officerTitle: `### Loatheb Healing Cooldown assignments to post as a \`/rw\` in-game`,
     officerAssignment,
+    assignedCharacters: [
+      ...new Set(
+        assignments.flatMap((t) => t.assignments.flatMap((x) => x.characters)),
+      ),
+    ],
   });
 }

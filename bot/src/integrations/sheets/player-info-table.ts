@@ -46,6 +46,10 @@ export interface PlayerInfo {
    */
   discordRoles: string[];
   /**
+   * This is managed by individual players
+   */
+  hasDmRaidAssignmentsEnabled: boolean;
+  /**
    * Characters that belong to this player that have the Atiesh staff.
    */
   atieshCharacters: string[];
@@ -66,6 +70,7 @@ const config: SheetTableConfig<PlayerInfo> = {
     discordServerHandle,
     discordId,
     discordRoles,
+    hasDmRaidAssignmentsEnabled,
   ]) => ({
     discordHandle,
     discordId,
@@ -75,6 +80,7 @@ const config: SheetTableConfig<PlayerInfo> = {
     discordRoles: toEntityValue(discordRoles),
     atieshCharacters: [],
     charactersMetadata: [],
+    hasDmRaidAssignmentsEnabled: hasDmRaidAssignmentsEnabled === "TRUE",
   }),
   mapEntityToRaw: ({
     discordHandle,
@@ -83,12 +89,14 @@ const config: SheetTableConfig<PlayerInfo> = {
     mainName,
     altNames,
     discordRoles,
+    hasDmRaidAssignmentsEnabled,
   }) => [
     discordHandle,
     toCharsColumn(mainName, altNames),
     discordServerHandle,
     discordId,
     toColumnValue(discordRoles),
+    hasDmRaidAssignmentsEnabled ? "TRUE" : "FALSE",
   ],
 };
 
