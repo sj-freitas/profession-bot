@@ -62,7 +62,7 @@ export interface PlayerInfo {
 // Sheet table column names:
 // Discord handle,Character Names,Server Handle,Discord ID,	Discord Role (Updated every 24 hours)
 const config: SheetTableConfig<PlayerInfo> = {
-  tableRange: "A2:E",
+  tableRange: "A2:F",
   idColumnName: "discordId",
   mapRawToEntity: ([
     discordHandle,
