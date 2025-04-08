@@ -228,12 +228,12 @@ const commands = [
   new SlashCommandBuilder()
     .setName("assignment-opt-in")
     .setDescription(
-      "Opts in to receive DM assignments 30 minutes before the raid. You can opt-out at any time by doing /assignment-opt-out",
+      "Opts in to receive DM assignments 30 minutes before the raid.",
     ),
   new SlashCommandBuilder()
     .setName("assignment-opt-out")
     .setDescription(
-      "Opts out to receive DM assignments 30 minutes before the raid. You can opt-in at any time by doing /assignment-opt-in",
+      "Opts out to receive DM assignments 30 minutes before the raid.",
     ),
 ];
 
