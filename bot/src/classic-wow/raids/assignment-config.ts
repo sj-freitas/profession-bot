@@ -14,6 +14,7 @@ export interface RaidAssignmentResult {
   officerAssignment?: string;
   files?: AttachmentFile[];
   shortEnders?: Character[];
+  assignedCharacters?: Character[];
 }
 
 export type RaidAssignmentMaker = (

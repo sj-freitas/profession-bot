@@ -210,5 +210,10 @@ ${exportToRaidWarning(assignments)}
       },
     ],
     officerAssignment,
+    assignedCharacters: [
+      ...new Set(
+        assignments.flatMap((t) => t.assignments.flatMap((x) => x.characters)),
+      ),
+    ],
   });
 }

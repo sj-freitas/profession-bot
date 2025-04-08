@@ -42,6 +42,10 @@ import { tryLockSoftreserves } from "./flows/soft-reserves/try-lock-soft-reserve
 import { pollChannelsToUpdateShortEndersAfterRaids } from "./flows/short-ender-update/recurring-job";
 import { updateAshbringerSelectedMembers } from "./flows/ashbringer-flow/update-selected-members";
 import { updateListOfAshbringerCandidates } from "./flows/ashbringer-flow/update-list-of-candidates";
+import {
+  optInAssignmentsInDms,
+  optOutAssignmentsInDms,
+} from "./discord/opt-in-dm-assignments.command";
 
 const { RAID_SIGN_UP_CHANNELS } = CONFIG.GUILD;
 const FIVE_MINUTES = 5 * 60 * 1000;
@@ -221,6 +225,16 @@ const commands = [
         .setDescription("The emoji reaction to assess.")
         .setRequired(true),
     ),
+  new SlashCommandBuilder()
+    .setName("assignment-opt-in")
+    .setDescription(
+      "Opts in to receive DM assignments 30 minutes before the raid. You can opt-out at any time by doing /assignment-opt-out",
+    ),
+  new SlashCommandBuilder()
+    .setName("assignment-opt-out")
+    .setDescription(
+      "Opts out to receive DM assignments 30 minutes before the raid. You can opt-in at any time by doing /assignment-opt-in",
+    ),
 ];
 
 async function setupClient(database: Database): Promise<Client> {
@@ -280,6 +294,14 @@ async function setupClient(database: Database): Promise<Client> {
     {
       id: "missing-reaction",
       handler: getMissingRaiderFromEmojiReaction,
+    },
+    {
+      id: "assignment-opt-in",
+      handler: optInAssignmentsInDms,
+    },
+    {
+      id: "assignment-opt-out",
+      handler: optOutAssignmentsInDms,
     },
   ]);
 
@@ -368,6 +390,15 @@ async function bootstrapServer(): Promise<void> {
     async () => tryLockSoftreserves(discordClient, sheetClient),
     FIVE_MINUTES,
   );
+  // void loop(
+  //   async () =>
+  //     pollChannelsForDirectMessageAssignments(
+  //       discordClient,
+  //       database,
+  //       RAID_SIGN_UP_CHANNELS,
+  //     ),
+  //   FIVE_MINUTES,
+  // );
 
   try {
     console.log("Started refreshing application (/) commands.");

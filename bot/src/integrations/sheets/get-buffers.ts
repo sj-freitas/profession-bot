@@ -159,7 +159,7 @@ function readColumns(
 
   // Validate out of bounds
   for (let i = 0; i < numberOfColumns; i += 1) {
-    const currGroupTitle = table[0][readOffset + i];
+    const currGroupTitle = table[0]?.[readOffset + i];
     if (!currGroupTitle) {
       return null;
     }
