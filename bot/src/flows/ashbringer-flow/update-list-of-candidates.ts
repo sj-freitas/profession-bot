@@ -4,7 +4,10 @@ import { createSheetClient } from "../../integrations/sheets/config";
 import { PlayerInfoTable } from "../../integrations/sheets/player-info-table";
 import { fetchMemberOrNull } from "../../discord/utils";
 import { AshbringerPostConfigTable } from "../../integrations/sheets/ashbringer/ashbringer-post-config";
-import { AshbringerCandidate, AshbringerCandidatesTable } from "../../integrations/sheets/ashbringer/ashbringer-candidates-data";
+import {
+  AshbringerCandidate,
+  AshbringerCandidatesTable,
+} from "../../integrations/sheets/ashbringer/ashbringer-candidates-data";
 
 const ACCEPTED_ASHBRINGER_CLASSES = new Set(["Warrior", "Hunter", "Paladin"]);
 const ACCEPTED_ASHBRINGER_ROLES = new Set(["Raider"]);
@@ -85,13 +88,15 @@ export async function updateListOfAshbringerCandidates(
     .filter((t) => {
       return t.roles.cache.find((x) => ACCEPTED_ASHBRINGER_SPECS.has(x.name));
     });
-  const ashbringerCandidates: AshbringerCandidate[] = casterRaiders.map((t) => ({
-    characterClass:
-      t.roles.cache.find((x) => ACCEPTED_ASHBRINGER_CLASSES.has(x.name))?.name ??
-      "",
-    characterName: discordIdMainName.get(t.id) ?? "",
-    ashbringerStatus: "NotAnnounced",
-  }));
+  const ashbringerCandidates: AshbringerCandidate[] = casterRaiders.map(
+    (t) => ({
+      characterClass:
+        t.roles.cache.find((x) => ACCEPTED_ASHBRINGER_CLASSES.has(x.name))
+          ?.name ?? "",
+      characterName: discordIdMainName.get(t.id) ?? "",
+      ashbringerStatus: "NotAnnounced",
+    }),
+  );
 
   await ashbringerCandidatesTable.insertMany(
     ashbringerCandidates.sort((x, y) =>

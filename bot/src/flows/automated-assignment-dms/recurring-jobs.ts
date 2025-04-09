@@ -51,6 +51,7 @@ export async function pollChannelForDmAssignments(
   // Update the hash
   await raidInfoTable.updateValue({
     ...raidInfo,
+    lastUpdated: new Date(),
     assignmentsLocked: new Date(),
   });
 }
