@@ -88,12 +88,16 @@ export async function sendAssignmentDms(
       continue;
     }
 
-    const currUser = database.getPlayerInfos().find((t) => t.discordId === curr.currCharacter.player.discordId)
+    const currUser = database
+      .getPlayerInfos()
+      .find((t) => t.discordId === curr.currCharacter.player.discordId);
     if (!currUser || !currUser.hasDmRaidAssignmentsEnabled) {
-      return;
+      continue;
     }
 
-    const user = await discordClient.users.fetch(curr.currCharacter.player.discordId);
+    const user = await discordClient.users.fetch(
+      curr.currCharacter.player.discordId,
+    );
     if (!user) {
       continue;
     }

@@ -46,6 +46,7 @@ import {
   optInAssignmentsInDms,
   optOutAssignmentsInDms,
 } from "./discord/opt-in-dm-assignments.command";
+import { pollChannelsForDirectMessageAssignments } from "./flows/automated-assignment-dms/recurring-jobs";
 
 const { RAID_SIGN_UP_CHANNELS } = CONFIG.GUILD;
 const FIVE_MINUTES = 5 * 60 * 1000;
@@ -390,15 +391,15 @@ async function bootstrapServer(): Promise<void> {
     async () => tryLockSoftreserves(discordClient, sheetClient),
     FIVE_MINUTES,
   );
-  // void loop(
-  //   async () =>
-  //     pollChannelsForDirectMessageAssignments(
-  //       discordClient,
-  //       database,
-  //       RAID_SIGN_UP_CHANNELS,
-  //     ),
-  //   FIVE_MINUTES,
-  // );
+  void loop(
+    async () =>
+      pollChannelsForDirectMessageAssignments(
+        discordClient,
+        database,
+        RAID_SIGN_UP_CHANNELS,
+      ),
+    FIVE_MINUTES,
+  );
 
   try {
     console.log("Started refreshing application (/) commands.");
