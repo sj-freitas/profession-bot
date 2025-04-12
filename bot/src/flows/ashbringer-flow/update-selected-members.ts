@@ -48,20 +48,27 @@ export async function updateAshbringerSelectedMembers(
   }
 
   // Generate the post
-  const post = `# Ashbringer Nominee List
-These are the players that we have selected as the receivers of the Ashbringer. The list is on order of who'll get it, so first we'd like to congratulate <@${playerMainMap.get(ashbringerCandidateSelection[0].name)}>!
+  const post = `# The Ashbringer post
+They kept it from us in Naxxramas, but the Ashbringer is finally available, along with what looks like quite a challenging raid.
 
+Making this top ${ashbringerCandidateSelection.length} list was hard, and it's just the initial list. 
+We aim to hand out many more than this, because we hope to be cleaning up in this Scarlet raid for many months to come.
+
+But join us in congratulating:
+${ashbringerCandidateSelection.map((t, idx) => `${idx + 1}. <@${playerMainMap.get(t.name)}>`).join("\n")}
+on being our first Ashbringer recipients.
+
+Special note to <@${playerMainMap.get(ashbringerCandidateSelection[0].name)}>:
 > ${ashbringerCandidateSelection[0].reason}
 
-## Here's the current list of ${ashbringerCandidateSelection.length} Ashbringer Receivers
-The list is ordered by the officer's pick. If you have any questions regarding the order we are free to clarify.
+We don't have all the information on how the Ashbringer is obtained yet, but we know the first step is a seemingly 100% quest item drop, after which you take a short trip to Naxxramas, leading into a "splinter of Atiesh" style materials gathering quest in the Scarlet Raid. 
 
-${ashbringerCandidateSelection.map((t, idx) => `${idx + 1}. <@${playerMainMap.get(t.name)}>`).join("\n")}
+That last one mentioned will likely be the main bottleneck once we have most of the raid on farm, but we are crossing our fingers that it's tuned to be close to the same speed as Atiesh overall. We want to get as many of these out to people as possible.
 
-We don't know exactly yet how The Ashbringer is obtained, but if there's a drop that is needed, the list is in the order of those drops. If a person isn't in a raid the next in line will get the item. If a person drops for any reason the next inline will be promoted, we'll keep the list at 3 people for as long as it makes sense.
+With that goal in mind we encourage people to spend some time reading/watching guides, and to keep an eye on our discord channels for each boss. 
+As well as preparing for a challenging raid by stocking up on consumables. Both on your own and via GB-requests. 
 
-You are an extremely valued member of our guild and we appreciate all you've done for us!
-Hope you'll bring destruction to our enemies!`;
+The more prepared we are the faster we get a good feel for these bosses, and the faster we can start handing out the Shiny Swords to everyone who deserves them.`;
 
   if (!ashbringerPostConfig.postMessageId) {
     const message = await announcementChannel.send(post);
