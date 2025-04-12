@@ -8,7 +8,7 @@ import { AshbringerCandidateSelectionTable } from "../../integrations/sheets/ash
 export async function updateAshbringerSelectedMembers(
   discordClient: Client,
 ): Promise<void> {
-  if (new Date().getTime() <= new Date("12 April 2025 17:00 GMT").getTime()) {
+  if (new Date().getTime() <= new Date("12 April 2025 16:00 GMT").getTime()) {
     return;
   }
 
