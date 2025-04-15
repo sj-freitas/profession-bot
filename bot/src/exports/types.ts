@@ -7,7 +7,8 @@ export type AvailableProfession =
   | "Tailoring"
   | "Alchemy"
   | "Herbalism"
-  | "Engineering";
+  | "Engineering"
+  | "Cooking";
 
 const CRAFTING_PROFESSIONS: Set<AvailableProfession> = new Set([
   "Enchanting",
@@ -17,6 +18,7 @@ const CRAFTING_PROFESSIONS: Set<AvailableProfession> = new Set([
   "Alchemy",
   "Engineering",
   "Miner",
+  "Cooking"
 ]);
 
 export interface PlayerProfessionsData {
