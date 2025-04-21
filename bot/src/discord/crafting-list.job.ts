@@ -19,7 +19,7 @@ function splitByLines(text: string, numberOfLines: number): string[] {
     );
 }
 
-const NUMBER_OF_LINES_PER_POST = 15;
+const NUMBER_OF_LINES_PER_POST = 12;
 const RESPONSE_SHEET = "Responses";
 const CRAFTING_CHANNEL_ID = "1318686305609056346";
 
