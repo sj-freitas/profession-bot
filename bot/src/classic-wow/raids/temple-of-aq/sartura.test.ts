@@ -52,7 +52,7 @@ describe("sartura", () => {
             icon: {
               name: "Triangle",
               symbol: "{triangle}",
-              discordEmoji: ":evergreen_tree:",
+              discordEmoji: "<:Triangle:1345772816867528836>",
             },
             name: "Sartura",
           },
@@ -75,7 +75,7 @@ describe("sartura", () => {
             icon: {
               name: "Skull",
               symbol: "{skull}",
-              discordEmoji: ":skull:",
+              discordEmoji: "<:Skull:1345772813130399878>",
             },
             name: "Add 1",
           },
@@ -109,7 +109,7 @@ describe("sartura", () => {
             icon: {
               name: "Cross",
               symbol: "{cross}",
-              discordEmoji: ":x:",
+              discordEmoji: "<:Cross:1345772808231321762>",
             },
             name: "Add 2",
           },
@@ -143,7 +143,7 @@ describe("sartura", () => {
             icon: {
               name: "Square",
               symbol: "{square}",
-              discordEmoji: ":blue_square:",
+              discordEmoji: "<:Square:1345772815349059667>",
             },
             name: "Add 3",
           },
@@ -237,7 +237,7 @@ describe("sartura", () => {
             icon: {
               name: "Triangle",
               symbol: "{triangle}",
-              discordEmoji: ":evergreen_tree:",
+              discordEmoji: "<:Triangle:1345772816867528836>",
             },
             name: "Sartura",
           },
@@ -260,7 +260,7 @@ describe("sartura", () => {
             icon: {
               name: "Skull",
               symbol: "{skull}",
-              discordEmoji: ":skull:",
+              discordEmoji: "<:Skull:1345772813130399878>",
             },
             name: "Add 1",
           },
@@ -299,7 +299,7 @@ describe("sartura", () => {
             icon: {
               name: "Cross",
               symbol: "{cross}",
-              discordEmoji: ":x:",
+              discordEmoji: "<:Cross:1345772808231321762>",
             },
             name: "Add 2",
           },
@@ -338,7 +338,7 @@ describe("sartura", () => {
             icon: {
               name: "Square",
               symbol: "{square}",
-              discordEmoji: ":blue_square:",
+              discordEmoji: "<:Square:1345772815349059667>",
             },
             name: "Add 3",
           },
