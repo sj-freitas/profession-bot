@@ -136,3 +136,16 @@ export async function loop(
     });
   }
 }
+
+export async function preLoop(
+  callback: () => Promise<void>,
+  intervalInMs: number,
+) {
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    await new Promise((resolve) => {
+      setTimeout(resolve, intervalInMs);
+    });
+    await callback();
+  }
+}
