@@ -13,7 +13,8 @@ export function toMarkdown(
 ): string {
   return `
 # Profession Data
-This list is automatically updated, please add new submissions [here](https://docs.google.com/forms/d/e/1FAIpQLScb17YhYQOCUbBvTwO0CaYqvG145BkxOFdP2_uSvEhtGwg89Q/viewform?usp=dialog)
+This list is automatically updated, please add new submissions [here](https://docs.google.com/forms/d/e/1FAIpQLScb17YhYQOCUbBvTwO0CaYqvG145BkxOFdP2_uSvEhtGwg89Q/viewform?usp=dialog).
+You can search who can craft an item by typing \`/crafter <recipe name>\` anywhere on discord, or by using the discord search feature.
 
 ${[...data.entries()]
   .map(
