@@ -2,7 +2,7 @@
 import { REST, Routes, Events, SlashCommandBuilder, Client } from "discord.js";
 import { CONFIG } from "./config";
 import { Database } from "./exports/mem-database";
-import { loop, refreshDatabase } from "./exports/utils";
+import { loop, preLoop, refreshDatabase } from "./exports/utils";
 import { handleCrafter } from "./discord/professions.command";
 import { worldBuffsHandler } from "./discord/worldbuffs.command";
 import { raidAssignHandler } from "./discord/raidassign.command";
@@ -383,7 +383,7 @@ async function bootstrapServer(): Promise<void> {
     async () => tryUpdateSwitcherPost(discordClient, sheetClient),
     FORTY_FIVE_MINUTES,
   );
-  void loop(
+  void preLoop(
     async () => automaticFlushOfDiscordRoles(discordClient, sheetClient),
     TWO_HOURS,
   );
