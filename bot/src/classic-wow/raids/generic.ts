@@ -288,7 +288,7 @@ ${exportRaidGroupsToTable(raid)}
 ${discordSoulStoneAssignment}`;
 
   const officerAssignment = `${getRaidsortLuaAssignment(raid)}
-  ${toRwStoneAssignment(soulStoneAssignments)}`;
+${toRwStoneAssignment(soulStoneAssignments)}`;
 
   return Promise.resolve({
     dmAssignment,
