@@ -44,7 +44,7 @@ ${softReserveInfo
       curr,
     ) => `### For ${allSoftresRaidInfo.find((t) => t.raidId === curr.instanceRoster.instanceName)?.raidName}
 The following players haven't soft-reserved yet: ${curr.missingPlayers.map((t) => `<@${t.discordId}>`).join(", ")}
-**[Click here to fill your softres](${getSoftresLink(curr.instanceRoster.softresId)})**`,
+**[Click here to fill your softres](${getSoftresLink(curr.instanceRoster.softresId)})**${allSoftresRaidInfo.find((t) => t.raidId === curr.instanceRoster.instanceName)?.raidId === "scarletenclavesod" ? `\nPlease use the [Loot Sheets]("https://docs.google.com/spreadsheets/d/1OGGfGILi7NVMSuruLEzthW5hCVfal-aFLFutVh_Ibqc/edit?gid=0#gid=0") as reference` : ""}`,
   )
   .join("\n")}`;
 
