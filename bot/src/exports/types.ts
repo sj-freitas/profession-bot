@@ -18,7 +18,7 @@ const CRAFTING_PROFESSIONS: Set<AvailableProfession> = new Set([
   "Alchemy",
   "Engineering",
   "Miner",
-  "Cooking"
+  "Cooking",
 ]);
 
 export interface PlayerProfessionsData {
